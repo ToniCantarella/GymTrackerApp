@@ -44,6 +44,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,7 +57,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.ui.workouts.splitslist.SplitsScreen
+import com.example.gymtracker.ui.workouts.split.SplitScreen
+import com.example.gymtracker.ui.workouts.splitslist.SplitListScreen
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
@@ -72,21 +74,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @Serializable
-open class Route(
-    val alias: String
-) {
+open class Route {
     @Serializable
-    object Workouts : Route(alias = "workouts")
-    @Serializable
-    object Split : Route(alias = "split")
-    @Serializable
-    object AddSplit: Route(alias = "add-split")
+    object Workouts : Route()
 
     @Serializable
-    object Stats : Route(alias = "stats")
+    object SplitList : Route()
 
     @Serializable
-    object Test : Route(alias = "test")
+    class Split(val name: String) : Route()
+
+    @Serializable
+    object AddSplit : Route()
+
+    @Serializable
+    object Cardio : Route()
+
+    @Serializable
+    object CardioList : Route()
+
+    @Serializable
+    object Stats : Route()
+
+    @Serializable
+    object Test : Route()
 }
 
 data class BottomBarRoute<Route>(val titleResId: Int, val route: Route, val iconResInt: Int)
@@ -98,11 +109,32 @@ val bottomBarRoutes = listOf(
         iconResInt = R.drawable.weight
     ),
     BottomBarRoute(
+        titleResId = R.string.cardio,
+        route = Route.Cardio,
+        iconResInt = R.drawable.run
+    ),
+    BottomBarRoute(
         titleResId = R.string.stats,
         route = Route.Stats,
         iconResInt = R.drawable.stats
     )
 )
+
+@Composable
+fun GymFloatingActionButton(
+    onClick: () -> Unit,
+    icon: ImageVector
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null
+        )
+    }
+}
 
 @SuppressLint("RestrictedApi")
 @Composable
@@ -116,16 +148,15 @@ fun GymTrackerApp() {
         bottomBar = {
             BottomAppBar {
                 bottomBarRoutes.forEach { bottomBarRoute ->
-                    val selected =
-                        currentDestination?.hierarchy?.any { it.hasRoute(bottomBarRoute.route::class) }
+                    val selected = currentDestination?.hierarchy?.any {
+                        it.hasRoute(bottomBarRoute.route::class)
+                    }
                     if (selected != null) {
                         NavigationBarItem(
                             selected = selected,
                             onClick = {
-                                if (!selected) {
-                                    navController.navigate(bottomBarRoute.route) {
-                                        launchSingleTop = true
-                                    }
+                                navController.navigate(bottomBarRoute.route) {
+                                    launchSingleTop = true
                                 }
                             },
                             icon = {
@@ -146,19 +177,14 @@ fun GymTrackerApp() {
             }
         },
         floatingActionButton = {
-            when  {
-                currentDestination?.hierarchy?.any { it.hasRoute(Route.Split::class) } == true -> {
-                    FloatingActionButton(
-                        onClick = {
-                            navController.navigate(Route.AddSplit)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                    }
+            when {
+                currentDestination?.hierarchy?.any { it.hasRoute(Route.SplitList::class) } == true -> {
+                    GymFloatingActionButton(
+                        onClick = { navController.navigate(Route.AddSplit) },
+                        icon = Icons.Default.Add
+                    )
                 }
+
                 else -> {}
             }
         },
@@ -173,12 +199,23 @@ fun GymTrackerApp() {
             startDestination = Route.Workouts,
             modifier = Modifier.padding(innerPadding)
         ) {
-            navigation<Route.Workouts>(startDestination = Route.Split) {
+            navigation<Route.Workouts>(startDestination = Route.SplitList) {
+                composable<Route.SplitList> {
+                    SplitListScreen(
+                        onSplitClick = { navController.navigate(Route.Split(it)) }
+                    )
+                }
                 composable<Route.Split> {
-                    SplitsScreen()
+                    SplitScreen()
                 }
                 composable<Route.AddSplit> {
                     Text("add split")
+                }
+            }
+
+            navigation<Route.Cardio>(startDestination = Route.CardioList) {
+                composable<Route.CardioList> {
+                    Text("Cardiolist")
                 }
             }
 

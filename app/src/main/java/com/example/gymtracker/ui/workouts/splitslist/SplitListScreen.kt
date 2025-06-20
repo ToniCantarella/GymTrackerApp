@@ -24,24 +24,26 @@ private val splitsTestData = listOf(
 )
 
 @Composable
-fun SplitsScreen() {
-
-
-    SplitsScreen(
-        splits = splitsTestData
+fun SplitListScreen(
+    onSplitClick: (name: String) -> Unit
+) {
+    SplitListScreen(
+        splits = splitsTestData,
+        onSplitClick = onSplitClick
     )
 }
 
 @Composable
-fun SplitsScreen(
-    splits: List<String>
+fun SplitListScreen(
+    splits: List<String>,
+    onSplitClick: (name: String) -> Unit
 ) {
     Column (modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             items(splits) { split ->
                 Split(
                     split = split,
-                    onClick = {}
+                    onClick = {onSplitClick(split)}
                 )
             }
         }
@@ -75,8 +77,9 @@ private fun Split(
 @Composable
 private fun SplitsPreview() {
     GymTrackerTheme {
-        SplitsScreen(
-            splits = splitsTestData
+        SplitListScreen(
+            splits = splitsTestData,
+            onSplitClick = {}
         )
     }
 }

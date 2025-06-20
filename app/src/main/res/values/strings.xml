@@ -2,4 +2,5 @@
     <string name="app_name" translatable="false">Gym Tracker</string>
     <string name="workouts">Workouts</string>
     <string name="stats">Statistics</string>
+    <string name="cardio" translatable="false">Cardio</string>
 </resources>
