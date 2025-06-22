@@ -14,11 +14,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -30,7 +28,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -42,24 +39,18 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.example.gymtracker.ui.navigation.GymScaffold
+import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.workouts.split.SplitScreen
 import com.example.gymtracker.ui.workouts.splitslist.SplitListScreen
-import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,128 +64,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Serializable
-open class Route {
-    @Serializable
-    object Workouts : Route()
-
-    @Serializable
-    object SplitList : Route()
-
-    @Serializable
-    class Split(val name: String) : Route()
-
-    @Serializable
-    object AddSplit : Route()
-
-    @Serializable
-    object Cardio : Route()
-
-    @Serializable
-    object CardioList : Route()
-
-    @Serializable
-    object Stats : Route()
-
-    @Serializable
-    object Test : Route()
-}
-
-data class BottomBarRoute<Route>(val titleResId: Int, val route: Route, val iconResInt: Int)
-
-val bottomBarRoutes = listOf(
-    BottomBarRoute(
-        titleResId = R.string.workouts,
-        route = Route.Workouts,
-        iconResInt = R.drawable.weight
-    ),
-    BottomBarRoute(
-        titleResId = R.string.cardio,
-        route = Route.Cardio,
-        iconResInt = R.drawable.run
-    ),
-    BottomBarRoute(
-        titleResId = R.string.stats,
-        route = Route.Stats,
-        iconResInt = R.drawable.stats
-    )
-)
-
-@Composable
-fun GymFloatingActionButton(
-    onClick: () -> Unit,
-    icon: ImageVector
-) {
-    FloatingActionButton(
-        onClick = onClick,
-        shape = MaterialTheme.shapes.extraLarge
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null
-        )
-    }
-}
-
 @SuppressLint("RestrictedApi")
 @Composable
 fun GymTrackerApp() {
     val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-    val navigationAnimationMove = 1500
+    val navigationAnimationMoveInt = 1500
 
-    Scaffold(
-        bottomBar = {
-            BottomAppBar {
-                bottomBarRoutes.forEach { bottomBarRoute ->
-                    val selected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(bottomBarRoute.route::class)
-                    }
-                    if (selected != null) {
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(bottomBarRoute.route) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(bottomBarRoute.iconResInt),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = bottomBarRoute.titleResId)
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-        },
-        floatingActionButton = {
-            when {
-                currentDestination?.hierarchy?.any { it.hasRoute(Route.SplitList::class) } == true -> {
-                    GymFloatingActionButton(
-                        onClick = { navController.navigate(Route.AddSplit) },
-                        icon = Icons.Default.Add
-                    )
-                }
-
-                else -> {}
-            }
-        },
-        modifier = Modifier.fillMaxSize()
+    GymScaffold(
+        navController = navController
     ) { innerPadding ->
         NavHost(
-            enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMove }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMove }) },
-            popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMove }) },
-            popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMove }) },
+            enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMoveInt }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMoveInt }) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
+            popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
             navController = navController,
             startDestination = Route.Workouts,
             modifier = Modifier.padding(innerPadding)
@@ -202,7 +85,8 @@ fun GymTrackerApp() {
             navigation<Route.Workouts>(startDestination = Route.SplitList) {
                 composable<Route.SplitList> {
                     SplitListScreen(
-                        onSplitClick = { navController.navigate(Route.Split(it)) }
+                        onSplitNavigate = { navController.navigate(Route.Split(it)) },
+                        onNavigateToAddSplit = { navController.navigate(Route.AddSplit) }
                     )
                 }
                 composable<Route.Split> {

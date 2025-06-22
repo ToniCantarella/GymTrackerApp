@@ -2,5 +2,18 @@
     <string name="app_name" translatable="false">Gym Tracker</string>
     <string name="workouts">Workouts</string>
     <string name="stats">Statistics</string>
-    <string name="cardio" translatable="false">Cardio</string>
+    <string name="cardio">Cardio</string>
+    <string name="km" translatable="false">km</string>
+    <string name="m" translatable="false">m</string>
+    <string name="kg" translatable="false">kg</string>
+    <string name="mi" translatable="false">mi</string>
+    <string name="yd" translatable="false">yd</string>
+    <string name="lb" translatable="false">lb</string>
+    <string name="oz" translatable="false">oz</string>
+    <string name="personal_record">Personal record (PR)</string>
+    <string name="workouts_intro">Here you can create your personal list of workouts per day. For example: leg day, push movements, full body workout…</string>
+    <string name="cardio_intro">Here you can create your personal list of other types of exercises like running, yoga, stretching…</string>
+    <string name="stats_intro">When you start listing and tracking your workouts/exercises, data will be displayed here.</string>
+    <string name="last_time">Last time</string>
+    <string name="delete_items">Delete items</string>
 </resources>
