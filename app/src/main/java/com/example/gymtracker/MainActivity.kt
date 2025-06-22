@@ -8,7 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +41,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,8 +54,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.theme.GymTrackerTheme
+import com.example.gymtracker.ui.welcome.WelcomeScreen
 import com.example.gymtracker.ui.workouts.split.SplitScreen
 import com.example.gymtracker.ui.workouts.splitslist.SplitListScreen
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,45 +74,65 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("RestrictedApi")
 @Composable
 fun GymTrackerApp() {
+    val viewModel = koinViewModel<AppViewModel>()
+    val appUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
     val navigationAnimationMoveInt = 1500
 
-    GymScaffold(
-        navController = navController
-    ) { innerPadding ->
-        NavHost(
-            enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMoveInt }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMoveInt }) },
-            popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
-            popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
-            navController = navController,
-            startDestination = Route.Workouts,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            navigation<Route.Workouts>(startDestination = Route.SplitList) {
-                composable<Route.SplitList> {
-                    SplitListScreen(
-                        onSplitNavigate = { navController.navigate(Route.Split(it)) },
-                        onNavigateToAddSplit = { navController.navigate(Route.AddSplit) }
+    if (appUiState.loading){
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+        ){
+            CircularProgressIndicator()
+        }
+    } else {
+        GymScaffold(
+            navController = navController
+        ) { innerPadding ->
+            NavHost(
+                enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMoveInt }) },
+                exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMoveInt }) },
+                popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
+                popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
+                navController = navController,
+                startDestination = appUiState.initialRoute,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable<Route.Welcome> {
+                    WelcomeScreen(
+                        onUnderstoodClick = {
+                            viewModel.onUserWelcomed()
+                            navController.navigate(Route.Workouts)
+                        }
                     )
                 }
-                composable<Route.Split> {
-                    SplitScreen()
-                }
-                composable<Route.AddSplit> {
-                    Text("add split")
-                }
-            }
 
-            navigation<Route.Cardio>(startDestination = Route.CardioList) {
-                composable<Route.CardioList> {
-                    Text("Cardiolist")
+                navigation<Route.Workouts>(startDestination = Route.SplitList) {
+                    composable<Route.SplitList> {
+                        SplitListScreen(
+                            onSplitNavigate = { navController.navigate(Route.Split(it)) },
+                            onNavigateToAddSplit = { navController.navigate(Route.AddSplit) }
+                        )
+                    }
+                    composable<Route.Split> {
+                        SplitScreen()
+                    }
+                    composable<Route.AddSplit> {
+                        Text("add split")
+                    }
                 }
-            }
 
-            navigation<Route.Stats>(startDestination = Route.Test) {
-                composable<Route.Test> {
-                    Text("stats")
+                navigation<Route.Cardio>(startDestination = Route.CardioList) {
+                    composable<Route.CardioList> {
+                        Text("Cardiolist")
+                    }
+                }
+
+                navigation<Route.Stats>(startDestination = Route.Test) {
+                    composable<Route.Test> {
+                        Text("stats")
+                    }
                 }
             }
         }

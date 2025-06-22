@@ -9,4 +9,7 @@
     <string name="stats_intro">Kun aloitat kirjaamaan ja seuraamaan treenejäsi/liikuntaasi, tilastot näytetään täällä.</string>
     <string name="last_time">Viime kerta</string>
     <string name="delete_items">Poista kohteita</string>
+    <string name="understood">Ymmärrän</string>
+    <string name="welcome">Tervetuloa!</string>
+    <string name="welcome_text">Kaikki mitä luot tällä sovelluksella tallennetaan vain ja ainoastaan laitteellesi. Emme seuraa dataasi ollenkaan. Voit poistaa kaikki tiedot koska tahansa ja aloittaa alusta.</string>
 </resources>

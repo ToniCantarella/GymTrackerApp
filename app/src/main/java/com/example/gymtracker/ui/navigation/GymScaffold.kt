@@ -29,6 +29,10 @@ fun GymScaffold(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    val matchesBottomBarRoute = bottomBarRoutes.any { bottomBarRoute ->
+        currentDestination?.hierarchy?.any { it.hasRoute(bottomBarRoute.route::class) } == true
+    }
+
     Scaffold(
         topBar = {
             GymTopAppBar(
@@ -36,12 +40,12 @@ fun GymScaffold(
             )
         },
         bottomBar = {
-            BottomAppBar {
-                bottomBarRoutes.forEach { bottomBarRoute ->
-                    val selected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(bottomBarRoute.route::class)
-                    }
-                    if (selected != null) {
+            if (matchesBottomBarRoute && currentDestination != null) {
+                BottomAppBar {
+                    bottomBarRoutes.forEach { bottomBarRoute ->
+                        val selected = currentDestination.hierarchy.any {
+                            it.hasRoute(bottomBarRoute.route::class)
+                        }
                         NavigationBarItem(
                             selected = selected,
                             onClick = {
@@ -67,9 +71,9 @@ fun GymScaffold(
             }
         },
         floatingActionButton = {
-                GymFloatingActionButton(
-                    navBackStackEntry = navBackStackEntry
-                )
+            GymFloatingActionButton(
+                navBackStackEntry = navBackStackEntry
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -79,6 +83,9 @@ fun GymScaffold(
 
 @Serializable
 open class Route {
+    @Serializable
+    object Welcome : Route()
+
     @Serializable
     object Workouts : Route()
 
