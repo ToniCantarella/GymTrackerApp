@@ -31,6 +31,7 @@ fun GymFloatingActionButton(
 @Composable
 fun ProvideFloatingActionButton(
     onClick: () -> Unit,
+    visible: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val viewModelStoreOwner = LocalViewModelStoreOwner.current
@@ -39,8 +40,8 @@ fun ProvideFloatingActionButton(
             viewModelStoreOwner = owner,
             initializer = { GymFloatingActionButtonViewModel() },
         )
-        LaunchedEffect(onClick, content) {
-            viewModel.showFab = true
+        LaunchedEffect(onClick, visible, content) {
+            viewModel.showFab = visible
 
             viewModel.onClick = onClick
             viewModel.content = content

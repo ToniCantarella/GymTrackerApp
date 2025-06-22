@@ -11,7 +11,7 @@ data class SplitListUiState(
     val itemsToDelete: List<Long> = emptyList()
 )
 
-class SplitListViewModel: ViewModel() {
+class SplitListViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SplitListUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -35,7 +35,9 @@ class SplitListViewModel: ViewModel() {
     fun onSelectForDeletion(id: Long) {
         _uiState.update {
             it.copy(
-                itemsToDelete = it.itemsToDelete + listOf(id)
+                itemsToDelete =
+                    if (it.itemsToDelete.contains(id)) it.itemsToDelete.filter { item -> id != item }
+                    else it.itemsToDelete + listOf(id)
             )
         }
     }

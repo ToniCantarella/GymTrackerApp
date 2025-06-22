@@ -75,6 +75,13 @@ fun SplitListScreen(
                         contentDescription = null
                     )
                 }
+                IconButton(onClick = {}) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        tint = MaterialTheme.colorScheme.onError,
+                        contentDescription = null
+                    )
+                }
             } else {
                 IconButton(
                     onClick = viewModel::startSelectingForDeletion
@@ -89,7 +96,8 @@ fun SplitListScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = onNavigateToAddSplit
+        onClick = onNavigateToAddSplit,
+        visible = !uiState.selectingItemsToDelete
     ) {
         Icon(
             imageVector = Icons.Default.Add,
