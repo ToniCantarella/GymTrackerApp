@@ -19,4 +19,7 @@
     <string name="understood">I understand</string>
     <string name="welcome">Welcome!</string>
     <string name="welcome_text">Everything you create with this app is saved only on your device. We do not track any of your data. You can delete all data at any time and start from the beginning.</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="delete_are_you_sure">Are you sure you want to delete %s items?</string>
 </resources>

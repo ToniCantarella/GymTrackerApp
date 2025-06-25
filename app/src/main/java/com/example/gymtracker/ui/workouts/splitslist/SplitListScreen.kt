@@ -4,6 +4,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,17 +15,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -33,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
@@ -63,6 +70,7 @@ fun SplitListScreen(
     viewModel: SplitListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var confirmDeletionDialogOpen by remember { mutableStateOf(false) }
 
     ProvideTopAppBar(
         actions = {
@@ -75,10 +83,13 @@ fun SplitListScreen(
                         contentDescription = null
                     )
                 }
-                IconButton(onClick = {}) {
+                IconButton(
+                    onClick = { confirmDeletionDialogOpen = true },
+                    enabled = uiState.itemsToDelete.isNotEmpty()
+                ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        tint = MaterialTheme.colorScheme.onError,
+                        tint = MaterialTheme.colorScheme.error,
                         contentDescription = null
                     )
                 }
@@ -103,6 +114,46 @@ fun SplitListScreen(
             imageVector = Icons.Default.Add,
             contentDescription = null
         )
+    }
+
+    if (confirmDeletionDialogOpen) {
+        Dialog(
+            onDismissRequest = { confirmDeletionDialogOpen = false }
+        ) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(dimensionResource(id = R.dimen.padding_large))
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.delete_are_you_sure, uiState.itemsToDelete.size),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        OutlinedButton (
+                            onClick = {confirmDeletionDialogOpen = false}
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.cancel)
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                        Button(
+                            onClick = {}
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.delete)
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     SplitListScreen(

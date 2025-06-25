@@ -12,4 +12,7 @@
     <string name="understood">Ymmärrän</string>
     <string name="welcome">Tervetuloa!</string>
     <string name="welcome_text">Kaikki mitä luot tällä sovelluksella tallennetaan vain ja ainoastaan laitteellesi. Emme seuraa dataasi ollenkaan. Voit poistaa kaikki tiedot koska tahansa ja aloittaa alusta.</string>
+    <string name="cancel">Peruuta</string>
+    <string name="delete">Poista</string>
+    <string name="delete_are_you_sure">Oletko varma että haluat poistaa %s kohdetta?</string>
 </resources>

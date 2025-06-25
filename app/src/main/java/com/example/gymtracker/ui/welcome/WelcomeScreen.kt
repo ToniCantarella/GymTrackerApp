@@ -28,31 +28,34 @@ fun WelcomeScreen(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(dimensionResource(id = R.dimen.padding_large))
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(id = R.dimen.padding_large))
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.weight),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp)
-        )
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(id = R.string.welcome),
                 style = MaterialTheme.typography.titleLarge
             )
+            Icon(
+                painter = painterResource(id = R.drawable.weight),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp)
+            )
             Text(
                 text = stringResource(id = R.string.welcome_text),
                 textAlign = TextAlign.Center
             )
-        }
-        Button(
-            onClick = onUnderstoodClick
-        ) {
-            Text(
-                text = stringResource(id = R.string.understood)
-            )
+            Button(
+                onClick = onUnderstoodClick
+            ) {
+                Text(
+                    text = stringResource(id = R.string.understood)
+                )
+            }
         }
     }
 }
