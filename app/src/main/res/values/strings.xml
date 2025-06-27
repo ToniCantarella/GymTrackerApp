@@ -22,4 +22,11 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="delete_are_you_sure">Are you sure you want to delete %s items?</string>
+    <string name="name">Name</string>
+    <string name="exercise">Exercise</string>
+    <string name="done">Done</string>
+    <string name="set">Set</string>
+    <string name="repetitions">Reps</string>
+    <string name="description">Description</string>
+    <string name="optional">Optional</string>
 </resources>

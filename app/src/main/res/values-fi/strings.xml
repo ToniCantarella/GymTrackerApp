@@ -15,4 +15,11 @@
     <string name="cancel">Peruuta</string>
     <string name="delete">Poista</string>
     <string name="delete_are_you_sure">Oletko varma että haluat poistaa %s kohdetta?</string>
+    <string name="name">Nimi</string>
+    <string name="exercise">Liike</string>
+    <string name="done">Valmis</string>
+    <string name="set">Sarja</string>
+    <string name="repetitions">Toistot</string>
+    <string name="description">Kuvaus</string>
+    <string name="optional">Valinnainen</string>
 </resources>
