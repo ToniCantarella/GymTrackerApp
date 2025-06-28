@@ -13,14 +13,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -114,7 +117,14 @@ fun GymTrackerApp() {
                     composable<Route.SplitList> {
                         SplitListScreen(
                             onSplitNavigate = { navController.navigate(Route.Split(it)) },
-                            onNavigateToAddSplit = { navController.navigate(Route.Split(name = null, adding = true)) }
+                            onNavigateToAddSplit = {
+                                navController.navigate(
+                                    Route.Split(
+                                        name = null,
+                                        adding = true
+                                    )
+                                )
+                            }
                         )
                     }
                     composable<Route.Split> {
@@ -168,9 +178,11 @@ fun ThemePreviewColumn() {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("This is headline", style = MaterialTheme.typography.headlineSmall)
-            Text("This is body", style = MaterialTheme.typography.bodyLarge)
-            Text("This is label", style = MaterialTheme.typography.labelMedium)
+            FlowRow {
+                Text("This is headline", style = MaterialTheme.typography.headlineSmall)
+                Text("This is body", style = MaterialTheme.typography.bodyLarge)
+                Text("This is label", style = MaterialTheme.typography.labelMedium)
+            }
 
             FlowRow {
                 Button(onClick = {}) {
@@ -200,6 +212,75 @@ fun ThemePreviewColumn() {
                 }
                 ElevatedCard {
                     Text("Elevated Card", modifier = Modifier.padding(8.dp))
+                }
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row{
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                        Text(
+                            "Secondarycontainer",
+                            modifier = Modifier.padding(8.dp),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Row{
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
+                        Text(
+                            "tertiarycontainer", modifier = Modifier.padding(8.dp),
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Row{
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
+                        Text(
+                            "secondary", modifier = Modifier.padding(8.dp),
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
+                }
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary
+                    )
+                ) {
+                    Row{
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+                        Text(
+                            "tertiary", modifier = Modifier.padding(8.dp),
+                            color = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
                 }
             }
 
