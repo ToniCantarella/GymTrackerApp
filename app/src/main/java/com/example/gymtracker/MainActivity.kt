@@ -55,7 +55,6 @@ import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
-import com.example.gymtracker.ui.workouts.addsplit.AddSplitScreen
 import com.example.gymtracker.ui.workouts.split.SplitScreen
 import com.example.gymtracker.ui.workouts.splitslist.SplitListScreen
 import org.koin.androidx.compose.koinViewModel
@@ -80,13 +79,13 @@ fun GymTrackerApp() {
     val navController = rememberNavController()
     val navigationAnimationMoveInt = 1500
 
-    if (appUiState.loading){
+    if (appUiState.loading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-        ){
+        ) {
             CircularProgressIndicator()
         }
     } else {
@@ -115,14 +114,11 @@ fun GymTrackerApp() {
                     composable<Route.SplitList> {
                         SplitListScreen(
                             onSplitNavigate = { navController.navigate(Route.Split(it)) },
-                            onNavigateToAddSplit = { navController.navigate(Route.AddSplit) }
+                            onNavigateToAddSplit = { navController.navigate(Route.Split(name = null, adding = true)) }
                         )
                     }
                     composable<Route.Split> {
-                        SplitScreen()
-                    }
-                    composable<Route.AddSplit> {
-                        AddSplitScreen(
+                        SplitScreen(
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }
