@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,7 +30,8 @@ fun Exercise(
     addSet: () -> Unit,
     onChangeWeight: (setId: UUID, Double) -> Unit,
     onChangeRepetitions: (setId: UUID, Int) -> Unit,
-    onRemoveSet: (setId: UUID) -> Unit
+    onRemoveSet: (setId: UUID) -> Unit,
+    editing: Boolean = false
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -40,50 +42,70 @@ fun Exercise(
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.padding_large))
         ) {
-            OutlinedTextField(
-                value = exercise.name,
-                onValueChange = onNameChange,
-                placeholder = {
-                    Text(
-                        text = "${stringResource(id = R.string.exercise)} $index"
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = exercise.description ?: "",
-                onValueChange = onDescriptionChange,
-                placeholder = {
-                    Text(
-                        text = "${stringResource(id = R.string.description)} (${stringResource(id = R.string.optional)})"
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            HorizontalDivider()
+            if (editing) {
+                OutlinedTextField(
+                    value = exercise.name,
+                    onValueChange = onNameChange,
+                    placeholder = {
+                        Text(
+                            text = "${stringResource(id = R.string.exercise)} $index"
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            } else {
+                Text(
+                    text = exercise.name
+                )
+            }
+            if (editing) {
+                OutlinedTextField(
+                    value = exercise.description ?: "",
+                    onValueChange = onDescriptionChange,
+                    placeholder = {
+                        Text(
+                            text = "${stringResource(id = R.string.description)} (${
+                                stringResource(
+                                    id = R.string.optional
+                                )
+                            })",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    textStyle = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier
+                )
+            } else {
+                Text(
+                    text = exercise.description ?: "",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
             Column {
                 exercise.sets.forEachIndexed { index, set ->
+                    HorizontalDivider()
                     Set(
                         index = index,
                         set = set,
                         onChangeWeight = { onChangeWeight(set.setId, it) },
                         onChangeRepetitions = { onChangeRepetitions(set.setId, it) },
-                        onRemoveSet = { onRemoveSet(set.setId) }
+                        onRemoveSet = { onRemoveSet(set.setId) },
+                        editing = editing
                     )
-                    HorizontalDivider()
                 }
-                TextButton(
-                    onClick = addSet
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.set)
-                    )
+                if (editing) {
+                    TextButton(
+                        onClick = addSet
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.set)
+                        )
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.workouts.split
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,10 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.Exercise
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
+import com.example.gymtracker.ui.theme.GymTrackerTheme
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
@@ -127,7 +130,7 @@ fun SplitScreen(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
         ) {
             itemsIndexed(exercises) { index, exercise ->
-                Exercise (
+                Exercise(
                     index = index + 1,
                     exercise = exercise,
                     onNameChange = { name -> onExerciseNameChange(exercise.exerciseId, name) },
@@ -152,22 +155,108 @@ fun SplitScreen(
                             repetitions
                         )
                     },
-                    onRemoveSet = { setId -> onRemoveSet(exercise.exerciseId, setId) }
+                    onRemoveSet = { setId -> onRemoveSet(exercise.exerciseId, setId) },
+                    editing = addingSplit
                 )
             }
-            item {
-                Button(
-                    onClick = addExercise
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.exercise)
-                    )
+            if (addingSplit) {
+                item {
+                    Button(
+                        onClick = addExercise,
+                        enabled = exercises.last().name.isNotEmpty()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.exercise)
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ScreenForPreview(
+    adding: Boolean = true
+) {
+    SplitScreen(
+        exercises = listOf(
+            Exercise(
+                name = "Bench press",
+                exerciseId = UUID.randomUUID(),
+                description = "Remember to warm up shoulders",
+                sets = listOf(
+                    Set(
+                        setId = UUID.randomUUID(),
+                        weight = 100.0,
+                        repetitions = 10
+                    ),
+                    Set(
+                        setId = UUID.randomUUID(),
+                        weight = 80.0,
+                        repetitions = 10
+                    )
+                )
+            ),
+            Exercise(
+                name = if (!adding) "Overhead press" else "",
+                exerciseId = UUID.randomUUID(),
+                description = null,
+                sets = if (!adding) listOf(
+                    Set(
+                        setId = UUID.randomUUID(),
+                        weight = 30.0,
+                        repetitions = 10
+                    ),
+                    Set(
+                        setId = UUID.randomUUID(),
+                        weight = 80.0,
+                        repetitions = 10
+                    )
+                ) else listOf(
+                    Set(
+                        setId = UUID.randomUUID(),
+                        weight = 0.0,
+                        repetitions = 0
+                    ),
+                )
+            )
+        ),
+        addingSplit = adding,
+        addExercise = {},
+        onExerciseNameChange = { _, _ -> },
+        onDescriptionChange = { _, _ -> },
+        addSet = {},
+        onChangeWeight = { _, _, _ -> },
+        onChangeRepetitions = { _, _, _ -> },
+        onRemoveSet = { _, _ -> }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddSplitPreview() {
+    GymTrackerTheme {
+        ScreenForPreview()
+    }
+}
+
+@Preview(showBackground = true, locale = "fi", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AddSplitPreviewFi() {
+    GymTrackerTheme {
+        ScreenForPreview()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SplitPreview() {
+    GymTrackerTheme {
+        ScreenForPreview(adding = false)
     }
 }

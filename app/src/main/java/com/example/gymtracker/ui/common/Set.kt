@@ -10,16 +10,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.workouts.split.Set
@@ -30,7 +38,8 @@ fun Set(
     set: Set,
     onChangeWeight: (Double) -> Unit,
     onChangeRepetitions: (Int) -> Unit,
-    onRemoveSet: () -> Unit
+    onRemoveSet: () -> Unit,
+    editing: Boolean = false
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -39,49 +48,94 @@ fun Set(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.padding_medium))
     ) {
-        Text(
-            text = "${stringResource(id = R.string.set)} ${index + 1}"
-        )
-        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = "${set.weight}",
-                onValueChange = { onChangeWeight(it.toDouble()) },
-                supportingText = {
-                    Text(
-                        text = "kg" // TODO replace with users current weight unit
-                    )
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number
-                ),
-                modifier = Modifier.width(80.dp)
+        if(editing){
+            Text(
+                text = "${stringResource(id = R.string.set)} ${index + 1}",
+                style = MaterialTheme.typography.labelMedium
             )
-            OutlinedTextField(
-                value = "${set.repetitions}",
-                onValueChange = { onChangeRepetitions(it.toInt()) },
-                supportingText = {
-                    Text(
-                        text = stringResource(id = R.string.repetitions)
-                    )
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number
-                ),
-                modifier = Modifier.width(80.dp)
+        } else{
+            Checkbox(
+                checked = true,
+                onCheckedChange = {}
             )
         }
-        IconButton(
-            onClick = { onRemoveSet() },
-            enabled = index > 0
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = null
+            var weight by remember { mutableStateOf(set.weight.toString()) }
+            var repetitions by remember { mutableStateOf(set.repetitions.toString()) }
+
+            if (editing){
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = {
+                        weight = it
+                        val newWeight = it.toDoubleOrNull()
+                        if (newWeight != null) onChangeWeight(newWeight)
+                        else onChangeWeight(0.0)
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    textStyle = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.End),
+                    modifier = Modifier.width(80.dp)
+                )
+            }else {
+                Text(
+                    text = weight,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            Text(
+                text = "kg",
+                style = MaterialTheme.typography.labelMedium
             )
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+            if(editing){
+                OutlinedTextField(
+                    value = repetitions,
+                    onValueChange = {
+                        repetitions = it
+                        val newRepetitions = it.toIntOrNull()
+                        if (newRepetitions != null) onChangeRepetitions(newRepetitions)
+                        else onChangeRepetitions(0)
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    textStyle = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.End),
+                    modifier = Modifier.width(60.dp)
+                )
+            } else {
+                Text(
+                    text = repetitions,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            Text(
+                text = stringResource(id = R.string.repetitions),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        if (editing){
+            IconButton(
+                onClick = { onRemoveSet() },
+                enabled = index > 0
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        } else {
+            IconButton(
+                onClick = {  },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null
+                )
+            }
         }
     }
 }
