@@ -38,9 +38,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.gymtracker.R
+import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
@@ -126,7 +126,10 @@ fun SplitListScreen(
                         .padding(dimensionResource(id = R.dimen.padding_large))
                 ) {
                     Text(
-                        text = stringResource(id = R.string.delete_are_you_sure, uiState.itemsToDelete.size),
+                        text = stringResource(
+                            id = R.string.delete_are_you_sure,
+                            uiState.itemsToDelete.size
+                        ),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
@@ -135,8 +138,8 @@ fun SplitListScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        OutlinedButton (
-                            onClick = {confirmDeletionDialogOpen = false}
+                        OutlinedButton(
+                            onClick = { confirmDeletionDialogOpen = false }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.cancel)
@@ -180,7 +183,10 @@ fun SplitListScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         if (splits.isEmpty()) {
-            EmptySplits()
+            EmptyListCard(
+                icon = painterResource(id = R.drawable.weight),
+                subtitle = stringResource(id = R.string.workouts_intro)
+            )
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
@@ -248,29 +254,6 @@ private fun ExerciseListItem(
         }
     }
     HorizontalDivider()
-}
-
-@Composable
-fun EmptySplits() {
-    ElevatedCard(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.weight),
-                contentDescription = null,
-                modifier = Modifier.size(80.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.workouts_intro),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
 }
 
 @Preview(showBackground = true)

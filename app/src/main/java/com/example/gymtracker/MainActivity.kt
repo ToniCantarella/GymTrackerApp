@@ -1,6 +1,5 @@
 package com.example.gymtracker
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -54,6 +53,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.theme.GymTrackerTheme
@@ -74,10 +74,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("RestrictedApi")
 @Composable
 fun GymTrackerApp() {
-    val viewModel = koinViewModel<AppViewModel>()
+    val viewModel = koinViewModel<MainViewModel>()
     val appUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
     val navigationAnimationMoveInt = 1500
@@ -136,12 +135,12 @@ fun GymTrackerApp() {
 
                 navigation<Route.Cardio>(startDestination = Route.CardioList) {
                     composable<Route.CardioList> {
-                        Text("Cardiolist")
+                        CardioListScreen()
                     }
                 }
 
-                navigation<Route.Stats>(startDestination = Route.Test) {
-                    composable<Route.Test> {
+                navigation<Route.Stats>(startDestination = Route.StatsOverview) {
+                    composable<Route.StatsOverview> {
                         Text("stats")
                     }
                 }

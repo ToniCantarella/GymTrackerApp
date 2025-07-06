@@ -105,7 +105,7 @@ open class Route {
     object Stats : Route()
 
     @Serializable
-    object Test : Route()
+    object StatsOverview : Route()
 }
 
 data class BottomBarRoute<Route>(val titleResId: Int, val route: Route, val iconResInt: Int)

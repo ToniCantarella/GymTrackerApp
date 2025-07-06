@@ -21,7 +21,7 @@ data class AppUiState(
     val initialRoute: Route = Route.Welcome
 )
 
-class AppViewModel(
+class MainViewModel(
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())

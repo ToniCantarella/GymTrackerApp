@@ -17,6 +17,7 @@ fun GymFloatingActionButton(
             viewModelStoreOwner = entry,
             initializer = { GymFloatingActionButtonViewModel() }
         )
+
         if(viewModel.showFab){
             FloatingActionButton(
                 onClick = viewModel.onClick,
@@ -42,7 +43,6 @@ fun ProvideFloatingActionButton(
         )
         LaunchedEffect(onClick, visible, content) {
             viewModel.showFab = visible
-
             viewModel.onClick = onClick
             viewModel.content = content
         }

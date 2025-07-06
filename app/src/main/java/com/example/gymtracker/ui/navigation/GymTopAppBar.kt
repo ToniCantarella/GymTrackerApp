@@ -44,11 +44,9 @@ fun ProvideTopAppBar(
         )
         LaunchedEffect(title, navigationItem, actions) {
             viewModel.showTopBar = true
-
             viewModel.title = title
             viewModel.navigationIcon = navigationItem
             viewModel.actions = actions
         }
     }
-
 }
