@@ -46,26 +46,11 @@ import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.toDateAndTimeString
 import org.koin.androidx.compose.koinViewModel
-import java.time.Duration
 import java.time.Instant
-
-private val splitsTestData: List<ExerciseListItem> = List(40) {
-    ExerciseListItem(
-        id = it.toLong(),
-        name = "Treeni $it",
-        lastDate = Instant.now().minus(Duration.ofDays(it.toLong()))
-    )
-}
-
-data class ExerciseListItem(
-    val id: Long,
-    val name: String,
-    val lastDate: Instant
-)
 
 @Composable
 fun SplitListScreen(
-    onSplitNavigate: (name: String) -> Unit,
+    onSplitNavigate: (id: Int) -> Unit,
     onNavigateToAddSplit: () -> Unit,
     viewModel: SplitListViewModel = koinViewModel()
 ) {
@@ -95,7 +80,8 @@ fun SplitListScreen(
                 }
             } else {
                 IconButton(
-                    onClick = viewModel::startSelectingForDeletion
+                    onClick = viewModel::startSelectingForDeletion,
+                    enabled = uiState.splits.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -160,7 +146,7 @@ fun SplitListScreen(
     }
 
     SplitListScreen(
-        splits = splitsTestData,
+        splits = uiState.splits,
         selectingItemsToDelete = uiState.selectingItemsToDelete,
         selectedItemsForDeletion = uiState.itemsToDelete,
         onSelectForDeletion = viewModel::onSelectForDeletion,
@@ -171,12 +157,12 @@ fun SplitListScreen(
 
 @Composable
 fun SplitListScreen(
-    splits: List<ExerciseListItem>,
+    splits: List<SplitListItem>,
     selectingItemsToDelete: Boolean,
-    selectedItemsForDeletion: List<Long>,
-    onSelectForDeletion: (id: Long) -> Unit,
+    selectedItemsForDeletion: List<Int>,
+    onSelectForDeletion: (id: Int) -> Unit,
     onSplitHold: () -> Unit,
-    onSplitClick: (name: String) -> Unit
+    onSplitClick: (id: Int) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -198,7 +184,7 @@ fun SplitListScreen(
                         isSetForDeletion = selectedItemsForDeletion.contains(split.id),
                         onSelectForDeletion = onSelectForDeletion,
                         onHold = onSplitHold,
-                        onClick = { onSplitClick(split.name) }
+                        onClick = { onSplitClick(split.id) }
                     )
                 }
             }
@@ -208,10 +194,10 @@ fun SplitListScreen(
 
 @Composable
 private fun ExerciseListItem(
-    exercise: ExerciseListItem,
+    exercise: SplitListItem,
     selectingItemsToDelete: Boolean,
     isSetForDeletion: Boolean,
-    onSelectForDeletion: (id: Long) -> Unit,
+    onSelectForDeletion: (id: Int) -> Unit,
     onHold: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -238,7 +224,7 @@ private fun ExerciseListItem(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${stringResource(id = R.string.last_time)}: ${exercise.lastDate.toDateAndTimeString()}",
+                    text = "${stringResource(id = R.string.last_time)}: ${exercise.latestTimestamp.toDateAndTimeString()}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -261,7 +247,13 @@ private fun ExerciseListItem(
 private fun SplitsPreview() {
     GymTrackerTheme {
         SplitListScreen(
-            splits = splitsTestData,
+            splits = listOf(
+                SplitListItem(
+                    id = 0,
+                    name = "Workout 1",
+                    latestTimestamp = Instant.now()
+                )
+            ),
             selectingItemsToDelete = false,
             onSplitClick = {},
             onSelectForDeletion = {},

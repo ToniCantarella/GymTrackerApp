@@ -119,7 +119,7 @@ fun GymTrackerApp() {
                             onNavigateToAddSplit = {
                                 navController.navigate(
                                     Route.Split(
-                                        name = null,
+                                        id = null,
                                         adding = true
                                     )
                                 )

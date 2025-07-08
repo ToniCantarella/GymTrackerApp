@@ -30,12 +30,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
-import com.example.gymtracker.ui.workouts.split.Set
+import com.example.gymtracker.ui.workouts.split.WorkoutSet
 
 @Composable
 fun Set(
     index: Int,
-    set: Set,
+    set: WorkoutSet,
     onChangeWeight: (Double) -> Unit,
     onChangeRepetitions: (Int) -> Unit,
     onRemoveSet: () -> Unit,
@@ -48,12 +48,12 @@ fun Set(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.padding_medium))
     ) {
-        if(editing){
+        if (editing) {
             Text(
                 text = "${stringResource(id = R.string.set)} ${index + 1}",
                 style = MaterialTheme.typography.labelMedium
             )
-        } else{
+        } else {
             Checkbox(
                 checked = true,
                 onCheckedChange = {}
@@ -65,7 +65,7 @@ fun Set(
             var weight by remember { mutableStateOf(set.weight.toString()) }
             var repetitions by remember { mutableStateOf(set.repetitions.toString()) }
 
-            if (editing){
+            if (editing) {
                 OutlinedTextField(
                     value = weight,
                     onValueChange = {
@@ -80,9 +80,9 @@ fun Set(
                     textStyle = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.End),
                     modifier = Modifier.width(80.dp)
                 )
-            }else {
+            } else {
                 Text(
-                    text = weight,
+                    text = set.weight.toString(),
                     style = MaterialTheme.typography.labelMedium
                 )
             }
@@ -91,7 +91,7 @@ fun Set(
                 style = MaterialTheme.typography.labelMedium
             )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
-            if(editing){
+            if (editing) {
                 OutlinedTextField(
                     value = repetitions,
                     onValueChange = {
@@ -108,7 +108,7 @@ fun Set(
                 )
             } else {
                 Text(
-                    text = repetitions,
+                    text = set.repetitions.toString(),
                     style = MaterialTheme.typography.labelMedium
                 )
             }
@@ -117,7 +117,7 @@ fun Set(
                 style = MaterialTheme.typography.labelMedium
             )
         }
-        if (editing){
+        if (editing) {
             IconButton(
                 onClick = { onRemoveSet() },
                 enabled = index > 0
@@ -129,7 +129,7 @@ fun Set(
             }
         } else {
             IconButton(
-                onClick = {  },
+                onClick = { },
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,

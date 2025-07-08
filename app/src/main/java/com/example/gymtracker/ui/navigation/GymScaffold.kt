@@ -93,7 +93,7 @@ open class Route {
     object SplitList : Route()
 
     @Serializable
-    class Split(val name: String?, val adding: Boolean = false) : Route()
+    class Split(val id: Int?, val adding: Boolean = false) : Route()
 
     @Serializable
     object Cardio : Route()

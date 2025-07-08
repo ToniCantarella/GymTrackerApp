@@ -88,9 +88,9 @@ fun Exercise(
                     Set(
                         index = index,
                         set = set,
-                        onChangeWeight = { onChangeWeight(set.setId, it) },
-                        onChangeRepetitions = { onChangeRepetitions(set.setId, it) },
-                        onRemoveSet = { onRemoveSet(set.setId) },
+                        onChangeWeight = { onChangeWeight(set.uuid, it) },
+                        onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
+                        onRemoveSet = { onRemoveSet(set.uuid) },
                         editing = editing
                     )
                 }

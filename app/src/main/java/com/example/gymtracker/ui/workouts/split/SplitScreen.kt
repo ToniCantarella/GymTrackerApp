@@ -12,8 +12,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,13 +86,24 @@ fun SplitScreen(
         }
     )
 
-    ProvideFloatingActionButton(
-        onClick = viewModel::onDonePressed
-    ) {
-        Icon(
-            imageVector = Icons.Default.Check,
-            contentDescription = null
-        )
+    if(uiState.adding){
+        ProvideFloatingActionButton(
+            onClick = viewModel::onCreateSplitPressed
+        ) {
+            Icon(
+                imageVector = Icons.Default.Build,
+                contentDescription = null
+            )
+        }
+    } else {
+        ProvideFloatingActionButton(
+            onClick = viewModel::onFinishWorkoutPressed
+        ) {
+            Icon(
+                imageVector = Icons.Default.Done,
+                contentDescription = null
+            )
+        }
     }
 
     SplitScreen(
@@ -133,29 +145,29 @@ fun SplitScreen(
                 Exercise(
                     index = index + 1,
                     exercise = exercise,
-                    onNameChange = { name -> onExerciseNameChange(exercise.exerciseId, name) },
+                    onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
                     onDescriptionChange = { description ->
                         onDescriptionChange(
-                            exercise.exerciseId,
+                            exercise.uuid,
                             description
                         )
                     },
-                    addSet = { addSet(exercise.exerciseId) },
+                    addSet = { addSet(exercise.uuid) },
                     onChangeWeight = { setId, weight ->
                         onChangeWeight(
-                            exercise.exerciseId,
+                            exercise.uuid,
                             setId,
                             weight
                         )
                     },
                     onChangeRepetitions = { setId, repetitions ->
                         onChangeRepetitions(
-                            exercise.exerciseId,
+                            exercise.uuid,
                             setId,
                             repetitions
                         )
                     },
-                    onRemoveSet = { setId -> onRemoveSet(exercise.exerciseId, setId) },
+                    onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
                     editing = addingSplit
                 )
             }
@@ -187,16 +199,16 @@ private fun ScreenForPreview(
         exercises = listOf(
             Exercise(
                 name = "Bench press",
-                exerciseId = UUID.randomUUID(),
+                uuid = UUID.randomUUID(),
                 description = "Remember to warm up shoulders",
                 sets = listOf(
-                    Set(
-                        setId = UUID.randomUUID(),
+                    WorkoutSet(
+                        uuid = UUID.randomUUID(),
                         weight = 100.0,
                         repetitions = 10
                     ),
-                    Set(
-                        setId = UUID.randomUUID(),
+                    WorkoutSet(
+                        uuid = UUID.randomUUID(),
                         weight = 80.0,
                         repetitions = 10
                     )
@@ -204,22 +216,22 @@ private fun ScreenForPreview(
             ),
             Exercise(
                 name = if (!adding) "Overhead press" else "",
-                exerciseId = UUID.randomUUID(),
+                uuid = UUID.randomUUID(),
                 description = null,
                 sets = if (!adding) listOf(
-                    Set(
-                        setId = UUID.randomUUID(),
+                    WorkoutSet(
+                        uuid = UUID.randomUUID(),
                         weight = 30.0,
                         repetitions = 10
                     ),
-                    Set(
-                        setId = UUID.randomUUID(),
+                    WorkoutSet(
+                        uuid = UUID.randomUUID(),
                         weight = 80.0,
                         repetitions = 10
                     )
                 ) else listOf(
-                    Set(
-                        setId = UUID.randomUUID(),
+                    WorkoutSet(
+                        uuid = UUID.randomUUID(),
                         weight = 0.0,
                         repetitions = 0
                     ),

@@ -3,13 +3,15 @@ package com.example.gymtracker.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.SavedStateHandle
+import androidx.room.Room
 import com.example.gymtracker.MainViewModel
+import com.example.gymtracker.database.GymDatabase
+import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.workouts.split.SplitViewModel
 import com.example.gymtracker.ui.workouts.splitslist.SplitListViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import java.io.File
 
@@ -19,12 +21,37 @@ val appModule = module {
             File(androidContext().filesDir, "settings.preferences_pb")
         }
     }
+}
 
-    viewModel { MainViewModel(get()) }
+val databaseModule = module {
+    single {
+        Room.databaseBuilder(
+            get(),
+            GymDatabase::class.java,
+            "gym-tracker-db"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    single { get<GymDatabase>().splitDao() }
+    single { get<GymDatabase>().exerciseDao() }
+    single { get<GymDatabase>().setDao() }
+    single { get<GymDatabase>().sessionDao() }
+
+    single {
+        WorkoutRepository(
+            splitDao = get(),
+            exerciseDao = get(),
+            setDao = get(),
+            sessionDao = get()
+        )
+    }
 }
 
 val viewModelModule = module {
-    viewModel { (handle: SavedStateHandle) -> SplitViewModel(handle) }
-    viewModel { SplitListViewModel() }
-    viewModel { CardioListViewModel() }
+    viewModelOf(::MainViewModel)
+    viewModelOf(::SplitListViewModel)
+    viewModelOf(::CardioListViewModel)
+    viewModelOf(::SplitViewModel)
 }
