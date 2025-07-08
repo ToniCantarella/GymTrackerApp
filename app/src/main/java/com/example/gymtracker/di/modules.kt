@@ -30,7 +30,6 @@ val databaseModule = module {
             GymDatabase::class.java,
             "gym-tracker-db"
         )
-            .fallbackToDestructiveMigration()
             .build()
     }
 

@@ -30,7 +30,7 @@ import java.util.UUID
         SetEntity::class,
         SplitSessionEntity::class
     ],
-    version = 3
+    version = 1
 )
 @TypeConverters(Converters::class)
 abstract class GymDatabase : RoomDatabase() {
