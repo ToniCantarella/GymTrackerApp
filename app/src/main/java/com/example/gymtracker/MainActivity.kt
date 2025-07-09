@@ -7,9 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -45,10 +43,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -60,89 +58,89 @@ import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
 import com.example.gymtracker.ui.workouts.split.SplitScreen
 import com.example.gymtracker.ui.workouts.splitslist.SplitListScreen
-import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.uiState.value.loading
+        }
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             GymTrackerTheme {
-                GymTrackerApp()
+                GymTrackerApp(
+                    viewModel = viewModel
+                )
             }
         }
     }
 }
 
 @Composable
-fun GymTrackerApp() {
-    val viewModel = koinViewModel<MainViewModel>()
+fun GymTrackerApp(
+    viewModel: MainViewModel
+) {
     val appUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
     val navigationAnimationMoveInt = 1500
 
-    if (appUiState.loading) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+    GymScaffold(
+        navController = navController
+    ) { innerPadding ->
+        NavHost(
+            enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMoveInt }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMoveInt }) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
+            popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
+            navController = navController,
+            startDestination = appUiState.initialRoute,
+            modifier = Modifier.padding(innerPadding)
         ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        GymScaffold(
-            navController = navController
-        ) { innerPadding ->
-            NavHost(
-                enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMoveInt }) },
-                exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMoveInt }) },
-                popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
-                popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
-                navController = navController,
-                startDestination = appUiState.initialRoute,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                composable<Route.Welcome> {
-                    WelcomeScreen(
-                        onUnderstoodClick = {
-                            viewModel.onUserWelcomed()
-                            navController.navigate(Route.Workouts)
+            composable<Route.Welcome> {
+                WelcomeScreen(
+                    onUnderstoodClick = {
+                        viewModel.onUserWelcomed()
+                        navController.navigate(Route.Workouts)
+                    }
+                )
+            }
+
+            navigation<Route.Workouts>(startDestination = Route.SplitList) {
+                composable<Route.SplitList> {
+                    SplitListScreen(
+                        onSplitNavigate = { navController.navigate(Route.Split(it)) },
+                        onNavigateToAddSplit = {
+                            navController.navigate(
+                                Route.Split(
+                                    id = null,
+                                    adding = true
+                                )
+                            )
                         }
                     )
                 }
-
-                navigation<Route.Workouts>(startDestination = Route.SplitList) {
-                    composable<Route.SplitList> {
-                        SplitListScreen(
-                            onSplitNavigate = { navController.navigate(Route.Split(it)) },
-                            onNavigateToAddSplit = {
-                                navController.navigate(
-                                    Route.Split(
-                                        id = null,
-                                        adding = true
-                                    )
-                                )
-                            }
-                        )
-                    }
-                    composable<Route.Split> {
-                        SplitScreen(
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
+                composable<Route.Split> {
+                    SplitScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
+            }
 
-                navigation<Route.Cardio>(startDestination = Route.CardioList) {
-                    composable<Route.CardioList> {
-                        CardioListScreen()
-                    }
+            navigation<Route.Cardio>(startDestination = Route.CardioList) {
+                composable<Route.CardioList> {
+                    CardioListScreen()
                 }
+            }
 
-                navigation<Route.Stats>(startDestination = Route.StatsOverview) {
-                    composable<Route.StatsOverview> {
-                        Text("stats")
-                    }
+            navigation<Route.Stats>(startDestination = Route.StatsOverview) {
+                composable<Route.StatsOverview> {
+                    Text("stats")
                 }
             }
         }
@@ -217,7 +215,7 @@ fun ThemePreviewColumn() {
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
-                    Row{
+                    Row {
                         Icon(
                             imageVector = Icons.Default.AccountBox,
                             contentDescription = null,
@@ -235,7 +233,7 @@ fun ThemePreviewColumn() {
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 ) {
-                    Row{
+                    Row {
                         Icon(
                             imageVector = Icons.Default.AccountBox,
                             contentDescription = null,
@@ -252,7 +250,7 @@ fun ThemePreviewColumn() {
                         containerColor = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    Row{
+                    Row {
                         Icon(
                             imageVector = Icons.Default.AccountBox,
                             contentDescription = null,
@@ -269,7 +267,7 @@ fun ThemePreviewColumn() {
                         containerColor = MaterialTheme.colorScheme.tertiary
                     )
                 ) {
-                    Row{
+                    Row {
                         Icon(
                             imageVector = Icons.Default.AccountBox,
                             contentDescription = null,

@@ -49,7 +49,7 @@ fun Set(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = dimensionResource(id = R.dimen.padding_medium))
+            .padding(vertical = dimensionResource(id = R.dimen.padding_small))
     ) {
         var checked by remember { mutableStateOf(false) }
 
