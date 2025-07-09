@@ -26,7 +26,17 @@ class WorkoutRepository(
     private val sessionDao: SplitSessionDao
 ) {
     suspend fun getSplitsWithLatestTimestamp(): List<SplitListItem> {
-        return splitDao.getSplitsWithLatestSession()
+        val splits = splitDao.getAllSplits()
+
+        return splits.map {
+            val timestamp = sessionDao.getLastSession(it.id)?.timestamp
+
+            SplitListItem(
+                id = it.id,
+                name = it.name,
+                latestTimestamp = timestamp ?: Instant.now()
+            )
+        }
     }
 
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
