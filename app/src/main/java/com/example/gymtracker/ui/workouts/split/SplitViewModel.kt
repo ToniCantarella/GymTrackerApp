@@ -42,7 +42,8 @@ data class SplitUiState(
                 )
             )
         )
-    )
+    ),
+    val setsPerformed: List<WorkoutSet> = emptyList()
 )
 
 class SplitViewModel(
@@ -80,7 +81,30 @@ class SplitViewModel(
     }
 
     fun onFinishWorkoutPressed() {
+        if (navParams.id != null) {
+            viewModelScope.launch {
+                workoutRepository.markSessionDone(
+                    splitId = navParams.id,
+                    setsPerformed = uiState.value.setsPerformed
+                )
+            }
+        }
+    }
 
+    fun onCheckSet(workoutSet: WorkoutSet, checked: Boolean) {
+        if (checked) {
+            _uiState.update {
+                it.copy(
+                    setsPerformed = it.setsPerformed + listOf(workoutSet)
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    setsPerformed = it.setsPerformed.filter { set -> set.uuid != workoutSet.uuid }
+                )
+            }
+        }
     }
 
     fun onSplitNameChange(name: String) {

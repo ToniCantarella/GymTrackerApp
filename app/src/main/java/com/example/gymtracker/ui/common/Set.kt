@@ -39,8 +39,11 @@ fun Set(
     onChangeWeight: (Double) -> Unit,
     onChangeRepetitions: (Int) -> Unit,
     onRemoveSet: () -> Unit,
+    onCheckSet: (WorkoutSet, Boolean) -> Unit,
     editing: Boolean = false
 ) {
+    var editingSet by remember { mutableStateOf(editing) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -48,24 +51,24 @@ fun Set(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.padding_medium))
     ) {
-        if (editing) {
-            Text(
-                text = "${stringResource(id = R.string.set)} ${index + 1}",
-                style = MaterialTheme.typography.labelMedium
-            )
-        } else {
-            Checkbox(
-                checked = true,
-                onCheckedChange = {}
-            )
-        }
+        var checked by remember { mutableStateOf(false) }
+
+        Checkbox(
+            checked = checked,
+            onCheckedChange = {
+                editingSet = false
+                checked = it
+                onCheckSet(set, it)
+            }
+        )
+
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             var weight by remember { mutableStateOf(set.weight.toString()) }
             var repetitions by remember { mutableStateOf(set.repetitions.toString()) }
 
-            if (editing) {
+            if (editingSet) {
                 OutlinedTextField(
                     value = weight,
                     onValueChange = {
@@ -91,7 +94,7 @@ fun Set(
                 style = MaterialTheme.typography.labelMedium
             )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
-            if (editing) {
+            if (editingSet) {
                 OutlinedTextField(
                     value = repetitions,
                     onValueChange = {
@@ -117,7 +120,7 @@ fun Set(
                 style = MaterialTheme.typography.labelMedium
             )
         }
-        if (editing) {
+        if (editingSet) {
             IconButton(
                 onClick = { onRemoveSet() },
                 enabled = index > 0
@@ -129,7 +132,7 @@ fun Set(
             }
         } else {
             IconButton(
-                onClick = { },
+                onClick = { editingSet = true },
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,

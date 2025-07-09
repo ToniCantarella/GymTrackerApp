@@ -133,7 +133,7 @@ fun SplitListScreen(
                         }
                         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                         Button(
-                            onClick = {}
+                            onClick = viewModel::onDeleteSelected
                         ) {
                             Text(
                                 text = stringResource(id = R.string.delete)

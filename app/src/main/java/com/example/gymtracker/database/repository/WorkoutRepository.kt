@@ -66,33 +66,31 @@ class WorkoutRepository(
         splitDao.deleteById(splitId)
     }
 
-    suspend fun markSessionDone(splitId: Int, exercisesPerformed: List<Exercise>): Long {
+    suspend fun markSessionDone(splitId: Int, setsPerformed: List<WorkoutSet>): Long {
+        val lastSessionId = sessionDao.getLastSession(splitId)?.id
         val sessionId = sessionDao.insert(
             SplitSessionEntity(
                 splitId = splitId,
                 timestamp = Instant.now()
             )
         ).toInt()
-        val exercises = exerciseDao.getBySplitId(splitId)
 
-        val uuidToIdMap = exercises.associateBy { it.uuid }
+        val lastSets = lastSessionId?.let { setDao.getSetsForSession(it) }
 
-        exercisesPerformed.forEach { exercise ->
-            val exerciseId = uuidToIdMap[exercise.uuid]?.id
-            if (exerciseId != null) {
-                exercise.sets.forEach { set ->
-                    setDao.insert(
-                        SetEntity(
-                            exerciseId = exerciseId,
-                            sessionId = sessionId,
-                            uuid = set.uuid,
-                            weight = set.weight,
-                            repetitions = set.repetitions
-                        )
-                    )
-                }
-            }
+        lastSets?.forEach { set ->
+            val foundSet = setsPerformed.find { it.uuid == set.uuid }
+
+            setDao.insert(
+                SetEntity(
+                    sessionId = sessionId,
+                    exerciseId = set.exerciseId,
+                    uuid = set.uuid,
+                    weight = foundSet?.weight ?: set.weight,
+                    repetitions = foundSet?.repetitions ?: set.repetitions
+                )
+            )
         }
+
 
         return sessionId.toLong()
     }

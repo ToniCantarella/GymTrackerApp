@@ -86,7 +86,7 @@ fun SplitScreen(
         }
     )
 
-    if(uiState.adding){
+    if (uiState.adding) {
         ProvideFloatingActionButton(
             onClick = viewModel::onCreateSplitPressed
         ) {
@@ -115,7 +115,8 @@ fun SplitScreen(
         addSet = viewModel::addSet,
         onChangeWeight = viewModel::onChangeWeight,
         onChangeRepetitions = viewModel::onChangeRepetitions,
-        onRemoveSet = viewModel::onRemoveSet
+        onRemoveSet = viewModel::onRemoveSet,
+        onCheckSet = viewModel::onCheckSet
     )
 }
 
@@ -129,6 +130,7 @@ fun SplitScreen(
     addSet: (exerciseId: UUID) -> Unit,
     onChangeWeight: (exerciseId: UUID, setId: UUID, Double) -> Unit,
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, Int) -> Unit,
+    onCheckSet: (set: WorkoutSet, checked: Boolean) -> Unit,
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit
 ) {
     Column(
@@ -168,6 +170,7 @@ fun SplitScreen(
                         )
                     },
                     onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+                    onCheckSet = onCheckSet,
                     editing = addingSplit
                 )
             }
@@ -245,6 +248,7 @@ private fun ScreenForPreview(
         addSet = {},
         onChangeWeight = { _, _, _ -> },
         onChangeRepetitions = { _, _, _ -> },
+        onCheckSet = { _, _ -> },
         onRemoveSet = { _, _ -> }
     )
 }

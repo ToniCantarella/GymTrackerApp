@@ -10,9 +10,6 @@ interface SetDao {
     @Insert
     suspend fun insert(set: SetEntity): Long
 
-    @Query("SELECT * FROM sets WHERE exerciseId = :exerciseId")
-    suspend fun getSetsForExercise(exerciseId: Int): List<SetEntity>
-
     @Query("SELECT * FROM sets WHERE sessionId = :sessionId")
     suspend fun getSetsForSession(sessionId: Int): List<SetEntity>
 }

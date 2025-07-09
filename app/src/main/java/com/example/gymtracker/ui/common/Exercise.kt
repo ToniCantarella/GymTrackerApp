@@ -19,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.workouts.split.Exercise
+import com.example.gymtracker.ui.workouts.split.WorkoutSet
 import java.util.UUID
 
 @Composable
@@ -31,6 +32,7 @@ fun Exercise(
     onChangeWeight: (setId: UUID, Double) -> Unit,
     onChangeRepetitions: (setId: UUID, Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
+    onCheckSet: (set: WorkoutSet, checked: Boolean) -> Unit,
     editing: Boolean = false
 ) {
     ElevatedCard(
@@ -91,6 +93,7 @@ fun Exercise(
                         onChangeWeight = { onChangeWeight(set.uuid, it) },
                         onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
                         onRemoveSet = { onRemoveSet(set.uuid) },
+                        onCheckSet = onCheckSet,
                         editing = editing
                     )
                 }

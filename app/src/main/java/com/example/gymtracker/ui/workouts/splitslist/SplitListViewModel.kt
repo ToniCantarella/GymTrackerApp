@@ -1,6 +1,5 @@
 package com.example.gymtracker.ui.workouts.splitslist
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymtracker.database.repository.WorkoutRepository
@@ -32,7 +31,6 @@ class SplitListViewModel(
     init {
         viewModelScope.launch {
             val splits = workoutRepository.getSplitsWithLatestTimestamp()
-            Log.d("toni", "splits : ${splits}")
             _uiState.update {
                 it.copy(
                     splits = splits,
@@ -66,6 +64,16 @@ class SplitListViewModel(
                     if (it.itemsToDelete.contains(id)) it.itemsToDelete.filter { item -> id != item }
                     else it.itemsToDelete + listOf(id)
             )
+        }
+    }
+
+    fun onDeleteSelected() {
+        val itemsToDelete = uiState.value.itemsToDelete
+
+        viewModelScope.launch {
+            itemsToDelete.forEach {
+                workoutRepository.deleteSplit(it)
+            }
         }
     }
 }
