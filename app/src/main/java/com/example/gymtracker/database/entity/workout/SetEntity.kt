@@ -15,12 +15,6 @@ import java.util.UUID
             parentColumns = ["id"],
             childColumns = ["exerciseId"],
             onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = SplitSessionEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["sessionId"],
-            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [Index("exerciseId")]
@@ -29,6 +23,38 @@ data class SetEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val exerciseId: Int,
+    @Contextual
+    val uuid: UUID,
+    val weight: Double,
+    val repetitions: Int
+)
+
+@Entity(
+    tableName = "set_sessions",
+    foreignKeys = [
+        ForeignKey(
+            entity = SetEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["setId"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = SplitSessionEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["sessionId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index("setId"),
+        Index("sessionId"),
+        Index(value = ["setId", "sessionId"])
+    ]
+)
+data class SetSessionEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val setId: Int,
     val sessionId: Int,
     @Contextual
     val uuid: UUID,

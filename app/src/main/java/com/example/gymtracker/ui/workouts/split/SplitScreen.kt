@@ -171,7 +171,7 @@ fun SplitScreen(
                     },
                     onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
                     onCheckSet = onCheckSet,
-                    editing = addingSplit
+                    addingExercise = addingSplit
                 )
             }
             if (addingSplit) {

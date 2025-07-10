@@ -36,6 +36,7 @@ val databaseModule = module {
     single { get<GymDatabase>().splitDao() }
     single { get<GymDatabase>().exerciseDao() }
     single { get<GymDatabase>().setDao() }
+    single { get<GymDatabase>().setSessionDao() }
     single { get<GymDatabase>().sessionDao() }
 
     single {
@@ -43,6 +44,7 @@ val databaseModule = module {
             splitDao = get(),
             exerciseDao = get(),
             setDao = get(),
+            setSessionDao = get(),
             sessionDao = get()
         )
     }

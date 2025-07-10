@@ -21,7 +21,10 @@ data class SplitEntity(
         childColumns = ["splitId"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index("splitId")]
+    indices = [
+        Index("splitId"),
+        Index("timestamp")
+    ]
 )
 data class SplitSessionEntity(
     @PrimaryKey(autoGenerate = true)

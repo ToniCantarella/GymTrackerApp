@@ -40,9 +40,9 @@ fun Set(
     onChangeRepetitions: (Int) -> Unit,
     onRemoveSet: () -> Unit,
     onCheckSet: (WorkoutSet, Boolean) -> Unit,
-    editing: Boolean = false
+    addingSet: Boolean = false
 ) {
-    var editingSet by remember { mutableStateOf(editing) }
+    var editingSet by remember { mutableStateOf(addingSet) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

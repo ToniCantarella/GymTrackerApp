@@ -2,10 +2,12 @@ package com.example.gymtracker.database.repository
 
 import com.example.gymtracker.database.dao.ExerciseDao
 import com.example.gymtracker.database.dao.SetDao
+import com.example.gymtracker.database.dao.SetSessionDao
 import com.example.gymtracker.database.dao.SplitDao
 import com.example.gymtracker.database.dao.SplitSessionDao
 import com.example.gymtracker.database.entity.workout.ExerciseEntity
 import com.example.gymtracker.database.entity.workout.SetEntity
+import com.example.gymtracker.database.entity.workout.SetSessionEntity
 import com.example.gymtracker.database.entity.workout.SplitEntity
 import com.example.gymtracker.database.entity.workout.SplitSessionEntity
 import com.example.gymtracker.ui.workouts.split.Exercise
@@ -14,7 +16,8 @@ import com.example.gymtracker.ui.workouts.splitslist.SplitListItem
 import java.time.Instant
 
 data class LastPerformedSplit(
-    val splitName: String,
+    val id: Int,
+    val name: String,
     val timestamp: Instant,
     val exercises: List<Exercise>
 )
@@ -23,6 +26,7 @@ class WorkoutRepository(
     private val splitDao: SplitDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
+    private val setSessionDao: SetSessionDao,
     private val sessionDao: SplitSessionDao
 ) {
     suspend fun getSplitsWithLatestTimestamp(): List<SplitListItem> {
@@ -59,9 +63,18 @@ class WorkoutRepository(
             ).toInt()
 
             exercise.sets.forEach { set ->
-                setDao.insert(
+                val setId = setDao.insert(
                     SetEntity(
                         exerciseId = exerciseId,
+                        uuid = set.uuid,
+                        weight = set.weight,
+                        repetitions = set.repetitions
+                    )
+                ).toInt()
+
+                setSessionDao.insert(
+                    SetSessionEntity(
+                        setId = setId,
                         sessionId = sessionId,
                         uuid = set.uuid,
                         weight = set.weight,
@@ -76,8 +89,7 @@ class WorkoutRepository(
         splitDao.deleteById(splitId)
     }
 
-    suspend fun markSessionDone(splitId: Int, setsPerformed: List<WorkoutSet>): Long {
-        val lastSessionId = sessionDao.getLastSession(splitId)?.id
+    suspend fun markSessionDone(splitId: Int, exercisesPerformed: List<Exercise>): Long {
         val sessionId = sessionDao.insert(
             SplitSessionEntity(
                 splitId = splitId,
@@ -85,49 +97,82 @@ class WorkoutRepository(
             )
         ).toInt()
 
-        val lastSets = lastSessionId?.let { setDao.getSetsForSession(it) }
+        val exercisesForSplit = exerciseDao.getBySplitId(splitId).associateBy { it.uuid }
 
-        lastSets?.forEach { set ->
-            val foundSet = setsPerformed.find { it.uuid == set.uuid }
-
-            setDao.insert(
-                SetEntity(
-                    sessionId = sessionId,
-                    exerciseId = set.exerciseId,
-                    uuid = set.uuid,
-                    weight = foundSet?.weight ?: set.weight,
-                    repetitions = foundSet?.repetitions ?: set.repetitions
+        exercisesPerformed.forEach { performedExercise ->
+            val exerciseId = exercisesForSplit[performedExercise.uuid]?.id ?: exerciseDao.insert(
+                ExerciseEntity(
+                    splitId = splitId,
+                    uuid = performedExercise.uuid,
+                    name = performedExercise.name,
+                    description = performedExercise.description
                 )
-            )
-        }
+            ).toInt()
 
+            val existingSets = setDao.getSetsForExercise(exerciseId).associateBy { it.uuid }
+
+            performedExercise.sets.forEach { performedSet ->
+                val existingSet = existingSets[performedSet.uuid]
+                val setId = existingSet?.id ?: setDao.insert(
+                    SetEntity(
+                        exerciseId = exerciseId,
+                        uuid = performedSet.uuid,
+                        weight = performedSet.weight,
+                        repetitions = performedSet.repetitions
+                    )
+                ).toInt()
+
+                val setInfoChanged = (existingSet?.weight != performedSet.weight || existingSet.repetitions != performedSet.repetitions)
+                if (existingSet != null && setInfoChanged) {
+                    setDao.updateSet(
+                        existingSet.copy(
+                            weight = performedSet.weight,
+                            repetitions = performedSet.repetitions
+                        )
+                    )
+                }
+
+                setSessionDao.insert(
+                    SetSessionEntity(
+                        setId = setId,
+                        sessionId = sessionId,
+                        uuid = performedSet.uuid,
+                        weight = performedSet.weight,
+                        repetitions = performedSet.repetitions
+                    )
+                )
+            }
+        }
 
         return sessionId.toLong()
     }
 
+
     suspend fun getLastPerformedSplit(splitId: Int): LastPerformedSplit? {
         val lastSession = sessionDao.getLastSession(splitId) ?: return null
         val split = splitDao.getSplitById(lastSession.splitId)
-        val performedSets = setDao.getSetsForSession(lastSession.id)
 
-        val exercisesGrouped = performedSets.groupBy { it.exerciseId }.map { (exerciseId, sets) ->
-            val exercise = exerciseDao.getById(exerciseId)
+        val exercises = exerciseDao.getBySplitId(splitId)
+        val exercisesGrouped = exercises.map { exercise ->
+            val sets = setDao.getSetsForExercise(exercise.id)
+
             Exercise(
                 uuid = exercise.uuid,
                 name = exercise.name,
                 description = exercise.description,
-                sets = sets.map {
+                sets = sets.map { set ->
                     WorkoutSet(
-                        uuid = it.uuid,
-                        weight = it.weight,
-                        repetitions = it.repetitions
+                        uuid = set.uuid,
+                        weight = set.weight,
+                        repetitions = set.repetitions
                     )
                 }
             )
         }
 
         return LastPerformedSplit(
-            splitName = split.name,
+            id = splitId,
+            name = split.name,
             timestamp = lastSession.timestamp,
             exercises = exercisesGrouped
         )
