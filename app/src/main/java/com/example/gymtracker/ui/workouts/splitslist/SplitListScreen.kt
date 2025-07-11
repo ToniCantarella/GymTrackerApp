@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +53,15 @@ import java.time.Instant
 @Composable
 fun SplitListScreen(
     onSplitNavigate: (id: Int) -> Unit,
-    onNavigateToAddSplit: () -> Unit,
-    viewModel: SplitListViewModel = koinViewModel()
+    onNavigateToAddSplit: () -> Unit
 ) {
+    val viewModel: SplitListViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
     var confirmDeletionDialogOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getSplits()
+    }
 
     ProvideTopAppBar(
         actions = {
@@ -146,6 +152,7 @@ fun SplitListScreen(
     }
 
     SplitListScreen(
+        loading = uiState.loading,
         splits = uiState.splits,
         selectingItemsToDelete = uiState.selectingItemsToDelete,
         selectedItemsForDeletion = uiState.itemsToDelete,
@@ -157,6 +164,7 @@ fun SplitListScreen(
 
 @Composable
 fun SplitListScreen(
+    loading: Boolean,
     splits: List<SplitListItem>,
     selectingItemsToDelete: Boolean,
     selectedItemsForDeletion: List<Int>,
@@ -165,10 +173,13 @@ fun SplitListScreen(
     onSplitClick: (id: Int) -> Unit
 ) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        if (splits.isEmpty()) {
+        if (loading) {
+            CircularProgressIndicator()
+        } else if (splits.isEmpty()) {
             EmptyListCard(
                 icon = painterResource(id = R.drawable.weight),
                 subtitle = stringResource(id = R.string.workouts_intro)
@@ -247,6 +258,7 @@ private fun ExerciseListItem(
 private fun SplitsPreview() {
     GymTrackerTheme {
         SplitListScreen(
+            loading = false,
             splits = listOf(
                 SplitListItem(
                     id = 0,
@@ -268,6 +280,7 @@ private fun SplitsPreview() {
 private fun EmptySplitsPreview() {
     GymTrackerTheme {
         SplitListScreen(
+            loading = false,
             splits = emptyList(),
             selectingItemsToDelete = false,
             onSelectForDeletion = {},
