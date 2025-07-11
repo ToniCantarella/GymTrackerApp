@@ -185,16 +185,16 @@ class SplitViewModel(
         }
     }
 
-    fun addSet(id: UUID) {
+    fun addSet(exerciseId: UUID) {
         _uiState.update {
             it.copy(
                 exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == id) {
+                    if (exercise.uuid == exerciseId) {
                         exercise.copy(
                             sets = exercise.sets + WorkoutSet(
                                 uuid = UUID.randomUUID(),
-                                weight = 0.0,
-                                repetitions = 0
+                                weight = exercise.sets.last().weight,
+                                repetitions = exercise.sets.last().repetitions
                             )
                         )
                     } else {
