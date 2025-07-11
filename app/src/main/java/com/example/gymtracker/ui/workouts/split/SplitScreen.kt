@@ -3,12 +3,13 @@ package com.example.gymtracker.ui.workouts.split
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -139,11 +140,12 @@ fun SplitScreen(
             .fillMaxSize()
             .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(vertical = dimensionResource(id = R.dimen.padding_large)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
         ) {
-            itemsIndexed(exercises) { index, exercise ->
+            exercises.forEachIndexed { index, exercise ->
                 Exercise(
                     index = index + 1,
                     exercise = exercise,
@@ -175,21 +177,20 @@ fun SplitScreen(
                 )
             }
             if (addingSplit) {
-                item {
-                    Button(
-                        onClick = addExercise,
-                        enabled = exercises.last().name.isNotEmpty()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                        Text(
-                            text = stringResource(id = R.string.exercise)
-                        )
-                    }
+                Button(
+                    onClick = addExercise,
+                    enabled = exercises.last().name.isNotEmpty()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.exercise)
+                    )
                 }
             }
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
         }
     }
 }
