@@ -73,10 +73,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val uiState by viewModel.uiState.collectAsState()
             GymTrackerTheme {
-                GymTrackerApp(
-                    viewModel = viewModel
-                )
+                if (!uiState.loading)
+                    GymTrackerApp(
+                        viewModel = viewModel
+                    )
             }
         }
     }

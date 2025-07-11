@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -53,9 +51,9 @@ import java.time.Instant
 @Composable
 fun SplitListScreen(
     onSplitNavigate: (id: Int) -> Unit,
-    onNavigateToAddSplit: () -> Unit
+    onNavigateToAddSplit: () -> Unit,
+    viewModel: SplitListViewModel = koinViewModel()
 ) {
-    val viewModel: SplitListViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
     var confirmDeletionDialogOpen by remember { mutableStateOf(false) }
 
@@ -185,10 +183,10 @@ fun SplitListScreen(
                 subtitle = stringResource(id = R.string.workouts_intro)
             )
         } else {
-            LazyColumn(
+            Column (
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(splits) { split ->
+                splits.forEach { split ->
                     ExerciseListItem(
                         exercise = split,
                         selectingItemsToDelete = selectingItemsToDelete,
