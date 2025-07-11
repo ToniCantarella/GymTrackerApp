@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -108,6 +109,7 @@ fun SplitScreen(
     }
 
     SplitScreen(
+        loading = uiState.loading,
         exercises = uiState.exercises,
         addingSplit = uiState.adding,
         addExercise = viewModel::addExercise,
@@ -123,6 +125,7 @@ fun SplitScreen(
 
 @Composable
 fun SplitScreen(
+    loading: Boolean,
     exercises: List<Exercise>,
     addingSplit: Boolean,
     addExercise: () -> Unit,
@@ -135,62 +138,68 @@ fun SplitScreen(
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit
 ) {
     Column(
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-        ) {
-            exercises.forEachIndexed { index, exercise ->
-                Exercise(
-                    index = index + 1,
-                    exercise = exercise,
-                    onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
-                    onDescriptionChange = { description ->
-                        onDescriptionChange(
-                            exercise.uuid,
-                            description
-                        )
-                    },
-                    addSet = { addSet(exercise.uuid) },
-                    onChangeWeight = { setId, weight ->
-                        onChangeWeight(
-                            exercise.uuid,
-                            setId,
-                            weight
-                        )
-                    },
-                    onChangeRepetitions = { setId, repetitions ->
-                        onChangeRepetitions(
-                            exercise.uuid,
-                            setId,
-                            repetitions
-                        )
-                    },
-                    onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
-                    onCheckSet = onCheckSet,
-                    addingExercise = addingSplit
-                )
-            }
-            if (addingSplit) {
-                Button(
-                    onClick = addExercise,
-                    enabled = exercises.last().name.isNotEmpty()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.exercise)
+        if (loading) {
+            CircularProgressIndicator()
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                exercises.forEachIndexed { index, exercise ->
+                    Exercise(
+                        index = index + 1,
+                        exercise = exercise,
+                        onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
+                        onDescriptionChange = { description ->
+                            onDescriptionChange(
+                                exercise.uuid,
+                                description
+                            )
+                        },
+                        addSet = { addSet(exercise.uuid) },
+                        onChangeWeight = { setId, weight ->
+                            onChangeWeight(
+                                exercise.uuid,
+                                setId,
+                                weight
+                            )
+                        },
+                        onChangeRepetitions = { setId, repetitions ->
+                            onChangeRepetitions(
+                                exercise.uuid,
+                                setId,
+                                repetitions
+                            )
+                        },
+                        onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+                        onCheckSet = onCheckSet,
+                        addingExercise = addingSplit
                     )
                 }
+                if (addingSplit) {
+                    Button(
+                        onClick = addExercise,
+                        enabled = exercises.last().name.isNotEmpty()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.exercise)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
             }
-            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
         }
     }
 }
@@ -200,6 +209,7 @@ private fun ScreenForPreview(
     adding: Boolean = true
 ) {
     SplitScreen(
+        loading = false,
         exercises = listOf(
             Exercise(
                 name = "Bench press",

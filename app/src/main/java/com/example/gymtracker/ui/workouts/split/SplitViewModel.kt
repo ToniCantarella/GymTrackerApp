@@ -27,6 +27,7 @@ data class WorkoutSet(
 )
 
 data class SplitUiState(
+    val loading: Boolean = true,
     val splitName: String = "",
     val adding: Boolean = false,
     val exercises: List<Exercise> = listOf(
@@ -60,11 +61,11 @@ class SplitViewModel(
         if (navParams.id != null) {
             viewModelScope.launch {
                 val lastPerformedSplit = workoutRepository.getLastPerformedSplit(navParams.id)
-                Log.d("toni", "last: $lastPerformedSplit")
                 _uiState.update {
                     it.copy(
                         splitName = lastPerformedSplit?.name ?: "",
-                        exercises = lastPerformedSplit?.exercises ?: emptyList()
+                        exercises = lastPerformedSplit?.exercises ?: emptyList(),
+                        loading = false
                     )
                 }
             }
@@ -86,7 +87,8 @@ class SplitViewModel(
         val performedSets = uiState.value.setsPerformed
 
         return exercises.map { exercise ->
-            val sets = performedSets.filter { performedSet -> exercise.sets.any{ set -> performedSet.uuid == set.uuid } }
+            val sets =
+                performedSets.filter { performedSet -> exercise.sets.any { set -> performedSet.uuid == set.uuid } }
             Exercise(
                 uuid = exercise.uuid,
                 name = exercise.name,
@@ -100,8 +102,6 @@ class SplitViewModel(
         if (navParams.id != null) {
             viewModelScope.launch {
                 val exercisesPerformed = findAndCollectPerformedExercises()
-
-                Log.d("toni", "$exercisesPerformed")
 
                 workoutRepository.markSessionDone(
                     splitId = navParams.id,
