@@ -98,7 +98,7 @@ fun SplitListScreen(
 
     ProvideFloatingActionButton(
         onClick = onNavigateToAddSplit,
-        visible = !uiState.selectingItemsToDelete
+        visible = !uiState.selectingItemsToDelete && uiState.splits.size < MAX_SPLITS
     ) {
         Icon(
             imageVector = Icons.Default.Add,

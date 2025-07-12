@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.workouts.split.Exercise
+import com.example.gymtracker.ui.workouts.split.MAX_SETS
 import com.example.gymtracker.ui.workouts.split.WorkoutSet
 import java.util.UUID
 
@@ -125,7 +126,8 @@ fun Exercise(
                     )
                 }
                 TextButton(
-                    onClick = addSet
+                    onClick = addSet,
+                    enabled = exercise.sets.size < MAX_SETS
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,

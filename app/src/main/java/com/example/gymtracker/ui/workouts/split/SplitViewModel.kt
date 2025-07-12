@@ -47,6 +47,9 @@ data class SplitUiState(
     val setsPerformed: List<WorkoutSet> = emptyList()
 )
 
+const val MAX_EXERCISES = 10
+const val MAX_SETS = 6
+
 class SplitViewModel(
     savedStateHandle: SavedStateHandle,
     private val workoutRepository: WorkoutRepository

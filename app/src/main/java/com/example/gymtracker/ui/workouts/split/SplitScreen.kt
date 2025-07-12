@@ -184,19 +184,17 @@ fun SplitScreen(
                         addingExercise = addingSplit
                     )
                 }
-                if (addingSplit) {
-                    Button(
-                        onClick = addExercise,
-                        enabled = exercises.last().name.isNotEmpty()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                        Text(
-                            text = stringResource(id = R.string.exercise)
-                        )
-                    }
+                Button(
+                    onClick = addExercise,
+                    enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = stringResource(id = R.string.exercise)
+                    )
                 }
                 Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
             }
