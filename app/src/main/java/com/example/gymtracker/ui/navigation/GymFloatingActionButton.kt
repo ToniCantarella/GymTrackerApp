@@ -1,5 +1,8 @@
 package com.example.gymtracker.ui.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,7 +21,11 @@ fun GymFloatingActionButton(
             initializer = { GymFloatingActionButtonViewModel() }
         )
 
-        if(viewModel.showFab){
+        AnimatedVisibility(
+            visible = viewModel.showFab,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             FloatingActionButton(
                 onClick = viewModel.onClick,
                 shape = MaterialTheme.shapes.extraLarge
