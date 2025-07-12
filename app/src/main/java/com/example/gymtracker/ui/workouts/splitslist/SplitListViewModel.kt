@@ -18,8 +18,8 @@ data class SplitListItem(
 data class SplitListUiState(
     val loading: Boolean = true,
     val splits: List<SplitListItem> = emptyList(),
-    val selectingItemsToDelete: Boolean = false,
-    val itemsToDelete: List<Int> = emptyList()
+    val selectingItems: Boolean = false,
+    val selectedItems: List<Int> = emptyList()
 )
 
 const val MAX_SPLITS = 7
@@ -46,35 +46,36 @@ class SplitListViewModel(
         }
     }
 
-    fun startSelectingForDeletion() {
+    fun startSelectingItems(id: Int? = null) {
         _uiState.update {
             it.copy(
-                selectingItemsToDelete = true
+                selectingItems = true,
+                selectedItems = if (id != null) listOf(id) else emptyList()
             )
         }
     }
 
-    fun stopSelectingForDeletion() {
+    fun stopSelectingItems() {
         _uiState.update {
             it.copy(
-                selectingItemsToDelete = false,
-                itemsToDelete = emptyList()
+                selectingItems = false,
+                selectedItems = emptyList()
             )
         }
     }
 
-    fun onSelectForDeletion(id: Int) {
+    fun onSelectItem(id: Int) {
         _uiState.update {
             it.copy(
-                itemsToDelete =
-                    if (it.itemsToDelete.contains(id)) it.itemsToDelete.filter { item -> id != item }
-                    else it.itemsToDelete + listOf(id)
+                selectedItems =
+                    if (it.selectedItems.contains(id)) it.selectedItems.filter { item -> id != item }
+                    else it.selectedItems + listOf(id)
             )
         }
     }
 
-    fun onDeleteSelected() {
-        val itemsToDelete = uiState.value.itemsToDelete
+    fun onDeleteSplits() {
+        val itemsToDelete = uiState.value.selectedItems
 
         viewModelScope.launch {
             itemsToDelete.forEach {

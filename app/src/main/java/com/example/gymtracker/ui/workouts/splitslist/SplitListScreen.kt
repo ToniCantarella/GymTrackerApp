@@ -58,9 +58,9 @@ fun SplitListScreen(
 
     ProvideTopAppBar(
         actions = {
-            if (uiState.selectingItemsToDelete) {
+            if (uiState.selectingItems) {
                 IconButton(
-                    onClick = viewModel::stopSelectingForDeletion
+                    onClick = viewModel::stopSelectingItems
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -69,7 +69,7 @@ fun SplitListScreen(
                 }
                 IconButton(
                     onClick = { deletionDialogOpen = true },
-                    enabled = uiState.itemsToDelete.isNotEmpty()
+                    enabled = uiState.selectedItems.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -79,7 +79,7 @@ fun SplitListScreen(
                 }
             } else {
                 IconButton(
-                    onClick = viewModel::startSelectingForDeletion,
+                    onClick = viewModel::startSelectingItems,
                     enabled = uiState.splits.isNotEmpty()
                 ) {
                     Icon(
@@ -93,7 +93,7 @@ fun SplitListScreen(
 
     ProvideFloatingActionButton(
         onClick = onNavigateToAddSplit,
-        visible = !uiState.selectingItemsToDelete && uiState.splits.size < MAX_SPLITS
+        visible = !uiState.selectingItems && uiState.splits.size < MAX_SPLITS
     ) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -113,7 +113,7 @@ fun SplitListScreen(
                     Text(
                         text = stringResource(
                             id = R.string.delete_are_you_sure,
-                            uiState.itemsToDelete.size
+                            uiState.selectedItems.size
                         ),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
@@ -132,7 +132,7 @@ fun SplitListScreen(
                         }
                         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                         Button(
-                            onClick = viewModel::onDeleteSelected
+                            onClick = viewModel::onDeleteSplits
                         ) {
                             Text(
                                 text = stringResource(id = R.string.delete)
@@ -147,11 +147,11 @@ fun SplitListScreen(
     SplitListScreen(
         loading = uiState.loading,
         splits = uiState.splits,
-        selectingItemsToDelete = uiState.selectingItemsToDelete,
-        selectedItemsForDeletion = uiState.itemsToDelete,
-        onSelectForDeletion = viewModel::onSelectForDeletion,
+        selectingItems = uiState.selectingItems,
+        selectedItems = uiState.selectedItems,
+        onSelect = viewModel::onSelectItem,
         onSplitClick = onSplitNavigate,
-        onSplitHold = viewModel::startSelectingForDeletion
+        onSplitHold = viewModel::startSelectingItems
     )
 }
 
@@ -159,10 +159,10 @@ fun SplitListScreen(
 fun SplitListScreen(
     loading: Boolean,
     splits: List<SplitListItem>,
-    selectingItemsToDelete: Boolean,
-    selectedItemsForDeletion: List<Int>,
-    onSelectForDeletion: (id: Int) -> Unit,
-    onSplitHold: () -> Unit,
+    selectingItems: Boolean,
+    selectedItems: List<Int>,
+    onSelect: (id: Int) -> Unit,
+    onSplitHold: (id: Int) -> Unit,
     onSplitClick: (id: Int) -> Unit
 ) {
     Column(
@@ -182,12 +182,12 @@ fun SplitListScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 splits.forEach { split ->
-                    ExerciseListItem(
-                        exercise = split,
-                        selectingItemsToDelete = selectingItemsToDelete,
-                        isSetForDeletion = selectedItemsForDeletion.contains(split.id),
-                        onSelectForDeletion = onSelectForDeletion,
-                        onHold = onSplitHold,
+                    SplitListItem(
+                        split = split,
+                        selectingItems = selectingItems,
+                        isSelected = selectedItems.contains(split.id),
+                        onSelect = onSelect,
+                        onHold = { onSplitHold(split.id) },
                         onClick = { onSplitClick(split.id) }
                     )
                 }
@@ -197,11 +197,11 @@ fun SplitListScreen(
 }
 
 @Composable
-private fun ExerciseListItem(
-    exercise: SplitListItem,
-    selectingItemsToDelete: Boolean,
-    isSetForDeletion: Boolean,
-    onSelectForDeletion: (id: Int) -> Unit,
+private fun SplitListItem(
+    split: SplitListItem,
+    selectingItems: Boolean,
+    isSelected: Boolean,
+    onSelect: (id: Int) -> Unit,
     onHold: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -210,7 +210,7 @@ private fun ExerciseListItem(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { if (!selectingItemsToDelete) onClick() },
+                onClick = { if (!selectingItems) onClick() },
                 onLongClick = onHold
             )
     ) {
@@ -224,20 +224,20 @@ private fun ExerciseListItem(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
             ) {
                 Text(
-                    text = exercise.name,
+                    text = split.name,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${stringResource(id = R.string.last_time)}: ${exercise.latestTimestamp.toDateAndTimeString()}",
+                    text = "${stringResource(id = R.string.last_time)}: ${split.latestTimestamp.toDateAndTimeString()}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            if (selectingItemsToDelete) {
+            if (selectingItems) {
                 Checkbox(
-                    checked = isSetForDeletion,
+                    checked = isSelected,
                     onCheckedChange = {
-                        onSelectForDeletion(exercise.id)
+                        onSelect(split.id)
                     }
                 )
             }
@@ -259,10 +259,10 @@ private fun SplitsPreview() {
                     latestTimestamp = Instant.now()
                 )
             ),
-            selectingItemsToDelete = false,
+            selectingItems = false,
             onSplitClick = {},
-            onSelectForDeletion = {},
-            selectedItemsForDeletion = emptyList(),
+            onSelect = {},
+            selectedItems = emptyList(),
             onSplitHold = {}
         )
     }
@@ -275,9 +275,9 @@ private fun EmptySplitsPreview() {
         SplitListScreen(
             loading = false,
             splits = emptyList(),
-            selectingItemsToDelete = false,
-            onSelectForDeletion = {},
-            selectedItemsForDeletion = emptyList(),
+            selectingItems = false,
+            onSelect = {},
+            selectedItems = emptyList(),
             onSplitClick = {},
             onSplitHold = {}
         )
