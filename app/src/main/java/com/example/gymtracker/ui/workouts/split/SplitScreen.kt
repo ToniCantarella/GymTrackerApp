@@ -89,7 +89,8 @@ fun SplitScreen(
 
     if (uiState.adding) {
         ProvideFloatingActionButton(
-            onClick = viewModel::onCreateSplitPressed
+            onClick = viewModel::onCreateSplitPressed,
+            visible = uiState.exercises.first().name.isNotEmpty() && uiState.splitName.isNotEmpty()
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.save),
