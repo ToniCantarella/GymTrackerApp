@@ -26,24 +26,24 @@ data class WorkoutSet(
     val repetitions: Int
 )
 
+fun emptyExercise() = Exercise(
+    uuid = UUID.randomUUID(),
+    name = "",
+    description = null,
+    sets = listOf(
+        WorkoutSet(
+            uuid = UUID.randomUUID(),
+            weight = 0.0,
+            repetitions = 0
+        )
+    )
+)
+
 data class SplitUiState(
     val loading: Boolean = false,
     val splitName: String = "",
     val adding: Boolean = false,
-    val exercises: List<Exercise> = listOf(
-        Exercise(
-            uuid = UUID.randomUUID(),
-            name = "",
-            description = null,
-            sets = listOf(
-                WorkoutSet(
-                    uuid = UUID.randomUUID(),
-                    weight = 0.0,
-                    repetitions = 0
-                )
-            )
-        )
-    )
+    val exercises: List<Exercise> = listOf(emptyExercise())
 )
 
 const val MAX_EXERCISES = 10
@@ -140,20 +140,7 @@ class SplitViewModel(
     fun addExercise() {
         _uiState.update {
             it.copy(
-                exercises = it.exercises + listOf(
-                    Exercise(
-                        uuid = UUID.randomUUID(),
-                        name = "",
-                        description = null,
-                        sets = listOf(
-                            WorkoutSet(
-                                uuid = UUID.randomUUID(),
-                                weight = 0.0,
-                                repetitions = 0
-                            )
-                        )
-                    )
-                )
+                exercises = it.exercises + listOf(emptyExercise())
             )
         }
     }

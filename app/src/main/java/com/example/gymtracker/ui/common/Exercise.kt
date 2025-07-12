@@ -73,7 +73,7 @@ fun Exercise(
                     )
                 } else {
                     Text(
-                        text = exercise.name
+                        text = exercise.name.ifEmpty { "${stringResource(id = R.string.exercise)} $index" }
                     )
                 }
                 if (!addingExercise) {
