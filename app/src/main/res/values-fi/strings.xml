@@ -22,4 +22,6 @@
     <string name="repetitions">Toistot</string>
     <string name="description">Kuvaus</string>
     <string name="optional">Valinnainen</string>
+    <string name="close">Sulje</string>
+    <string name="add">Lisää</string>
 </resources>

@@ -54,7 +54,7 @@ fun SplitListScreen(
     viewModel: SplitListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var confirmDeletionDialogOpen by remember { mutableStateOf(false) }
+    var deletionDialogOpen by remember { mutableStateOf(false) }
 
     ProvideTopAppBar(
         actions = {
@@ -64,17 +64,17 @@ fun SplitListScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = null
+                        contentDescription = stringResource(id = R.string.close)
                     )
                 }
                 IconButton(
-                    onClick = { confirmDeletionDialogOpen = true },
+                    onClick = { deletionDialogOpen = true },
                     enabled = uiState.itemsToDelete.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         tint = MaterialTheme.colorScheme.error,
-                        contentDescription = null
+                        contentDescription = stringResource(id = R.string.delete)
                     )
                 }
             } else {
@@ -84,7 +84,7 @@ fun SplitListScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = null
+                        contentDescription = stringResource(id = R.string.delete)
                     )
                 }
             }
@@ -97,13 +97,13 @@ fun SplitListScreen(
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = null
+            contentDescription = stringResource(id = R.string.add)
         )
     }
 
-    if (confirmDeletionDialogOpen) {
+    if (deletionDialogOpen) {
         Dialog(
-            onDismissRequest = { confirmDeletionDialogOpen = false }
+            onDismissRequest = { deletionDialogOpen = false }
         ) {
             ElevatedCard {
                 Column(
@@ -124,7 +124,7 @@ fun SplitListScreen(
                         horizontalArrangement = Arrangement.End
                     ) {
                         OutlinedButton(
-                            onClick = { confirmDeletionDialogOpen = false }
+                            onClick = { deletionDialogOpen = false }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.cancel)
