@@ -1,6 +1,5 @@
 package com.example.gymtracker.ui.workouts.split
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,7 +27,7 @@ data class WorkoutSet(
 )
 
 data class SplitUiState(
-    val loading: Boolean = true,
+    val loading: Boolean = false,
     val splitName: String = "",
     val adding: Boolean = false,
     val exercises: List<Exercise> = listOf(
@@ -62,6 +61,7 @@ class SplitViewModel(
 
     init {
         if (navParams.id != null) {
+            _uiState.update { it.copy(loading = true) }
             viewModelScope.launch {
                 val lastPerformedSplit = workoutRepository.getLastPerformedSplit(navParams.id)
                 _uiState.update {
@@ -112,21 +112,15 @@ class SplitViewModel(
     }
 
     fun onCheckSet(workoutSet: WorkoutSet, checked: Boolean) {
-        Log.d("toni", "$workoutSet")
+        _uiState.update { state ->
+            state.copy(
+                exercises = state.exercises.map { exercise ->
+                    val updatedSets = exercise.sets.map { set ->
+                        if (set.uuid == workoutSet.uuid) set.copy(checked = checked) else set
+                    }
 
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.sets.any{ set -> set.uuid == workoutSet.uuid }){
-                        exercise.copy(sets = exercise.sets.map { set ->
-                            if(set.uuid == workoutSet.uuid) {
-                                set.copy(
-                                    checked = checked
-                                )
-                            } else {
-                                set
-                            }
-                        })
+                    if (exercise.sets.any { it.uuid == workoutSet.uuid }) {
+                        exercise.copy(sets = updatedSets)
                     } else {
                         exercise
                     }
