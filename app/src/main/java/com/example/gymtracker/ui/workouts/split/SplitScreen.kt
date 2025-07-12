@@ -25,8 +25,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -154,34 +152,33 @@ fun SplitScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                itemsIndexed(exercises) { index, exercise ->
-                    val rememberExercise by remember(exercise.uuid) { mutableStateOf(exercise) }
+                itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
                     Exercise(
                         index = index + 1,
-                        exercise = rememberExercise,
-                        onNameChange = { name -> onExerciseNameChange(rememberExercise.uuid, name) },
+                        exercise = exercise,
+                        onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
                         onDescriptionChange = { description ->
                             onDescriptionChange(
-                                rememberExercise.uuid,
+                                exercise.uuid,
                                 description
                             )
                         },
-                        addSet = { addSet(rememberExercise.uuid) },
+                        addSet = { addSet(exercise.uuid) },
                         onChangeWeight = { setId, weight ->
                             onChangeWeight(
-                                rememberExercise.uuid,
+                                exercise.uuid,
                                 setId,
                                 weight
                             )
                         },
                         onChangeRepetitions = { setId, repetitions ->
                             onChangeRepetitions(
-                                rememberExercise.uuid,
+                                exercise.uuid,
                                 setId,
                                 repetitions
                             )
                         },
-                        onRemoveSet = { setId -> onRemoveSet(rememberExercise.uuid, setId) },
+                        onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
                         onCheckSet = onCheckSet,
                         addingExercise = addingSplit
                     )
