@@ -30,10 +30,11 @@ class SplitListViewModel(
     private val _uiState = MutableStateFlow(SplitListUiState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+        getSplits()
+    }
+
     fun getSplits() {
-        _uiState.update {
-            it.copy(loading = true)
-        }
         viewModelScope.launch {
             val splits = workoutRepository.getSplitsWithLatestTimestamp()
             _uiState.update {
@@ -79,6 +80,8 @@ class SplitListViewModel(
             itemsToDelete.forEach {
                 workoutRepository.deleteSplit(it)
             }
+
+            getSplits()
         }
     }
 }
