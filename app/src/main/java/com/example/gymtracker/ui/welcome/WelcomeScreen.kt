@@ -42,7 +42,7 @@ fun WelcomeScreen(
             )
             Icon(
                 painter = painterResource(id = R.drawable.weight),
-                contentDescription = null,
+                contentDescription = stringResource(id = R.string.weight_icon),
                 modifier = Modifier.size(100.dp)
             )
             Text(

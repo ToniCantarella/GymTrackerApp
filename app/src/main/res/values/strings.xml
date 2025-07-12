@@ -16,7 +16,7 @@
     <string name="stats_intro">When you start listing and tracking your workouts/exercises, data will be displayed here.</string>
     <string name="last_time">Last time</string>
     <string name="delete_items">Delete items</string>
-    <string name="understood">I understand</string>
+    <string name="understood">Understood</string>
     <string name="welcome">Welcome!</string>
     <string name="welcome_text">Everything you create with this app is saved only on your device. We do not track any of your data. You can delete all data at any time and start from the beginning.</string>
     <string name="cancel">Cancel</string>
@@ -31,4 +31,5 @@
     <string name="optional">Optional</string>
     <string name="close">Close</string>
     <string name="add">Add</string>
+    <string name="weight_icon">Icon of a weight</string>
 </resources>

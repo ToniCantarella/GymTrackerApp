@@ -24,4 +24,5 @@
     <string name="optional">Valinnainen</string>
     <string name="close">Sulje</string>
     <string name="add">Lisää</string>
+    <string name="weight_icon">Paino ikoni</string>
 </resources>
