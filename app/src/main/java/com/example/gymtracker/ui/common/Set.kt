@@ -51,13 +51,11 @@ fun Set(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.padding_small))
     ) {
-        var checked by remember { mutableStateOf(false) }
 
         Checkbox(
-            checked = checked,
+            checked = set.checked,
             onCheckedChange = {
                 editingSet = false
-                checked = it
                 onCheckSet(set, it)
             }
         )

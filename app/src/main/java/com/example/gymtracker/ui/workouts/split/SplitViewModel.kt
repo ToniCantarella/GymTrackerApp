@@ -22,6 +22,7 @@ data class Exercise(
 
 data class WorkoutSet(
     val uuid: UUID,
+    val checked: Boolean = false,
     val weight: Double,
     val repetitions: Int
 )
@@ -43,8 +44,7 @@ data class SplitUiState(
                 )
             )
         )
-    ),
-    val setsPerformed: List<WorkoutSet> = emptyList()
+    )
 )
 
 const val MAX_EXERCISES = 10
@@ -87,16 +87,13 @@ class SplitViewModel(
     // TODO RENAME
     private fun findAndCollectPerformedExercises(): List<Exercise> {
         val exercises = uiState.value.exercises
-        val performedSets = uiState.value.setsPerformed
 
         return exercises.map { exercise ->
-            val sets =
-                performedSets.filter { performedSet -> exercise.sets.any { set -> performedSet.uuid == set.uuid } }
             Exercise(
                 uuid = exercise.uuid,
                 name = exercise.name,
                 description = exercise.description,
-                sets = sets
+                sets = exercise.sets.filter { set -> set.checked }
             )
         }
     }
@@ -116,18 +113,25 @@ class SplitViewModel(
 
     fun onCheckSet(workoutSet: WorkoutSet, checked: Boolean) {
         Log.d("toni", "$workoutSet")
-        if (checked) {
-            _uiState.update {
-                it.copy(
-                    setsPerformed = it.setsPerformed + listOf(workoutSet)
-                )
-            }
-        } else {
-            _uiState.update {
-                it.copy(
-                    setsPerformed = it.setsPerformed.filter { set -> set.uuid != workoutSet.uuid }
-                )
-            }
+
+        _uiState.update {
+            it.copy(
+                exercises = it.exercises.map { exercise ->
+                    if (exercise.sets.any{ set -> set.uuid == workoutSet.uuid }){
+                        exercise.copy(sets = exercise.sets.map { set ->
+                            if(set.uuid == workoutSet.uuid) {
+                                set.copy(
+                                    checked = checked
+                                )
+                            } else {
+                                set
+                            }
+                        })
+                    } else {
+                        exercise
+                    }
+                }
+            )
         }
     }
 
