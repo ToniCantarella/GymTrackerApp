@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -142,13 +141,15 @@ fun SplitScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
     ) {
         if (loading) {
             CircularProgressIndicator()
         } else if (exercises.isNotEmpty()) {
             LazyColumn (
-                contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
+                contentPadding = PaddingValues(
+                    vertical = dimensionResource(id = R.dimen.padding_large),
+                    horizontal = dimensionResource(id = R.dimen.padding_large)
+                ),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
                 modifier = Modifier
                     .fillMaxSize()
