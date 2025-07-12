@@ -17,23 +17,21 @@ fun GymTopAppBar(
     navBackStackEntry?.let { entry ->
         val viewModel: GymTopAppBarViewModel = viewModel(
             viewModelStoreOwner = entry,
-            initializer = { GymTopAppBarViewModel()}
+            initializer = { GymTopAppBarViewModel() }
         )
 
-        if (viewModel.showTopBar){
-            TopAppBar(
-                title = viewModel.title,
-                navigationIcon = viewModel.navigationIcon,
-                actions = viewModel.actions
-            )
-        }
+        TopAppBar(
+            title = viewModel.title,
+            navigationIcon = viewModel.navigationIcon,
+            actions = viewModel.actions
+        )
     }
 }
 
 @Composable
 fun ProvideTopAppBar(
-    title: @Composable ()-> Unit = {},
-    navigationItem: @Composable ()-> Unit = {},
+    title: @Composable () -> Unit = {},
+    navigationItem: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     val viewModelStoreOwner = LocalViewModelStoreOwner.current
@@ -43,7 +41,6 @@ fun ProvideTopAppBar(
             initializer = { GymTopAppBarViewModel() },
         )
         LaunchedEffect(title, navigationItem, actions) {
-            viewModel.showTopBar = true
             viewModel.title = title
             viewModel.navigationIcon = navigationItem
             viewModel.actions = actions

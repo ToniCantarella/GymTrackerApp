@@ -9,8 +9,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class GymTopAppBarViewModel: ViewModel() {
-    var showTopBar by mutableStateOf(false)
-
     var title by mutableStateOf<@Composable () -> Unit>({ }, referentialEqualityPolicy())
 
     var navigationIcon by mutableStateOf<@Composable () -> Unit>({ }, referentialEqualityPolicy())
