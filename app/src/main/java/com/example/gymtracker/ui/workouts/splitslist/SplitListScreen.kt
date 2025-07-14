@@ -137,7 +137,9 @@ fun SplitListScreen(
                         }
                         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                         Button(
-                            onClick = viewModel::onDeleteSplits
+                            onClick = {
+                                viewModel.onDeleteSplits { deletionDialogOpen = false }
+                            }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.delete)
@@ -183,7 +185,7 @@ fun SplitListScreen(
                 subtitle = stringResource(id = R.string.workouts_intro)
             )
         } else {
-            Column (
+            Column(
                 modifier = Modifier.fillMaxSize()
             ) {
                 splits.forEach { split ->

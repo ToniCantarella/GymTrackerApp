@@ -70,15 +70,16 @@ class SplitListViewModel(
         }
     }
 
-    fun onDeleteSplits() {
+    fun onDeleteSplits(onDeletionDone: () -> Unit) {
         val itemsToDelete = uiState.value.selectedItems
 
         viewModelScope.launch {
             itemsToDelete.forEach {
                 workoutRepository.deleteSplit(it)
             }
-
+            stopSelectingItems()
             getSplits()
+            onDeletionDone()
         }
     }
 }
