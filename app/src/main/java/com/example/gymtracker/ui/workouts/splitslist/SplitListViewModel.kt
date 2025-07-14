@@ -30,10 +30,6 @@ class SplitListViewModel(
     private val _uiState = MutableStateFlow(SplitListUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getSplits()
-    }
-
     fun getSplits() {
         viewModelScope.launch {
             val splits = workoutRepository.getSplitsWithLatestTimestamp()

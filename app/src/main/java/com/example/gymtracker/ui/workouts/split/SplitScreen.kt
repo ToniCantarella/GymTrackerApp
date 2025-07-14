@@ -145,60 +145,88 @@ fun SplitScreen(
         if (loading) {
             CircularProgressIndicator()
         } else if (exercises.isNotEmpty()) {
-            LazyColumn (
-                contentPadding = PaddingValues(
-                    vertical = dimensionResource(id = R.dimen.padding_large),
-                    horizontal = dimensionResource(id = R.dimen.padding_large)
-                ),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
-                    Exercise(
-                        index = index + 1,
-                        exercise = exercise,
-                        onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
-                        onDescriptionChange = { description ->
-                            onDescriptionChange(
-                                exercise.uuid,
-                                description
-                            )
-                        },
-                        addSet = { addSet(exercise.uuid) },
-                        onChangeWeight = { setId, weight ->
-                            onChangeWeight(
-                                exercise.uuid,
-                                setId,
-                                weight
-                            )
-                        },
-                        onChangeRepetitions = { setId, repetitions ->
-                            onChangeRepetitions(
-                                exercise.uuid,
-                                setId,
-                                repetitions
-                            )
-                        },
-                        onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
-                        onCheckSet = onCheckSet,
-                        addingExercise = addingSplit
+            ExerciseList(
+                exercises = exercises,
+                addingSplit = addingSplit,
+                onAddExercise = addExercise,
+                onExerciseNameChange = onExerciseNameChange,
+                onDescriptionChange = onDescriptionChange,
+                onAddSet = addSet,
+                onChangeWeight = onChangeWeight,
+                onChangeRepetitions = onChangeRepetitions,
+                onCheckSet = onCheckSet,
+                onRemoveSet = onRemoveSet
+            )
+        }
+    }
+}
+
+@Composable
+fun ExerciseList(
+    exercises: List<Exercise>,
+    addingSplit: Boolean,
+    onAddExercise: () -> Unit,
+    onExerciseNameChange: (exerciseId: UUID, name: String) -> Unit,
+    onDescriptionChange: (exerciseId: UUID, description: String) -> Unit,
+    onAddSet: (exerciseId: UUID) -> Unit,
+    onChangeWeight: (exerciseId: UUID, setId: UUID, Double) -> Unit,
+    onChangeRepetitions: (exerciseId: UUID, setId: UUID, Int) -> Unit,
+    onCheckSet: (set: WorkoutSet, checked: Boolean) -> Unit,
+    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn (
+        contentPadding = PaddingValues(
+            vertical = dimensionResource(id = R.dimen.padding_large),
+            horizontal = dimensionResource(id = R.dimen.padding_large)
+        ),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
+            Exercise(
+                index = index + 1,
+                exercise = exercise,
+                onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
+                onDescriptionChange = { description ->
+                    onDescriptionChange(
+                        exercise.uuid,
+                        description
                     )
-                }
-                item{
-                    Button(
-                        onClick = addExercise,
-                        enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                        Text(
-                            text = stringResource(id = R.string.exercise)
-                        )
-                    }
-                }
+                },
+                addSet = { onAddSet(exercise.uuid) },
+                onChangeWeight = { setId, weight ->
+                    onChangeWeight(
+                        exercise.uuid,
+                        setId,
+                        weight
+                    )
+                },
+                onChangeRepetitions = { setId, repetitions ->
+                    onChangeRepetitions(
+                        exercise.uuid,
+                        setId,
+                        repetitions
+                    )
+                },
+                onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+                onCheckSet = onCheckSet,
+                addingExercise = addingSplit
+            )
+        }
+        item{
+            Button(
+                onClick = onAddExercise,
+                enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null
+                )
+                Text(
+                    text = stringResource(id = R.string.exercise)
+                )
             }
         }
     }

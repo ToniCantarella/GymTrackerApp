@@ -8,6 +8,7 @@ import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
+import com.example.gymtracker.ui.workouts.createsplit.CreateSplitViewModel
 import com.example.gymtracker.ui.workouts.split.SplitViewModel
 import com.example.gymtracker.ui.workouts.splitslist.SplitListViewModel
 import org.koin.android.ext.koin.androidContext
@@ -55,4 +56,5 @@ val viewModelModule = module {
     viewModelOf(::SplitListViewModel)
     viewModelOf(::CardioListViewModel)
     viewModelOf(::SplitViewModel)
+    viewModelOf(::CreateSplitViewModel)
 }

@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,12 +50,16 @@ import java.time.Instant
 
 @Composable
 fun SplitListScreen(
-    onSplitNavigate: (id: Int) -> Unit,
-    onNavigateToAddSplit: () -> Unit,
+    onNavigateToSplit: (id: Int) -> Unit,
+    onNavigateToCreateSplit: () -> Unit,
     viewModel: SplitListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getSplits()
+    }
 
     ProvideTopAppBar(
         actions = {
@@ -92,7 +97,7 @@ fun SplitListScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = onNavigateToAddSplit,
+        onClick = onNavigateToCreateSplit,
         visible = !uiState.selectingItems && uiState.splits.size < MAX_SPLITS
     ) {
         Icon(
@@ -150,7 +155,7 @@ fun SplitListScreen(
         selectingItems = uiState.selectingItems,
         selectedItems = uiState.selectedItems,
         onSelect = viewModel::onSelectItem,
-        onSplitClick = onSplitNavigate,
+        onSplitClick = onNavigateToSplit,
         onSplitHold = viewModel::startSelectingItems
     )
 }

@@ -56,6 +56,7 @@ import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
+import com.example.gymtracker.ui.workouts.createsplit.CreateSplitScreen
 import com.example.gymtracker.ui.workouts.split.SplitScreen
 import com.example.gymtracker.ui.workouts.splitslist.SplitListScreen
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -116,20 +117,19 @@ fun GymTrackerApp(
             navigation<Route.Workouts>(startDestination = Route.SplitList) {
                 composable<Route.SplitList> {
                     SplitListScreen(
-                        onSplitNavigate = { navController.navigate(Route.Split(it)) },
-                        onNavigateToAddSplit = {
-                            navController.navigate(
-                                Route.Split(
-                                    id = null,
-                                    adding = true
-                                )
-                            )
-                        }
+                        onNavigateToSplit = { navController.navigate(Route.Split(it)) },
+                        onNavigateToCreateSplit = { navController.navigate(Route.CreateSplit) }
                     )
                 }
                 composable<Route.Split> {
                     SplitScreen(
                         onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable<Route.CreateSplit> {
+                    CreateSplitScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onCreate = { navController.popBackStack() }
                     )
                 }
             }
