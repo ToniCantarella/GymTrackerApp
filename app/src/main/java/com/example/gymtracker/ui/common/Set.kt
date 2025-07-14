@@ -39,7 +39,7 @@ fun Set(
     onChangeWeight: (Double) -> Unit,
     onChangeRepetitions: (Int) -> Unit,
     onRemoveSet: () -> Unit,
-    onCheckSet: (WorkoutSet, Boolean) -> Unit,
+    onCheckSet: (checked: Boolean) -> Unit,
     addingSet: Boolean = false
 ) {
     var editingSet by remember { mutableStateOf(addingSet) }
@@ -56,7 +56,7 @@ fun Set(
             checked = set.checked,
             onCheckedChange = {
                 editingSet = false
-                onCheckSet(set, it)
+                onCheckSet(it)
             }
         )
 

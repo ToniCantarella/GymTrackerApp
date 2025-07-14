@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.ui.navigation.Route
+import com.example.gymtracker.ui.workouts.SplitUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -42,7 +43,6 @@ fun emptyExercise() = Exercise(
 data class SplitUiState(
     val loading: Boolean = false,
     val splitName: String = "",
-    val adding: Boolean = false,
     val exercises: List<Exercise> = listOf(emptyExercise())
 )
 
@@ -53,32 +53,109 @@ class SplitViewModel(
     savedStateHandle: SavedStateHandle,
     private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
+    private val splitUtil = SplitUtil()
     private val navParams = savedStateHandle.toRoute<Route.Split>()
 
-    private val _uiState = MutableStateFlow(SplitUiState(adding = navParams.adding))
+    private val _uiState = MutableStateFlow(SplitUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        if (navParams.id != null) {
-            _uiState.update { it.copy(loading = true) }
-            viewModelScope.launch {
-                val lastPerformedSplit = workoutRepository.getLastPerformedSplit(navParams.id)
-                _uiState.update {
-                    it.copy(
-                        splitName = lastPerformedSplit?.name ?: "",
-                        exercises = lastPerformedSplit?.exercises ?: emptyList(),
-                        loading = false
-                    )
-                }
+        viewModelScope.launch {
+            val lastPerformedSplit = workoutRepository.getLastPerformedSplit(navParams.id)
+            _uiState.update {
+                it.copy(
+                    splitName = lastPerformedSplit?.name ?: "",
+                    exercises = lastPerformedSplit?.exercises ?: emptyList(),
+                    loading = false
+                )
             }
         }
     }
 
-    fun onCreateSplitPressed() {
+    fun onSplitNameChange(name: String) {
+        _uiState.update {
+            it.copy(
+                splitName = name
+            )
+        }
+    }
+
+    fun onExerciseNameChange(id: UUID, name: String) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.updateExerciseName(it.exercises, id, name)
+            )
+        }
+    }
+
+    fun onDescriptionChange(id: UUID, description: String) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.updateExerciseDescription(it.exercises, id, description)
+            )
+        }
+    }
+
+    fun addExercise() {
+        _uiState.update {
+            it.copy(
+                exercises = it.exercises + listOf(emptyExercise())
+            )
+        }
+    }
+
+    fun onCheckSet(exerciseId: UUID, setId: UUID, checked: Boolean) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.checkSet(it.exercises, exerciseId, setId, checked)
+            )
+        }
+    }
+
+    fun addSet(exerciseId: UUID) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.addSet(it.exercises, exerciseId)
+            )
+        }
+    }
+
+    fun onRemoveSet(exerciseId: UUID, setId: UUID) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.removeSet(it.exercises, exerciseId, setId)
+            )
+        }
+    }
+
+    fun onChangeWeight(exerciseId: UUID, setId: UUID, weight: Double) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.updateWeight(it.exercises, exerciseId, setId, weight)
+            )
+        }
+    }
+
+    fun onChangeRepetitions(exerciseId: UUID, setId: UUID, repetitions: Int) {
+        _uiState.update {
+            it.copy(
+                exercises = splitUtil.updateRepetitions(
+                    it.exercises,
+                    exerciseId,
+                    setId,
+                    repetitions
+                )
+            )
+        }
+    }
+
+    fun onFinishWorkoutPressed() {
         viewModelScope.launch {
-            workoutRepository.addSplitWithExercises(
-                splitName = uiState.value.splitName,
-                exercises = uiState.value.exercises
+            val exercisesPerformed = findAndCollectPerformedExercises()
+
+            workoutRepository.markSessionDone(
+                splitId = navParams.id,
+                exercisesPerformed = exercisesPerformed
             )
         }
     }
@@ -92,163 +169,6 @@ class SplitViewModel(
                 name = exercise.name,
                 description = exercise.description,
                 sets = exercise.sets.filter { set -> set.checked }
-            )
-        }
-    }
-
-    fun onFinishWorkoutPressed() {
-        if (navParams.id != null) {
-            viewModelScope.launch {
-                val exercisesPerformed = findAndCollectPerformedExercises()
-
-                workoutRepository.markSessionDone(
-                    splitId = navParams.id,
-                    exercisesPerformed = exercisesPerformed
-                )
-            }
-        }
-    }
-
-    fun onCheckSet(workoutSet: WorkoutSet, checked: Boolean) {
-        _uiState.update { state ->
-            state.copy(
-                exercises = state.exercises.map { exercise ->
-                    val updatedSets = exercise.sets.map { set ->
-                        if (set.uuid == workoutSet.uuid) set.copy(checked = checked) else set
-                    }
-
-                    if (exercise.sets.any { it.uuid == workoutSet.uuid }) {
-                        exercise.copy(sets = updatedSets)
-                    } else {
-                        exercise
-                    }
-                }
-            )
-        }
-    }
-
-    fun onSplitNameChange(name: String) {
-        _uiState.update {
-            it.copy(
-                splitName = name
-            )
-        }
-    }
-
-    fun addExercise() {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises + listOf(emptyExercise())
-            )
-        }
-    }
-
-    fun onExerciseNameChange(id: UUID, name: String) {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == id) {
-                        exercise.copy(name = name)
-                    } else {
-                        exercise
-                    }
-                }
-            )
-        }
-    }
-
-    fun onDescriptionChange(id: UUID, description: String) {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == id) {
-                        exercise.copy(description = description)
-                    } else {
-                        exercise
-                    }
-                }
-            )
-        }
-    }
-
-    fun addSet(exerciseId: UUID) {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == exerciseId) {
-                        exercise.copy(
-                            sets = exercise.sets + WorkoutSet(
-                                uuid = UUID.randomUUID(),
-                                weight = exercise.sets.last().weight,
-                                repetitions = exercise.sets.last().repetitions
-                            )
-                        )
-                    } else {
-                        exercise
-                    }
-                }
-            )
-        }
-    }
-
-    fun onRemoveSet(exerciseId: UUID, setId: UUID) {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == exerciseId) {
-                        exercise.copy(
-                            sets = exercise.sets.filter { set ->
-                                set.uuid != setId
-                            }
-                        )
-                    } else {
-                        exercise
-                    }
-                }
-            )
-        }
-    }
-
-    fun onChangeWeight(exerciseId: UUID, setId: UUID, weight: Double) {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == exerciseId) {
-                        exercise.copy(
-                            sets = exercise.sets.map { set ->
-                                if (set.uuid == setId) {
-                                    set.copy(
-                                        weight = weight
-                                    )
-                                } else set
-                            }
-                        )
-                    } else {
-                        exercise
-                    }
-                }
-            )
-        }
-    }
-
-    fun onChangeRepetitions(exerciseId: UUID, setId: UUID, repetitions: Int) {
-        _uiState.update {
-            it.copy(
-                exercises = it.exercises.map { exercise ->
-                    if (exercise.uuid == exerciseId) {
-                        exercise.copy(
-                            sets = exercise.sets.map { set ->
-                                if (set.uuid == setId) {
-                                    set.copy(
-                                        repetitions = repetitions
-                                    )
-                                } else set
-                            }
-                        )
-                    } else {
-                        exercise
-                    }
-                }
             )
         }
     }

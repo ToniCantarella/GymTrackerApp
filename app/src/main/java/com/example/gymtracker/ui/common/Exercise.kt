@@ -42,7 +42,7 @@ fun Exercise(
     onChangeWeight: (setId: UUID, Double) -> Unit,
     onChangeRepetitions: (setId: UUID, Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
-    onCheckSet: (set: WorkoutSet, checked: Boolean) -> Unit,
+    onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
     addingExercise: Boolean = false
 ) {
     var editingExercise by remember { mutableStateOf(addingExercise) }
@@ -121,7 +121,12 @@ fun Exercise(
                         onChangeWeight = { onChangeWeight(set.uuid, it) },
                         onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
                         onRemoveSet = { onRemoveSet(set.uuid) },
-                        onCheckSet = onCheckSet,
+                        onCheckSet = { checked ->
+                            onCheckSet(
+                                set.uuid,
+                                checked
+                            )
+                        },
                         addingSet = addingExercise
                     )
                 }

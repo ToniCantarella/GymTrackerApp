@@ -117,7 +117,7 @@ private fun CreateSplitScreen(
             onAddSet = addSet,
             onChangeWeight = onChangeWeight,
             onChangeRepetitions = onChangeRepetitions,
-            onCheckSet = { _, _ -> },
+            onCheckSet = { _, _, _ -> },
             onRemoveSet = onRemoveSet
         )
     }

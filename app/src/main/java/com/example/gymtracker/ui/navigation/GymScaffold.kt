@@ -18,8 +18,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.gymtracker.R
-import kotlinx.serialization.Serializable
 
 @Composable
 fun GymScaffold(
@@ -80,53 +78,3 @@ fun GymScaffold(
         content(innerPadding)
     }
 }
-
-@Serializable
-open class Route {
-    @Serializable
-    object Welcome : Route()
-
-    @Serializable
-    object Workouts : Route()
-
-    @Serializable
-    object SplitList : Route()
-
-    @Serializable
-    class Split(val id: Int?, val adding: Boolean = false) : Route()
-
-    @Serializable
-    object CreateSplit: Route()
-
-    @Serializable
-    object Cardio : Route()
-
-    @Serializable
-    object CardioList : Route()
-
-    @Serializable
-    object Stats : Route()
-
-    @Serializable
-    object StatsOverview : Route()
-}
-
-data class BottomBarRoute<Route>(val titleResId: Int, val route: Route, val iconResInt: Int)
-
-val bottomBarRoutes = listOf(
-    BottomBarRoute(
-        titleResId = R.string.workouts,
-        route = Route.Workouts,
-        iconResInt = R.drawable.weight
-    ),
-    BottomBarRoute(
-        titleResId = R.string.cardio,
-        route = Route.Cardio,
-        iconResInt = R.drawable.run
-    ),
-    BottomBarRoute(
-        titleResId = R.string.stats,
-        route = Route.Stats,
-        iconResInt = R.drawable.stats
-    )
-)
