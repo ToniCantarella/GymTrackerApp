@@ -5,36 +5,42 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
-import com.example.gymtracker.ui.common.Exercise
 import com.example.gymtracker.ui.workouts.MAX_EXERCISES
 import com.example.gymtracker.ui.workouts.entity.Exercise
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
 fun ExerciseList(
     exercises: List<Exercise>,
-    addingSplit: Boolean,
+    creatingSplit: Boolean,
     onAddExercise: () -> Unit,
-    onExerciseNameChange: (exerciseId: UUID, name: String) -> Unit,
-    onDescriptionChange: (exerciseId: UUID, description: String) -> Unit,
-    onAddSet: (exerciseId: UUID) -> Unit,
+    onExerciseNameChange: (id: UUID, name: String) -> Unit,
+    onDescriptionChange: (id: UUID, description: String) -> Unit,
+    onAddSet: (id: UUID) -> Unit,
     onChangeWeight: (exerciseId: UUID, setId: UUID, Double) -> Unit,
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, Int) -> Unit,
     onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit,
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lazyListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
     LazyColumn(
+        state = lazyListState,
         contentPadding = PaddingValues(
             vertical = dimensionResource(id = R.dimen.padding_large),
             horizontal = dimensionResource(id = R.dimen.padding_large)
@@ -77,12 +83,17 @@ fun ExerciseList(
                         checked
                     )
                 },
-                addingExercise = addingSplit
+                creatingExercise = creatingSplit
             )
         }
         item {
             Button(
-                onClick = onAddExercise,
+                onClick = {
+                    onAddExercise()
+                    scope.launch {
+                        lazyListState.animateScrollToItem(exercises.size)
+                    }
+                },
                 enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
             ) {
                 Icon(

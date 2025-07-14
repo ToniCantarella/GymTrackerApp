@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.common
+package com.example.gymtracker.ui.workouts.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

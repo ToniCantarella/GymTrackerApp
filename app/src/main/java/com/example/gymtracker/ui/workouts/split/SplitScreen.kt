@@ -127,7 +127,7 @@ fun SplitScreen(
         } else if (exercises.isNotEmpty()) {
             ExerciseList(
                 exercises = exercises,
-                addingSplit = false,
+                creatingSplit = false,
                 onAddExercise = addExercise,
                 onExerciseNameChange = onExerciseNameChange,
                 onDescriptionChange = onDescriptionChange,

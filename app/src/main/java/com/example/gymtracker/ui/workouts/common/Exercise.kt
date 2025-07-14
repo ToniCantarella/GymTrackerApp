@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.common
+package com.example.gymtracker.ui.workouts.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,9 +43,9 @@ fun Exercise(
     onChangeRepetitions: (setId: UUID, Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
     onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
-    addingExercise: Boolean = false
+    creatingExercise: Boolean = false
 ) {
-    var editingExercise by remember { mutableStateOf(addingExercise) }
+    var editingExercise by remember { mutableStateOf(creatingExercise) }
 
     ElevatedCard(
         modifier = Modifier
@@ -76,7 +76,7 @@ fun Exercise(
                         text = exercise.name.ifEmpty { "${stringResource(id = R.string.exercise)} $index" }
                     )
                 }
-                if (!addingExercise) {
+                if (!creatingExercise) {
                     IconButton(
                         onClick = {
                             editingExercise = true
@@ -127,7 +127,7 @@ fun Exercise(
                                 checked
                             )
                         },
-                        addingSet = addingExercise
+                        addingSet = creatingExercise
                     )
                 }
                 TextButton(
@@ -185,7 +185,7 @@ fun ExerciseForPreview(
         onChangeRepetitions = { _, _ -> },
         onRemoveSet = {},
         onCheckSet = { _, _ -> },
-        addingExercise = addingExercise
+        creatingExercise = addingExercise
     )
 }
 
