@@ -1,8 +1,12 @@
 package com.example.gymtracker.ui.workouts
 
-import com.example.gymtracker.ui.workouts.split.Exercise
-import com.example.gymtracker.ui.workouts.split.WorkoutSet
+import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 import java.util.UUID
+
+const val MAX_SPLITS = 7
+const val MAX_EXERCISES = 10
+const val MAX_SETS = 6
 
 class SplitUtil {
 

@@ -10,8 +10,8 @@ import com.example.gymtracker.database.entity.workout.SetEntity
 import com.example.gymtracker.database.entity.workout.SetSessionEntity
 import com.example.gymtracker.database.entity.workout.SplitEntity
 import com.example.gymtracker.database.entity.workout.SplitSessionEntity
-import com.example.gymtracker.ui.workouts.split.Exercise
-import com.example.gymtracker.ui.workouts.split.WorkoutSet
+import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 import com.example.gymtracker.ui.workouts.splitslist.SplitListItem
 import java.time.Instant
 

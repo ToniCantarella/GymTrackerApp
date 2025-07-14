@@ -20,8 +20,8 @@ import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
-import com.example.gymtracker.ui.workouts.split.Exercise
-import com.example.gymtracker.ui.workouts.split.ExerciseList
+import com.example.gymtracker.ui.workouts.common.ExerciseList
+import com.example.gymtracker.ui.workouts.entity.Exercise
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 

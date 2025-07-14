@@ -27,9 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.ui.workouts.split.Exercise
-import com.example.gymtracker.ui.workouts.split.MAX_SETS
-import com.example.gymtracker.ui.workouts.split.WorkoutSet
+import com.example.gymtracker.ui.workouts.MAX_SETS
+import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 import java.util.UUID
 
 @Composable

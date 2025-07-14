@@ -44,6 +44,7 @@ import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
+import com.example.gymtracker.ui.workouts.MAX_SPLITS
 import com.example.gymtracker.utility.toDateAndTimeString
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant

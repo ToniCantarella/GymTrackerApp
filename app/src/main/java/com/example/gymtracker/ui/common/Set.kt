@@ -30,7 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
-import com.example.gymtracker.ui.workouts.split.WorkoutSet
+import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 
 @Composable
 fun Set(

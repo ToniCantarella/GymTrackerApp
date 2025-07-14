@@ -7,47 +7,18 @@ import androidx.navigation.toRoute
 import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.workouts.SplitUtil
+import com.example.gymtracker.ui.workouts.entity.Exercise
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-data class Exercise(
-    val uuid: UUID,
-    val name: String,
-    val description: String?,
-    val sets: List<WorkoutSet>
-)
-
-data class WorkoutSet(
-    val uuid: UUID,
-    val checked: Boolean = false,
-    val weight: Double,
-    val repetitions: Int
-)
-
-fun emptyExercise() = Exercise(
-    uuid = UUID.randomUUID(),
-    name = "",
-    description = null,
-    sets = listOf(
-        WorkoutSet(
-            uuid = UUID.randomUUID(),
-            weight = 0.0,
-            repetitions = 0
-        )
-    )
-)
-
 data class SplitUiState(
     val loading: Boolean = false,
     val splitName: String = "",
-    val exercises: List<Exercise> = listOf(emptyExercise())
+    val exercises: List<Exercise> = listOf(Exercise.emptyExercise())
 )
-
-const val MAX_EXERCISES = 10
-const val MAX_SETS = 6
 
 class SplitViewModel(
     savedStateHandle: SavedStateHandle,
@@ -99,7 +70,7 @@ class SplitViewModel(
     fun addExercise() {
         _uiState.update {
             it.copy(
-                exercises = it.exercises + listOf(emptyExercise())
+                exercises = it.exercises + listOf(Exercise.emptyExercise())
             )
         }
     }

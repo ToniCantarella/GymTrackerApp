@@ -22,8 +22,6 @@ data class SplitListUiState(
     val selectedItems: List<Int> = emptyList()
 )
 
-const val MAX_SPLITS = 7
-
 class SplitListViewModel(
     private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
