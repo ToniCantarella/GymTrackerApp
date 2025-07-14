@@ -51,8 +51,8 @@ fun ExerciseList(
     ) {
         itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
             Exercise(
-                index = index + 1,
                 exercise = exercise,
+                placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}",
                 onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
                 onDescriptionChange = { description ->
                     onDescriptionChange(

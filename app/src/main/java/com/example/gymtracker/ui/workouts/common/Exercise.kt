@@ -34,8 +34,8 @@ import java.util.UUID
 
 @Composable
 fun Exercise(
-    index: Int,
     exercise: Exercise,
+    placeholderName: String,
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
     addSet: () -> Unit,
@@ -43,7 +43,7 @@ fun Exercise(
     onChangeRepetitions: (setId: UUID, Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
     onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
-    creatingExercise: Boolean = false
+    creatingExercise: Boolean = true
 ) {
     var editingExercise by remember { mutableStateOf(creatingExercise) }
 
@@ -67,13 +67,13 @@ fun Exercise(
                         onValueChange = onNameChange,
                         placeholder = {
                             Text(
-                                text = "${stringResource(id = R.string.exercise)} $index"
+                                text = placeholderName
                             )
                         }
                     )
                 } else {
                     Text(
-                        text = exercise.name.ifEmpty { "${stringResource(id = R.string.exercise)} $index" }
+                        text = exercise.name.ifEmpty { placeholderName }
                     )
                 }
                 if (!creatingExercise) {
@@ -176,8 +176,8 @@ fun ExerciseForPreview(
     addingExercise: Boolean = false
 ) {
     Exercise(
-        index = 0,
         exercise = exercise,
+        placeholderName = "${stringResource(id = R.string.exercise)} 1",
         onNameChange = {},
         onDescriptionChange = {},
         addSet = {},
