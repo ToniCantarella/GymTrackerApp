@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.room)
     implementation(libs.room.runtime)
+    implementation(libs.compose.charts)
+    implementation(libs.compose.calendar)
     annotationProcessor(libs.room.compiler)
 
     ksp(libs.room.compiler)

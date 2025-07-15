@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
+import com.example.gymtracker.ui.stats.StatsOverviewScreen
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
 import com.example.gymtracker.ui.workouts.createsplit.CreateSplitScreen
@@ -142,7 +143,9 @@ fun GymTrackerApp(
 
             navigation<Route.Stats>(startDestination = Route.StatsOverview) {
                 composable<Route.StatsOverview> {
-                    Text("stats")
+                    StatsOverviewScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
             }
         }

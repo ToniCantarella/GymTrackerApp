@@ -177,4 +177,8 @@ class WorkoutRepository(
             exercises = exercisesGrouped
         )
     }
+
+    suspend fun getSplitSessionsBetweenDates(startDate: Instant, endDate: Instant): List<SplitSessionEntity?> {
+        return sessionDao.getSessionsForTimespan(startDate, endDate)
+    }
 }

@@ -25,4 +25,8 @@
     <string name="close">Sulje</string>
     <string name="add">Lisää</string>
     <string name="weight_icon">Paino ikoni</string>
+    <string name="back">Takaisin</string>
+    <string name="overview">Yleisnäkymä</string>
+    <string name="days_worked_out">Treenatut päivät</string>
+    <string name="total">Yhteensä</string>
 </resources>

@@ -8,6 +8,7 @@ import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
+import com.example.gymtracker.ui.stats.StatsOverviewViewModel
 import com.example.gymtracker.ui.workouts.createsplit.CreateSplitViewModel
 import com.example.gymtracker.ui.workouts.split.SplitViewModel
 import com.example.gymtracker.ui.workouts.splitslist.SplitListViewModel
@@ -57,4 +58,5 @@ val viewModelModule = module {
     viewModelOf(::CardioListViewModel)
     viewModelOf(::SplitViewModel)
     viewModelOf(::CreateSplitViewModel)
+    viewModelOf(::StatsOverviewViewModel)
 }

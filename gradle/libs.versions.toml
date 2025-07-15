@@ -14,6 +14,8 @@ koin = "4.1.0"
 datastore = "1.1.7"
 room = "2.7.2"
 ksp = "2.1.21-2.0.1"
+composeCharts = "0.1.7"
+composeCalendar = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +42,8 @@ room = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "core-splashscreen" }
+compose-charts = {module ="io.github.ehsannarmani:compose-charts", version.ref = "composeCharts"}
+compose-calendar = {module = "com.kizitonwose.calendar:compose-multiplatform", version.ref = "composeCalendar"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

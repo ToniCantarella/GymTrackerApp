@@ -32,4 +32,8 @@
     <string name="close">Close</string>
     <string name="add">Add</string>
     <string name="weight_icon">Icon of a weight</string>
+    <string name="back">Back</string>
+    <string name="overview">Overview</string>
+    <string name="days_worked_out">Days trained</string>
+    <string name="total">Total</string>
 </resources>
