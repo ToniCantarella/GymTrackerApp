@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.stats
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -143,6 +145,7 @@ private fun Calendar(
     val highlightedDates: List<LocalDate> = remember(days) {
         days.map { it.atZone(zoneId).toLocalDate().toKotlinLocalDate() }
     }
+    val highlightColor = Color.Green.copy(alpha = .3f)
 
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(100) }
@@ -185,7 +188,13 @@ private fun Calendar(
         }
         HorizontalCalendar(
             state = state,
-            dayContent = { day -> Day(day, selected = highlightedDates.contains(day.date)) }
+            dayContent = { day ->
+                Day(
+                    day = day,
+                    selected = highlightedDates.contains(day.date),
+                    highlightColor = highlightColor
+                )
+            }
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -201,7 +210,7 @@ private fun Calendar(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(Color.Green)
+                        .background(highlightColor)
                         .size(10.dp)
                 )
                 Text(
@@ -218,21 +227,25 @@ private fun Calendar(
 val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
 @Composable
-private fun Day(day: CalendarDay, selected: Boolean) {
+private fun Day(day: CalendarDay, selected: Boolean, highlightColor: Color) {
     Box(
         modifier = Modifier
             .aspectRatio(1f)
             .clip(CircleShape)
-            .background(color = if (selected) Color.Green.copy(alpha = .3f) else Color.Transparent)
+            .background(color = if (selected) highlightColor else Color.Transparent)
             .then(
-                if (day.date == today) Modifier.border(2.dp, Color.Red, CircleShape)
+                if (day.date == today)
+                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
                 else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = day.date.dayOfMonth.toString(),
-            color = if (day.position == DayPosition.MonthDate && day.date <= today) Color.White else Color.Gray
+            color = if (day.position == DayPosition.MonthDate && day.date <= today)
+                MaterialTheme.colorScheme.onSurface
+            else
+                MaterialTheme.colorScheme.onSurface.copy(.5f)
         )
     }
 }
@@ -240,6 +253,17 @@ private fun Day(day: CalendarDay, selected: Boolean) {
 @Preview(showBackground = true)
 @Composable
 private fun StatsOverviewPreview() {
+    GymTrackerTheme {
+        StatsOverviewScreen(
+            loading = false,
+            workoutDays = emptyList()
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun StatsOverviewPreviewDark() {
     GymTrackerTheme {
         StatsOverviewScreen(
             loading = false,
