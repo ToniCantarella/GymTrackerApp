@@ -61,12 +61,6 @@ class WorkoutRepository(
 
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
         val splitId = splitDao.insert(SplitEntity(name = splitName)).toInt()
-        val sessionId = sessionDao.insert(
-            SplitSessionEntity(
-                splitId = splitId,
-                timestamp = Instant.now()
-            )
-        ).toInt()
 
         exercises.forEach { exercise ->
             val exerciseId = exerciseDao.insert(
@@ -79,7 +73,7 @@ class WorkoutRepository(
             ).toInt()
 
             exercise.sets.forEach { set ->
-                val setId = setDao.insert(
+                setDao.insert(
                     SetEntity(
                         exerciseId = exerciseId,
                         uuid = set.uuid,
@@ -87,16 +81,6 @@ class WorkoutRepository(
                         repetitions = set.repetitions
                     )
                 ).toInt()
-
-                setSessionDao.insert(
-                    SetSessionEntity(
-                        setId = setId,
-                        sessionId = sessionId,
-                        uuid = set.uuid,
-                        weight = set.weight,
-                        repetitions = set.repetitions
-                    )
-                )
             }
         }
     }
@@ -166,8 +150,8 @@ class WorkoutRepository(
 
 
     suspend fun getLastPerformedSplitWithExercises(splitId: Int): LastPerformedSplit? {
-        val lastSession = sessionDao.getLastSession(splitId) ?: return null
-        val split = splitDao.getSplitById(lastSession.splitId)
+        val timestamp = sessionDao.getLastSession(splitId)?.timestamp ?: Instant.now()
+        val split = splitDao.getSplitById(splitId)
 
         val exercises = exerciseDao.getBySplitId(splitId)
         val exercisesGrouped = exercises.map { exercise ->
@@ -190,7 +174,7 @@ class WorkoutRepository(
         return LastPerformedSplit(
             id = splitId,
             name = split.name,
-            timestamp = lastSession.timestamp,
+            timestamp = timestamp,
             exercises = exercisesGrouped
         )
     }
