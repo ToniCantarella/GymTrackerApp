@@ -1,11 +1,11 @@
 package com.example.gymtracker.ui.stats
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,16 +28,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
+import com.example.gymtracker.database.repository.WorkoutSession
+import com.example.gymtracker.database.repository.WorkoutType
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
-import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -54,7 +54,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.todayIn
 import org.koin.androidx.compose.koinViewModel
-import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
 import kotlin.time.ExperimentalTime
@@ -86,14 +85,14 @@ fun StatsOverviewScreen(
 
     StatsOverviewScreen(
         loading = uiState.loading,
-        workoutDays = uiState.workoutDays
+        workoutSessions = uiState.workoutSessions
     )
 }
 
 @Composable
 private fun StatsOverviewScreen(
     loading: Boolean,
-    workoutDays: List<Instant>
+    workoutSessions: List<WorkoutSession>
 ) {
     if (loading) {
         Box(
@@ -109,7 +108,7 @@ private fun StatsOverviewScreen(
         ) {
             item {
                 Calendar(
-                    days = workoutDays
+                    workoutSessions = workoutSessions
                 )
             }
 
@@ -138,14 +137,17 @@ private fun StatsCard(
 @OptIn(ExperimentalTime::class)
 @Composable
 private fun Calendar(
-    days: List<Instant>,
+    workoutSessions: List<WorkoutSession>,
     modifier: Modifier = Modifier
 ) {
-    val zoneId = ZoneId.systemDefault()
-    val highlightedDates: List<LocalDate> = remember(days) {
-        days.map { it.atZone(zoneId).toLocalDate().toKotlinLocalDate() }
-    }
-    val highlightColor = Color.Green.copy(alpha = .3f)
+    val highlightColors = listOf(
+        Color(0xFFFF7D7D),
+        Color(0xFFFFDF7D),
+        Color(0xFFAAFF7D),
+        Color(0xFF7DFFDA),
+        Color(0xFF7D9EFF),
+        Color(0xFFD17DFF),
+    )
 
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(100) }
@@ -159,15 +161,29 @@ private fun Calendar(
         firstDayOfWeek = daysOfWeek.first()
     )
 
+    val sessionsByDate: Map<LocalDate, List<WorkoutSession>> = remember(workoutSessions) {
+        val zoneId = ZoneId.systemDefault()
+        workoutSessions.groupBy {
+            it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
+        }
+    }
+    val workouts = remember(workoutSessions) {
+        workoutSessions.groupBy { it.name }
+    }
+    val workoutColors: Map<String, Color> = remember(workouts) {
+        workouts.keys.mapIndexed { index, name ->
+            name to highlightColors[index % highlightColors.size]
+        }.toMap()
+    }
+
     StatsCard(modifier = modifier) {
         Text(
             text = currentMonth.month.getDisplayName(
-                java.time.format.TextStyle.FULL,
+                java.time.format.TextStyle.FULL_STANDALONE,
                 Locale.getDefault()
             ),
             modifier = Modifier.padding(
-                bottom = dimensionResource(id = R.dimen.padding_medium),
-                start = dimensionResource(id = R.dimen.padding_medium)
+                bottom = dimensionResource(id = R.dimen.padding_medium)
             )
         )
         Row(
@@ -189,67 +205,106 @@ private fun Calendar(
         HorizontalCalendar(
             state = state,
             dayContent = { day ->
+                val sessionsOnDay = sessionsByDate[day.date].orEmpty()
+
                 Day(
                     day = day,
-                    selected = highlightedDates.contains(day.date),
-                    highlightColor = highlightColor
-                )
+                ) {
+                    sessionsOnDay.forEach { session ->
+                        CalendarIcon(
+                            painter =
+                                if (session.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
+                                else painterResource(id = R.drawable.run),
+                            tint = workoutColors[session.name]
+                        )
+                    }
+                }
             }
         )
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = dimensionResource(id = R.dimen.padding_small))
-                .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-                verticalAlignment = Alignment.CenterVertically
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(highlightColor)
-                        .size(10.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.days_worked_out)
-                )
+                workouts.forEach {
+                    val workout = it.value.first()
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CalendarIcon(
+                            painter =
+                                if (workout.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
+                                else painterResource(id = R.drawable.run),
+                            tint = workoutColors[workout.name]
+                        )
+                        Text(
+                            text = workout.name
+                        )
+                    }
+                }
             }
             Text(
-                text = "${stringResource(id = R.string.total)}: ${days.size}"
+                text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
             )
         }
     }
 }
 
+@Composable
+private fun CalendarIcon(
+    painter: Painter,
+    tint: Color? = null
+) {
+    Icon(
+        painter = painter,
+        tint = tint ?: MaterialTheme.colorScheme.onSurface,
+        contentDescription = null,
+        modifier = Modifier.size(16.dp)
+    )
+}
+
 val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
 @Composable
-private fun Day(day: CalendarDay, selected: Boolean, highlightColor: Color) {
+private fun Day(
+    day: CalendarDay,
+    contentIcons: @Composable () -> Unit
+) {
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .clip(CircleShape)
-            .background(color = if (selected) highlightColor else Color.Transparent)
+            .padding(1.dp)
+            .background(MaterialTheme.colorScheme.inverseOnSurface)
             .then(
                 if (day.date == today)
-                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                    Modifier.border(1.dp, MaterialTheme.colorScheme.primary)
                 else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.align(Alignment.BottomStart)
+        ) {
+            contentIcons()
+        }
         Text(
             text = day.date.dayOfMonth.toString(),
             color = if (day.position == DayPosition.MonthDate && day.date <= today)
                 MaterialTheme.colorScheme.onSurface
             else
-                MaterialTheme.colorScheme.onSurface.copy(.5f)
+                MaterialTheme.colorScheme.onSurface.copy(.5f),
+            modifier = Modifier.align(Alignment.TopEnd)
         )
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 private fun StatsOverviewPreview() {
@@ -270,4 +325,4 @@ private fun StatsOverviewPreviewDark() {
             workoutDays = emptyList()
         )
     }
-}
+}*/

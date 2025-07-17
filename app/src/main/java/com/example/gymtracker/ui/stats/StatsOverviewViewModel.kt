@@ -2,7 +2,9 @@ package com.example.gymtracker.ui.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gymtracker.database.repository.Workout
 import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.database.repository.WorkoutSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,8 +22,8 @@ fun firstDayOfMonthInstant(zoneId: ZoneId = ZoneId.systemDefault()): Instant {
 
 data class StatsOverviewUiState(
     val loading: Boolean = true,
-    val workoutDays: List<Instant> = emptyList(),
-    val sessionDays: List<Instant> = emptyList(),
+    val workouts: List<Workout> = emptyList(),
+    val workoutSessions: List<WorkoutSession> = emptyList(),
     val startDate: Instant = firstDayOfMonthInstant(),
     val endDate: Instant = Instant.now()
 )
@@ -38,15 +40,9 @@ class StatsOverviewViewModel(
                 startDate = uiState.value.startDate,
                 endDate = uiState.value.endDate
             )
-            val sessionTimestamps = sessions.mapNotNull { it?.timestamp }
-            val zoneId = ZoneId.systemDefault()
-            val workoutTimestamps = sessionTimestamps
-                .groupBy { it.atZone(zoneId).toLocalDate() }
-                .map { (_, dailyInstants) -> dailyInstants.first() }
             _uiState.update {
                 it.copy(
-                    sessionDays = sessionTimestamps,
-                    workoutDays = workoutTimestamps,
+                    workoutSessions = sessions,
                     loading = false
                 )
             }

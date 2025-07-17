@@ -22,6 +22,22 @@ data class LastPerformedSplit(
     val exercises: List<Exercise>
 )
 
+data class Workout (
+    val name: String,
+    val type: WorkoutType
+)
+
+enum class WorkoutType {
+    GYM,
+    CARDIO
+}
+
+data class WorkoutSession(
+    val name: String,
+    val timestamp: Instant,
+    val type: WorkoutType
+)
+
 class WorkoutRepository(
     private val splitDao: SplitDao,
     private val exerciseDao: ExerciseDao,
@@ -122,7 +138,8 @@ class WorkoutRepository(
                     )
                 ).toInt()
 
-                val setInfoChanged = (existingSet?.weight != performedSet.weight || existingSet.repetitions != performedSet.repetitions)
+                val setInfoChanged =
+                    (existingSet?.weight != performedSet.weight || existingSet.repetitions != performedSet.repetitions)
                 if (existingSet != null && setInfoChanged) {
                     setDao.updateSet(
                         existingSet.copy(
@@ -148,7 +165,7 @@ class WorkoutRepository(
     }
 
 
-    suspend fun getLastPerformedSplit(splitId: Int): LastPerformedSplit? {
+    suspend fun getLastPerformedSplitWithExercises(splitId: Int): LastPerformedSplit? {
         val lastSession = sessionDao.getLastSession(splitId) ?: return null
         val split = splitDao.getSplitById(lastSession.splitId)
 
@@ -178,7 +195,24 @@ class WorkoutRepository(
         )
     }
 
-    suspend fun getSplitSessionsBetweenDates(startDate: Instant, endDate: Instant): List<SplitSessionEntity?> {
-        return sessionDao.getSessionsForTimespan(startDate, endDate)
+    suspend fun getSplitSessionsBetweenDates(
+        startDate: Instant,
+        endDate: Instant
+    ): List<WorkoutSession> {
+        val sessions = sessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
+        if (sessions.isEmpty()) return emptyList()
+
+        val splits = splitDao.getAllSplits().associateBy { it.id }
+
+        return sessions.mapNotNull { session ->
+            val splitName = splits[session.splitId]?.name
+            if (splitName != null){
+                WorkoutSession(
+                    name = splitName,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.GYM
+                )
+            } else null
+        }
     }
 }

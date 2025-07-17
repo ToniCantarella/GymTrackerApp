@@ -32,7 +32,7 @@ class SplitViewModel(
 
     init {
         viewModelScope.launch {
-            val lastPerformedSplit = workoutRepository.getLastPerformedSplit(navParams.id)
+            val lastPerformedSplit = workoutRepository.getLastPerformedSplitWithExercises(navParams.id)
             _uiState.update {
                 it.copy(
                     splitName = lastPerformedSplit?.name ?: "",
