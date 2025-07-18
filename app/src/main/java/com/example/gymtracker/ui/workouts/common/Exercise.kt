@@ -61,25 +61,52 @@ fun Exercise(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                if (editingExercise) {
-                    OutlinedTextField(
-                        value = exercise.name,
-                        onValueChange = onNameChange,
-                        placeholder = {
-                            Text(
-                                text = placeholderName
-                            )
-                        }
-                    )
-                } else {
-                    Text(
-                        text = exercise.name.ifEmpty { placeholderName }
-                    )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+                ) {
+                    if (editingExercise) {
+                        OutlinedTextField(
+                            value = exercise.name,
+                            onValueChange = onNameChange,
+                            placeholder = {
+                                Text(
+                                    text = placeholderName
+                                )
+                            }
+                        )
+                    } else {
+                        Text(
+                            text = exercise.name.ifEmpty { placeholderName }
+                        )
+                    }
+                    if (editingExercise) {
+                        OutlinedTextField(
+                            value = exercise.description ?: "",
+                            onValueChange = onDescriptionChange,
+                            placeholder = {
+                                Text(
+                                    text = "${stringResource(id = R.string.description)} (${
+                                        stringResource(
+                                            id = R.string.optional
+                                        )
+                                    })",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            textStyle = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier
+                        )
+                    } else if(exercise.description != null) {
+                        Text(
+                            text = exercise.description,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
                 }
                 if (!creatingExercise) {
                     IconButton(
                         onClick = {
-                            editingExercise = true
+                            editingExercise = !editingExercise
                         }
                     ) {
                         Icon(
@@ -89,29 +116,7 @@ fun Exercise(
                     }
                 }
             }
-            if (editingExercise) {
-                OutlinedTextField(
-                    value = exercise.description ?: "",
-                    onValueChange = onDescriptionChange,
-                    placeholder = {
-                        Text(
-                            text = "${stringResource(id = R.string.description)} (${
-                                stringResource(
-                                    id = R.string.optional
-                                )
-                            })",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    textStyle = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                )
-            } else {
-                Text(
-                    text = exercise.description ?: "",
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
+
             Column {
                 exercise.sets.forEachIndexed { index, set ->
                     HorizontalDivider()
@@ -199,6 +204,16 @@ private fun ExercisePreview() {
 
 @Preview
 @Composable
+private fun ExercisePreviewNoDescription() {
+    GymTrackerTheme {
+        ExerciseForPreview(
+            exercise = testExercise.copy(description = null)
+        )
+    }
+}
+
+@Preview
+@Composable
 private fun AddingExercisePreview() {
     GymTrackerTheme {
         ExerciseForPreview(
@@ -207,11 +222,7 @@ private fun AddingExercisePreview() {
                 name = "",
                 description = null,
                 sets = listOf(
-                    WorkoutSet(
-                        uuid = UUID.randomUUID(),
-                        weight = 0.0,
-                        repetitions = 0
-                    )
+                    WorkoutSet.emptySet()
                 )
             ),
             addingExercise = true
