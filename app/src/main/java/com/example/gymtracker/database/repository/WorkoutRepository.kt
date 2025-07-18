@@ -194,22 +194,9 @@ class WorkoutRepository(
         }
     }
 
-    suspend fun getAllWorkoutSessions(): List<WorkoutSession> {
+    suspend fun getAllSplitSessions(): List<WorkoutSession> {
         val sessions = sessionDao.getAllSessions().filterNotNull()
-        if (sessions.isEmpty()) return emptyList()
-
-        val splits = splitDao.getAllSplits().associateBy { it.id }
-
-        return sessions.mapNotNull { session ->
-            val splitName = splits[session.splitId]?.name
-            if (splitName != null) {
-                WorkoutSession(
-                    name = splitName,
-                    timestamp = session.timestamp,
-                    type = WorkoutType.GYM
-                )
-            } else null
-        }
+        return getWorkoutSessionsForSplitSessions(sessions)
     }
 
     suspend fun getSplitSessionsBetweenDates(
@@ -217,6 +204,11 @@ class WorkoutRepository(
         endDate: Instant
     ): List<WorkoutSession> {
         val sessions = sessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
+
+        return getWorkoutSessionsForSplitSessions(sessions)
+    }
+
+    private suspend fun getWorkoutSessionsForSplitSessions(sessions: List<SplitSessionEntity>): List<WorkoutSession> {
         if (sessions.isEmpty()) return emptyList()
 
         val splits = splitDao.getAllSplits().associateBy { it.id }

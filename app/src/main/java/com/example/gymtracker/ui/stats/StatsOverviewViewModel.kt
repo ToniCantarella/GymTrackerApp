@@ -61,7 +61,7 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkoutSessions() {
-        val sessions = workoutRepository.getAllWorkoutSessions()
+        val sessions = workoutRepository.getAllSplitSessions()
         _uiState.update {
             it.copy(
                 allWorkoutSessions = sessions
