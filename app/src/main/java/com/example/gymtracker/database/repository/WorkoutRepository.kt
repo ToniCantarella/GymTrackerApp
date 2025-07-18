@@ -60,15 +60,15 @@ class WorkoutRepository(
     }
 
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
-        val splitId = splitDao.insert(SplitEntity(name = splitName)).toInt()
+        val splitId = splitDao.insert(SplitEntity(name = splitName.trim())).toInt()
 
         exercises.forEach { exercise ->
             val exerciseId = exerciseDao.insert(
                 ExerciseEntity(
                     splitId = splitId,
                     uuid = exercise.uuid,
-                    name = exercise.name,
-                    description = exercise.description
+                    name = exercise.name.trim(),
+                    description = exercise.description?.trim()
                 )
             ).toInt()
 
@@ -87,8 +87,19 @@ class WorkoutRepository(
 
     suspend fun deleteSplit(splitId: Int) = splitDao.deleteById(splitId)
 
-    suspend fun markSessionDone(splitId: Int, exercises: List<Exercise>) {
+    suspend fun markSessionDone(splitId: Int, splitName: String? = null, exercises: List<Exercise>) {
         if (exercises.isEmpty()) return
+
+        if(splitName?.isNotEmpty() == true){
+            val currentSplit = splitDao.getSplitById(splitId)
+            if(currentSplit.name != splitName) {
+                splitDao.updateSplit(
+                    currentSplit.copy(
+                        name = splitName.trim()
+                    )
+                )
+            }
+        }
 
         val performedSets = exercises.filter { it.sets.any { set -> set.checked } }
 
@@ -109,8 +120,8 @@ class WorkoutRepository(
                 ExerciseEntity(
                     splitId = splitId,
                     uuid = exercise.uuid,
-                    name = exercise.name,
-                    description = exercise.description
+                    name = exercise.name.trim(),
+                    description = exercise.description?.trim()
                 )
             ).toInt()
 
@@ -119,8 +130,8 @@ class WorkoutRepository(
             if (currentExercise != null && exerciseInfoChanged) {
                 exerciseDao.updateExercise(
                     currentExercise.copy(
-                        name = exercise.name,
-                        description = exercise.description
+                        name = exercise.name.trim(),
+                        description = exercise.description?.trim()
                     )
                 )
             }

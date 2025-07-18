@@ -127,6 +127,7 @@ class SplitViewModel(
         viewModelScope.launch {
             workoutRepository.markSessionDone(
                 splitId = navParams.id,
+                splitName = uiState.value.splitName,
                 exercises = uiState.value.exercises
             )
             onFinish()
