@@ -86,7 +86,7 @@ fun SplitScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = viewModel::onFinishWorkoutPressed
+        onClick = { viewModel.onFinishWorkoutPressed(onNavigateBack) }
     ) {
         Icon(
             imageVector = Icons.Default.Done,
@@ -136,7 +136,7 @@ fun SplitScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
-            ){
+            ) {
                 Text(
                     text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString()}"
                 )

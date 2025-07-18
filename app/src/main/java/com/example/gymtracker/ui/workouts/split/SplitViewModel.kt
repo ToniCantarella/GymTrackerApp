@@ -123,12 +123,13 @@ class SplitViewModel(
         }
     }
 
-    fun onFinishWorkoutPressed() {
+    fun onFinishWorkoutPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
             workoutRepository.markSessionDone(
                 splitId = navParams.id,
                 exercises = uiState.value.exercises
             )
+            onFinish()
         }
     }
 }
