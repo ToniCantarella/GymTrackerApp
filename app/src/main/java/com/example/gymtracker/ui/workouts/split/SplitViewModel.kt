@@ -12,12 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.util.UUID
 
 data class SplitUiState(
     val loading: Boolean = false,
     val splitName: String = "",
-    val exercises: List<Exercise> = listOf(Exercise.emptyExercise())
+    val latestTimestamp: Instant? = null,
+    val exercises: List<Exercise> = emptyList()
 )
 
 class SplitViewModel(
@@ -32,11 +34,12 @@ class SplitViewModel(
 
     init {
         viewModelScope.launch {
-            val lastPerformedSplit = workoutRepository.getLastPerformedSplitWithExercises(navParams.id)
+            val latestSplit = workoutRepository.getLatestSplitWithExercises(navParams.id)
             _uiState.update {
                 it.copy(
-                    splitName = lastPerformedSplit?.name ?: "",
-                    exercises = lastPerformedSplit?.exercises ?: emptyList(),
+                    splitName = latestSplit?.name ?: "",
+                    latestTimestamp = latestSplit?.timestamp,
+                    exercises = latestSplit?.exercises ?: emptyList(),
                     loading = false
                 )
             }

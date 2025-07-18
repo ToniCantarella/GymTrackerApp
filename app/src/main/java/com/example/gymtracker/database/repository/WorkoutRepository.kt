@@ -15,7 +15,7 @@ import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 import com.example.gymtracker.ui.workouts.splitslist.SplitListItem
 import java.time.Instant
 
-data class LastPerformedSplit(
+data class LatestSplitWithExercises(
     val id: Int,
     val name: String,
     val timestamp: Instant,
@@ -153,7 +153,7 @@ class WorkoutRepository(
     }
 
 
-    suspend fun getLastPerformedSplitWithExercises(splitId: Int): LastPerformedSplit? {
+    suspend fun getLatestSplitWithExercises(splitId: Int): LatestSplitWithExercises? {
         val timestamp = sessionDao.getLastSession(splitId)?.timestamp ?: Instant.now()
         val split = splitDao.getSplitById(splitId)
 
@@ -175,7 +175,7 @@ class WorkoutRepository(
             )
         }
 
-        return LastPerformedSplit(
+        return LatestSplitWithExercises(
             id = splitId,
             name = split.name,
             timestamp = timestamp,

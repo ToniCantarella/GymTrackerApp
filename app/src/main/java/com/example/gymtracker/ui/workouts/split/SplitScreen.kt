@@ -2,8 +2,10 @@ package com.example.gymtracker.ui.workouts.split
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
@@ -29,7 +32,9 @@ import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.workouts.common.ExerciseList
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
+import com.example.gymtracker.utility.toDateAndTimeString
 import org.koin.androidx.compose.koinViewModel
+import java.time.Instant
 import java.util.UUID
 
 @Composable
@@ -91,6 +96,7 @@ fun SplitScreen(
 
     SplitScreen(
         loading = uiState.loading,
+        latestTimestamp = uiState.latestTimestamp,
         exercises = uiState.exercises,
         addExercise = viewModel::addExercise,
         onExerciseNameChange = viewModel::onExerciseNameChange,
@@ -106,6 +112,7 @@ fun SplitScreen(
 @Composable
 fun SplitScreen(
     loading: Boolean,
+    latestTimestamp: Instant?,
     exercises: List<Exercise>,
     addExercise: () -> Unit,
     onExerciseNameChange: (exerciseId: UUID, name: String) -> Unit,
@@ -125,6 +132,15 @@ fun SplitScreen(
         if (loading) {
             CircularProgressIndicator()
         } else if (exercises.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
+            ){
+                Text(
+                    text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString()}"
+                )
+            }
             ExerciseList(
                 exercises = exercises,
                 creatingSplit = false,
@@ -146,6 +162,7 @@ private fun ScreenForPreview(
 ) {
     SplitScreen(
         loading = false,
+        latestTimestamp = Instant.now(),
         exercises = listOf(
             Exercise(
                 name = "Bench press",
