@@ -3,12 +3,16 @@ package com.example.gymtracker.database.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.gymtracker.database.entity.workout.ExerciseEntity
 
 @Dao
 interface ExerciseDao {
     @Insert
     suspend fun insert(exercise: ExerciseEntity): Long
+
+    @Update
+    suspend fun updateExercise(exercise: ExerciseEntity)
 
     @Query("SELECT * FROM exercises WHERE splitId = :splitId")
     suspend fun getExercisesBySplitId(splitId: Int): List<ExerciseEntity>

@@ -90,9 +90,9 @@ class WorkoutRepository(
     suspend fun markSessionDone(splitId: Int, exercises: List<Exercise>) {
         if (exercises.isEmpty()) return
 
-        val performedSets = exercises.filter {it.sets.any {set -> set.checked} }
+        val performedSets = exercises.filter { it.sets.any { set -> set.checked } }
 
-        val sessionId = if (performedSets.isNotEmpty()){
+        val sessionId = if (performedSets.isNotEmpty()) {
             sessionDao.insert(
                 SplitSessionEntity(
                     splitId = splitId,
@@ -104,7 +104,8 @@ class WorkoutRepository(
         val currentExercises = exerciseDao.getExercisesBySplitId(splitId).associateBy { it.uuid }
 
         exercises.forEach { exercise ->
-            val exerciseId = currentExercises[exercise.uuid]?.id ?: exerciseDao.insert(
+            val currentExercise = currentExercises[exercise.uuid]
+            val exerciseId = currentExercise?.id ?: exerciseDao.insert(
                 ExerciseEntity(
                     splitId = splitId,
                     uuid = exercise.uuid,
@@ -113,11 +114,22 @@ class WorkoutRepository(
                 )
             ).toInt()
 
-            val existingSets = setDao.getSetsForExercise(exerciseId).associateBy { it.uuid }
+            val exerciseInfoChanged =
+                (currentExercise?.name != exercise.name || currentExercise.description != exercise.description)
+            if (currentExercise != null && exerciseInfoChanged) {
+                exerciseDao.updateExercise(
+                    currentExercise.copy(
+                        name = exercise.name,
+                        description = exercise.description
+                    )
+                )
+            }
+
+            val currentSets = setDao.getSetsForExercise(exerciseId).associateBy { it.uuid }
 
             exercise.sets.forEach { set ->
-                val existingSet = existingSets[set.uuid]
-                val setId = existingSet?.id ?: setDao.insert(
+                val currentSet = currentSets[set.uuid]
+                val setId = currentSet?.id ?: setDao.insert(
                     SetEntity(
                         exerciseId = exerciseId,
                         uuid = set.uuid,
@@ -127,10 +139,10 @@ class WorkoutRepository(
                 ).toInt()
 
                 val setInfoChanged =
-                    (existingSet?.weight != set.weight || existingSet.repetitions != set.repetitions)
-                if (existingSet != null && setInfoChanged) {
+                    (currentSet?.weight != set.weight || currentSet.repetitions != set.repetitions)
+                if (currentSet != null && setInfoChanged) {
                     setDao.updateSet(
-                        existingSet.copy(
+                        currentSet.copy(
                             weight = set.weight,
                             repetitions = set.repetitions
                         )
