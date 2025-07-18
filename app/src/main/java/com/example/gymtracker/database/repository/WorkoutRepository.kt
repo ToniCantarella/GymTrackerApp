@@ -18,7 +18,7 @@ import java.time.Instant
 data class LatestSplitWithExercises(
     val id: Int,
     val name: String,
-    val timestamp: Instant,
+    val timestamp: Instant?,
     val exercises: List<Exercise>
 )
 
@@ -54,9 +54,9 @@ class WorkoutRepository(
             SplitListItem(
                 id = it.id,
                 name = it.name,
-                latestTimestamp = timestamp ?: Instant.now()
+                latestTimestamp = timestamp
             )
-        }
+        }.sortedBy { it.latestTimestamp }
     }
 
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
@@ -154,7 +154,7 @@ class WorkoutRepository(
 
 
     suspend fun getLatestSplitWithExercises(splitId: Int): LatestSplitWithExercises? {
-        val timestamp = sessionDao.getLastSession(splitId)?.timestamp ?: Instant.now()
+        val timestamp = sessionDao.getLastSession(splitId)?.timestamp
         val split = splitDao.getSplitById(splitId)
 
         val exercises = exerciseDao.getExercisesBySplitId(splitId)

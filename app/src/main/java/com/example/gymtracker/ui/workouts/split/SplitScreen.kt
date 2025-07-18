@@ -138,7 +138,7 @@ fun SplitScreen(
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
             ) {
                 Text(
-                    text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString()}"
+                    text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString() ?: "-"}"
                 )
             }
             ExerciseList(

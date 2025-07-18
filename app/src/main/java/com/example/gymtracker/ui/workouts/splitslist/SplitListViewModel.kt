@@ -12,7 +12,7 @@ import java.time.Instant
 data class SplitListItem(
     val id: Int,
     val name: String,
-    val latestTimestamp: Instant
+    val latestTimestamp: Instant?
 )
 
 data class SplitListUiState(

@@ -236,7 +236,7 @@ private fun SplitListItem(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${stringResource(id = R.string.last_time)}: ${split.latestTimestamp.toDateAndTimeString()}",
+                    text = "${stringResource(id = R.string.last_time)}: ${split.latestTimestamp?.toDateAndTimeString() ?: "-"}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
