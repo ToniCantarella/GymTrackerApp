@@ -23,7 +23,8 @@ fun firstDayOfMonthInstant(zoneId: ZoneId = ZoneId.systemDefault()): Instant {
 data class StatsOverviewUiState(
     val loading: Boolean = true,
     val workouts: List<Workout> = emptyList(),
-    val workoutSessions: List<WorkoutSession> = emptyList(),
+    val allWorkoutSessions: List<WorkoutSession> = emptyList(),
+    val workoutSessionsBetweenDates: List<WorkoutSession> = emptyList(),
     val startDate: Instant = firstDayOfMonthInstant(),
     val endDate: Instant = Instant.now()
 )
@@ -36,16 +37,47 @@ class StatsOverviewViewModel(
 
     init {
         viewModelScope.launch {
-            val sessions = workoutRepository.getSplitSessionsBetweenDates(
+            fetchAllWorkouts()
+            fetchAllWorkoutSessions()
+            fetchWorkoutSessionsBetweenDates(
                 startDate = uiState.value.startDate,
                 endDate = uiState.value.endDate
             )
             _uiState.update {
                 it.copy(
-                    workoutSessions = sessions,
                     loading = false
                 )
             }
+        }
+    }
+
+    private suspend fun fetchAllWorkouts() {
+        val workouts = workoutRepository.getAllWorkouts()
+        _uiState.update {
+            it.copy(
+                workouts = workouts
+            )
+        }
+    }
+
+    private suspend fun fetchAllWorkoutSessions() {
+        val sessions = workoutRepository.getAllWorkoutSessions()
+        _uiState.update {
+            it.copy(
+                allWorkoutSessions = sessions
+            )
+        }
+    }
+
+    private suspend fun fetchWorkoutSessionsBetweenDates(startDate: Instant, endDate: Instant) {
+        val sessions = workoutRepository.getSplitSessionsBetweenDates(
+            startDate = startDate,
+            endDate = endDate
+        )
+        _uiState.update {
+            it.copy(
+                workoutSessionsBetweenDates = sessions
+            )
         }
     }
 }

@@ -11,6 +11,9 @@ interface SplitSessionDao {
     @Insert
     suspend fun insert(session: SplitSessionEntity): Long
 
+    @Query("SELECT * FROM SPLIT_SESSIONS")
+    suspend fun getAllSessions(): List<SplitSessionEntity?>
+
     @Query("SELECT * FROM split_sessions WHERE splitId = :splitId ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastSession(splitId: Int): SplitSessionEntity?
 

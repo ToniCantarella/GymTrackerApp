@@ -80,7 +80,7 @@ class WorkoutRepository(
                         weight = set.weight,
                         repetitions = set.repetitions
                     )
-                ).toInt()
+                )
             }
         }
     }
@@ -181,6 +181,35 @@ class WorkoutRepository(
             timestamp = timestamp,
             exercises = exercisesGrouped
         )
+    }
+
+    suspend fun getAllWorkouts(): List<Workout> {
+        val splits = splitDao.getAllSplits()
+
+        return splits.map {
+            Workout(
+                name = it.name,
+                type = WorkoutType.GYM
+            )
+        }
+    }
+
+    suspend fun getAllWorkoutSessions(): List<WorkoutSession> {
+        val sessions = sessionDao.getAllSessions().filterNotNull()
+        if (sessions.isEmpty()) return emptyList()
+
+        val splits = splitDao.getAllSplits().associateBy { it.id }
+
+        return sessions.mapNotNull { session ->
+            val splitName = splits[session.splitId]?.name
+            if (splitName != null) {
+                WorkoutSession(
+                    name = splitName,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.GYM
+                )
+            } else null
+        }
     }
 
     suspend fun getSplitSessionsBetweenDates(
