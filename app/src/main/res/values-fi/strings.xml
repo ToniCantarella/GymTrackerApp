@@ -29,4 +29,5 @@
     <string name="overview">Yleisnäkymä</string>
     <string name="days_worked_out">Treenatut päivät</string>
     <string name="total">Yhteensä</string>
+    <string name="clear">Tyhjennä</string>
 </resources>

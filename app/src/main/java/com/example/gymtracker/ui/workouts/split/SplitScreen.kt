@@ -1,5 +1,7 @@
 package com.example.gymtracker.ui.workouts.split
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +49,9 @@ fun SplitScreen(
 
     ProvideTopAppBar(
         title = {
+            val interactionSource = remember { MutableInteractionSource() }
+            val isFocused by interactionSource.collectIsFocusedAsState()
+
             OutlinedTextField(
                 value = uiState.splitName,
                 onValueChange = viewModel::onSplitNameChange,
@@ -54,14 +60,15 @@ fun SplitScreen(
                         text = stringResource(id = R.string.name)
                     )
                 },
+                interactionSource = interactionSource,
                 trailingIcon = {
-                    if (uiState.splitName.isNotEmpty()) {
+                    if (isFocused && uiState.splitName.isNotEmpty()) {
                         IconButton(
                             onClick = { viewModel.onSplitNameChange("") }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = null
+                                contentDescription = stringResource(id = R.string.clear)
                             )
                         }
                     }
@@ -79,7 +86,7 @@ fun SplitScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null
+                    contentDescription = stringResource(R.string.back)
                 )
             }
         }
@@ -90,7 +97,7 @@ fun SplitScreen(
     ) {
         Icon(
             imageVector = Icons.Default.Done,
-            contentDescription = null
+            contentDescription = stringResource(id = R.string.done)
         )
     }
 
