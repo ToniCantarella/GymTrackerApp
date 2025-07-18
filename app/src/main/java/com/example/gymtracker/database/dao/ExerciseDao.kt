@@ -11,8 +11,8 @@ interface ExerciseDao {
     suspend fun insert(exercise: ExerciseEntity): Long
 
     @Query("SELECT * FROM exercises WHERE splitId = :splitId")
-    suspend fun getBySplitId(splitId: Int): List<ExerciseEntity>
+    suspend fun getExercisesBySplitId(splitId: Int): List<ExerciseEntity>
 
     @Query("SELECT * FROM exercises WHERE id = :exerciseId")
-    suspend fun getById(exerciseId: Int): ExerciseEntity
+    suspend fun getExercisesById(exerciseId: Int): ExerciseEntity
 }

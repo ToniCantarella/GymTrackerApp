@@ -122,24 +122,9 @@ class SplitViewModel(
 
     fun onFinishWorkoutPressed() {
         viewModelScope.launch {
-            val exercisesPerformed = findAndCollectPerformedExercises()
-
             workoutRepository.markSessionDone(
                 splitId = navParams.id,
-                exercisesPerformed = exercisesPerformed
-            )
-        }
-    }
-
-    private fun findAndCollectPerformedExercises(): List<Exercise> {
-        val exercises = uiState.value.exercises
-
-        return exercises.map { exercise ->
-            Exercise(
-                uuid = exercise.uuid,
-                name = exercise.name,
-                description = exercise.description,
-                sets = exercise.sets.filter { set -> set.checked }
+                exercises = uiState.value.exercises
             )
         }
     }

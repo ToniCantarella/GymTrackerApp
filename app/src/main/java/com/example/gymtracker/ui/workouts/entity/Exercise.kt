@@ -8,7 +8,7 @@ data class Exercise(
     val description: String?,
     val sets: List<WorkoutSet>
 ) {
-    companion object{
+    companion object {
         fun emptyExercise() = Exercise(
             uuid = UUID.randomUUID(),
             name = "",
