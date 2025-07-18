@@ -130,7 +130,10 @@ fun SplitListScreen(
                         horizontalArrangement = Arrangement.End
                     ) {
                         OutlinedButton(
-                            onClick = { deletionDialogOpen = false }
+                            onClick = {
+                                deletionDialogOpen = false
+                                viewModel.stopSelectingItems()
+                            }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.cancel)
