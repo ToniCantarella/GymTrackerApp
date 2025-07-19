@@ -1,7 +1,5 @@
 package com.example.gymtracker.ui.workouts.split
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,28 +8,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
+import com.example.gymtracker.ui.navigation.TopBarTextField
 import com.example.gymtracker.ui.theme.GymTrackerTheme
+import com.example.gymtracker.ui.workouts.SPLIT_NAME_MAX_SIZE
 import com.example.gymtracker.ui.workouts.common.ExerciseList
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
@@ -49,35 +44,10 @@ fun SplitScreen(
 
     ProvideTopAppBar(
         title = {
-            val interactionSource = remember { MutableInteractionSource() }
-            val isFocused by interactionSource.collectIsFocusedAsState()
-
-            OutlinedTextField(
+            TopBarTextField(
                 value = uiState.splitName,
                 onValueChange = viewModel::onSplitNameChange,
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.name)
-                    )
-                },
-                interactionSource = interactionSource,
-                trailingIcon = {
-                    if (isFocused && uiState.splitName.isNotEmpty()) {
-                        IconButton(
-                            onClick = { viewModel.onSplitNameChange("") }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(id = R.string.clear)
-                            )
-                        }
-                    }
-                },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                modifier = Modifier.fillMaxWidth()
+                maxSize = SPLIT_NAME_MAX_SIZE
             )
         },
         navigationItem = {
