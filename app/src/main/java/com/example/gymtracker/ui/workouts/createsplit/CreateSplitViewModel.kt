@@ -55,6 +55,14 @@ class CreateSplitViewModel(
         }
     }
 
+    fun onRemoveExercise(exerciseId: UUID) {
+        _uiState.update {
+            it.copy(
+                exercises = it.exercises.filter { exercise -> exercise.uuid != exerciseId }
+            )
+        }
+    }
+
     fun addSet(exerciseId: UUID) {
         _uiState.update {
             it.copy(

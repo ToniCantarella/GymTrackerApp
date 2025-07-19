@@ -61,6 +61,7 @@ fun CreateSplitScreen(
     CreateSplitScreen(
         exercises = uiState.exercises,
         addExercise = viewModel::addExercise,
+        onRemoveExercise = viewModel::onRemoveExercise,
         onExerciseNameChange = viewModel::onExerciseNameChange,
         onDescriptionChange = viewModel::onDescriptionChange,
         addSet = viewModel::addSet,
@@ -74,6 +75,7 @@ fun CreateSplitScreen(
 private fun CreateSplitScreen(
     exercises: List<Exercise>,
     addExercise: () -> Unit,
+    onRemoveExercise: (exerciseId: UUID) -> Unit,
     onExerciseNameChange: (exerciseId: UUID, name: String) -> Unit,
     onDescriptionChange: (exerciseId: UUID, name: String) -> Unit,
     addSet: (exerciseId: UUID) -> Unit,
@@ -86,6 +88,7 @@ private fun CreateSplitScreen(
             exercises = exercises,
             creatingSplit = true,
             onAddExercise = addExercise,
+            onRemoveExercise = onRemoveExercise,
             onExerciseNameChange = onExerciseNameChange,
             onDescriptionChange = onDescriptionChange,
             onAddSet = addSet,

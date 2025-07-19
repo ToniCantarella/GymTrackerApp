@@ -87,12 +87,16 @@ class WorkoutRepository(
 
     suspend fun deleteSplit(splitId: Int) = splitDao.deleteById(splitId)
 
-    suspend fun markSessionDone(splitId: Int, splitName: String? = null, exercises: List<Exercise>) {
+    suspend fun markSessionDone(
+        splitId: Int,
+        splitName: String? = null,
+        exercises: List<Exercise>
+    ) {
         if (exercises.isEmpty()) return
 
-        if(splitName?.isNotEmpty() == true){
+        if (splitName?.isNotEmpty() == true) {
             val currentSplit = splitDao.getSplitById(splitId)
-            if(currentSplit.name != splitName) {
+            if (currentSplit.name != splitName) {
                 splitDao.updateSplit(
                     currentSplit.copy(
                         name = splitName.trim()
@@ -113,6 +117,16 @@ class WorkoutRepository(
         } else null
 
         val currentExercises = exerciseDao.getExercisesBySplitId(splitId).associateBy { it.uuid }
+
+        val deletedExercises = currentExercises.values.filter { current ->
+            exercises.none {
+                it.uuid == current.uuid
+            }
+        }
+
+        if (deletedExercises.isNotEmpty()) {
+            exerciseDao.deleteExercises(deletedExercises)
+        }
 
         exercises.forEach { exercise ->
             val currentExercise = currentExercises[exercise.uuid]
@@ -137,6 +151,14 @@ class WorkoutRepository(
             }
 
             val currentSets = setDao.getSetsForExercise(exerciseId).associateBy { it.uuid }
+
+            val deletedSets = currentSets.values.filter { current ->
+                exercise.sets.none { it.uuid == current.uuid }
+            }
+
+            if (deletedSets.isNotEmpty()) {
+                setDao.deleteSets(deletedSets)
+            }
 
             exercise.sets.forEach { set ->
                 val currentSet = currentSets[set.uuid]

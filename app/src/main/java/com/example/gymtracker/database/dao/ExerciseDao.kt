@@ -1,6 +1,7 @@
 package com.example.gymtracker.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -13,6 +14,9 @@ interface ExerciseDao {
 
     @Update
     suspend fun updateExercise(exercise: ExerciseEntity)
+
+    @Delete
+    suspend fun deleteExercises(exercises: List<ExerciseEntity>)
 
     @Query("SELECT * FROM exercises WHERE splitId = :splitId")
     suspend fun getExercisesBySplitId(splitId: Int): List<ExerciseEntity>

@@ -78,6 +78,14 @@ class SplitViewModel(
         }
     }
 
+    fun onRemoveExercise(exerciseId: UUID) {
+        _uiState.update {
+            it.copy(
+                exercises = it.exercises.filter { exercise -> exercise.uuid != exerciseId }
+            )
+        }
+    }
+
     fun onCheckSet(exerciseId: UUID, setId: UUID, checked: Boolean) {
         _uiState.update {
             it.copy(

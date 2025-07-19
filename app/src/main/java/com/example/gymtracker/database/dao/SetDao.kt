@@ -1,6 +1,7 @@
 package com.example.gymtracker.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -10,6 +11,9 @@ import com.example.gymtracker.database.entity.workout.SetEntity
 interface SetDao {
     @Insert
     suspend fun insert(set: SetEntity): Long
+
+    @Delete
+    suspend fun deleteSets(sets: List<SetEntity>)
 
     @Update
     suspend fun updateSet(set: SetEntity)

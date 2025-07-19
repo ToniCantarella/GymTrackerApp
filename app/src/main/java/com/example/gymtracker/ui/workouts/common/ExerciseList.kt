@@ -27,6 +27,7 @@ fun ExerciseList(
     exercises: List<Exercise>,
     creatingSplit: Boolean,
     onAddExercise: () -> Unit,
+    onRemoveExercise: (exerciseId: UUID) -> Unit,
     onExerciseNameChange: (id: UUID, name: String) -> Unit,
     onDescriptionChange: (id: UUID, description: String) -> Unit,
     onAddSet: (id: UUID) -> Unit,
@@ -60,6 +61,7 @@ fun ExerciseList(
                         description
                     )
                 },
+                onDelete = { onRemoveExercise(exercise.uuid) },
                 addSet = { onAddSet(exercise.uuid) },
                 onChangeWeight = { setId, weight ->
                     onChangeWeight(

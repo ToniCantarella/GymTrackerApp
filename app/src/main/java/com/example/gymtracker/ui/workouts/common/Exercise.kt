@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -27,6 +28,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.theme.GymTrackerTheme
+import com.example.gymtracker.ui.workouts.EXERCISE_DESCRIPTION_MAX_SIZE
+import com.example.gymtracker.ui.workouts.EXERCISE_NAME_MAX_SIZE
 import com.example.gymtracker.ui.workouts.MAX_SETS
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
@@ -38,6 +41,7 @@ fun Exercise(
     placeholderName: String,
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
+    onDelete: () -> Unit,
     addSet: () -> Unit,
     onChangeWeight: (setId: UUID, Double) -> Unit,
     onChangeRepetitions: (setId: UUID, Int) -> Unit,
@@ -67,7 +71,10 @@ fun Exercise(
                     if (editingExercise) {
                         OutlinedTextField(
                             value = exercise.name,
-                            onValueChange = onNameChange,
+                            onValueChange = {
+                                if (it.length <= EXERCISE_NAME_MAX_SIZE)
+                                    onNameChange(it)
+                            },
                             placeholder = {
                                 Text(
                                     text = placeholderName
@@ -82,7 +89,10 @@ fun Exercise(
                     if (editingExercise) {
                         OutlinedTextField(
                             value = exercise.description ?: "",
-                            onValueChange = onDescriptionChange,
+                            onValueChange = {
+                                if (it.length <= EXERCISE_DESCRIPTION_MAX_SIZE)
+                                    onDescriptionChange(it)
+                            },
                             placeholder = {
                                 Text(
                                     text = "${stringResource(id = R.string.description)} (${
@@ -103,22 +113,34 @@ fun Exercise(
                         )
                     }
                 }
-                if (!creatingExercise) {
-                    IconButton(
-                        onClick = {
-                            editingExercise = !editingExercise
+                Column {
+                    if (!creatingExercise) {
+                        IconButton(
+                            onClick = {
+                                editingExercise = !editingExercise
+                            }
+                        ) {
+                            Icon(
+                                painter =
+                                    if (editingExercise) painterResource(id = R.drawable.edit_off)
+                                    else painterResource(id = R.drawable.edit),
+                                contentDescription = null
+                            )
                         }
-                    ) {
-                        Icon(
-                            painter =
-                                if (editingExercise) painterResource(id = R.drawable.edit_off)
-                                else painterResource(id = R.drawable.edit),
-                            contentDescription = null
-                        )
+                    }
+                    if (editingExercise) {
+                        IconButton(
+                            onClick = onDelete
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(id = R.string.delete),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }
-
             Column {
                 exercise.sets.forEachIndexed { index, set ->
                     HorizontalDivider()
@@ -188,6 +210,7 @@ fun ExerciseForPreview(
         placeholderName = "${stringResource(id = R.string.exercise)} 1",
         onNameChange = {},
         onDescriptionChange = {},
+        onDelete = {},
         addSet = {},
         onChangeWeight = { _, _ -> },
         onChangeRepetitions = { _, _ -> },
