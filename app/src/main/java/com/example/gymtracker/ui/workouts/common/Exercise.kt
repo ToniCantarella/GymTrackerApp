@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -23,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
@@ -96,7 +96,7 @@ fun Exercise(
                             textStyle = MaterialTheme.typography.labelMedium,
                             modifier = Modifier
                         )
-                    } else if(exercise.description != null) {
+                    } else if (exercise.description != null) {
                         Text(
                             text = exercise.description,
                             style = MaterialTheme.typography.labelMedium
@@ -110,7 +110,9 @@ fun Exercise(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Create,
+                            painter =
+                                if (editingExercise) painterResource(id = R.drawable.edit_off)
+                                else painterResource(id = R.drawable.edit),
                             contentDescription = null
                         )
                     }
@@ -121,8 +123,9 @@ fun Exercise(
                 exercise.sets.forEachIndexed { index, set ->
                     HorizontalDivider()
                     Set(
-                        index = index,
                         set = set,
+                        setName = "${stringResource(id = R.string.set)} ${index + 1}",
+                        deletionEnabled = index != 0,
                         onChangeWeight = { onChangeWeight(set.uuid, it) },
                         onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
                         onRemoveSet = { onRemoveSet(set.uuid) },
