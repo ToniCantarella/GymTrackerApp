@@ -1,9 +1,9 @@
-package com.example.gymtracker.database.dao
+package com.example.gymtracker.database.dao.gym
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.gymtracker.database.entity.workout.SetSessionEntity
+import com.example.gymtracker.database.entity.gym.SetSessionEntity
 
 @Dao
 interface SetSessionDao {

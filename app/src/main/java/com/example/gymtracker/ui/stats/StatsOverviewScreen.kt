@@ -133,11 +133,13 @@ private fun StatsOverviewScreen(
                     workoutSessions = workoutSessionsBetweenDates
                 )
             }
-            item {
-                PieChartCard(
-                    workouts = workouts,
-                    workoutSessions = workoutSessions
-                )
+            if(workoutSessions.isNotEmpty()){
+                item {
+                    PieChartCard(
+                        workouts = workouts,
+                        workoutSessions = workoutSessions
+                    )
+                }
             }
         }
     }

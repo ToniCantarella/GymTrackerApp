@@ -1,4 +1,4 @@
-package com.example.gymtracker.database.entity.workout
+package com.example.gymtracker.database.entity.gym
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

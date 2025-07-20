@@ -1,10 +1,10 @@
-package com.example.gymtracker.database.dao
+package com.example.gymtracker.database.dao.gym
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.gymtracker.database.entity.workout.SplitEntity
+import com.example.gymtracker.database.entity.gym.SplitEntity
 
 @Dao
 interface SplitDao {

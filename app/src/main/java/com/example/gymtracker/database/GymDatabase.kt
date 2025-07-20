@@ -4,16 +4,21 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.gymtracker.database.dao.ExerciseDao
-import com.example.gymtracker.database.dao.SetDao
-import com.example.gymtracker.database.dao.SetSessionDao
-import com.example.gymtracker.database.dao.SplitDao
-import com.example.gymtracker.database.dao.SplitSessionDao
-import com.example.gymtracker.database.entity.workout.ExerciseEntity
-import com.example.gymtracker.database.entity.workout.SetEntity
-import com.example.gymtracker.database.entity.workout.SetSessionEntity
-import com.example.gymtracker.database.entity.workout.SplitEntity
-import com.example.gymtracker.database.entity.workout.SplitSessionEntity
+import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioSessionDao
+import com.example.gymtracker.database.dao.gym.ExerciseDao
+import com.example.gymtracker.database.dao.gym.SetDao
+import com.example.gymtracker.database.dao.gym.SetSessionDao
+import com.example.gymtracker.database.dao.gym.SplitDao
+import com.example.gymtracker.database.dao.gym.SplitSessionDao
+import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
+import com.example.gymtracker.database.entity.gym.ExerciseEntity
+import com.example.gymtracker.database.entity.gym.SetEntity
+import com.example.gymtracker.database.entity.gym.SetSessionEntity
+import com.example.gymtracker.database.entity.gym.SplitEntity
+import com.example.gymtracker.database.entity.gym.SplitSessionEntity
+import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
@@ -23,7 +28,9 @@ import java.util.UUID
         ExerciseEntity::class,
         SetEntity::class,
         SetSessionEntity::class,
-        SplitSessionEntity::class
+        SplitSessionEntity::class,
+        CardioEntity::class,
+        CardioSessionEntity::class
     ],
     version = 1
 )
@@ -34,6 +41,8 @@ abstract class GymDatabase : RoomDatabase() {
     abstract fun setDao(): SetDao
     abstract fun setSessionDao(): SetSessionDao
     abstract fun sessionDao(): SplitSessionDao
+    abstract fun cardioDao(): CardioDao
+    abstract fun cardioSessionDao(): CardioSessionDao
 }
 
 class Converters {
@@ -48,4 +57,10 @@ class Converters {
 
     @TypeConverter
     fun toInstant(millis: Long): Instant = Instant.ofEpochMilli(millis)
+
+    @TypeConverter
+    fun fromDuration(duration: Duration): Long = duration.toMillis()
+
+    @TypeConverter
+    fun toDuration(millis: Long): Duration = Duration.ofMillis(millis)
 }

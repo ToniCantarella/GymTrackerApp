@@ -1,15 +1,17 @@
 package com.example.gymtracker.database.repository
 
-import com.example.gymtracker.database.dao.ExerciseDao
-import com.example.gymtracker.database.dao.SetDao
-import com.example.gymtracker.database.dao.SetSessionDao
-import com.example.gymtracker.database.dao.SplitDao
-import com.example.gymtracker.database.dao.SplitSessionDao
-import com.example.gymtracker.database.entity.workout.ExerciseEntity
-import com.example.gymtracker.database.entity.workout.SetEntity
-import com.example.gymtracker.database.entity.workout.SetSessionEntity
-import com.example.gymtracker.database.entity.workout.SplitEntity
-import com.example.gymtracker.database.entity.workout.SplitSessionEntity
+import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioSessionDao
+import com.example.gymtracker.database.dao.gym.ExerciseDao
+import com.example.gymtracker.database.dao.gym.SetDao
+import com.example.gymtracker.database.dao.gym.SetSessionDao
+import com.example.gymtracker.database.dao.gym.SplitDao
+import com.example.gymtracker.database.dao.gym.SplitSessionDao
+import com.example.gymtracker.database.entity.gym.ExerciseEntity
+import com.example.gymtracker.database.entity.gym.SetEntity
+import com.example.gymtracker.database.entity.gym.SetSessionEntity
+import com.example.gymtracker.database.entity.gym.SplitEntity
+import com.example.gymtracker.database.entity.gym.SplitSessionEntity
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
@@ -43,7 +45,9 @@ class WorkoutRepository(
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
     private val setSessionDao: SetSessionDao,
-    private val sessionDao: SplitSessionDao
+    private val sessionDao: SplitSessionDao,
+    private val cardioDao: CardioDao,
+    private val cardioSessionDao: CardioSessionDao
 ) {
     suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem> {
         val splits = splitDao.getAllSplits()

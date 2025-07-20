@@ -1,9 +1,9 @@
-package com.example.gymtracker.database.dao
+package com.example.gymtracker.database.dao.gym
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.gymtracker.database.entity.workout.SplitSessionEntity
+import com.example.gymtracker.database.entity.gym.SplitSessionEntity
 import java.time.Instant
 
 @Dao
@@ -11,7 +11,7 @@ interface SplitSessionDao {
     @Insert
     suspend fun insert(session: SplitSessionEntity): Long
 
-    @Query("SELECT * FROM SPLIT_SESSIONS")
+    @Query("SELECT * FROM split_sessions")
     suspend fun getAllSessions(): List<SplitSessionEntity?>
 
     @Query("SELECT * FROM split_sessions WHERE splitId = :splitId ORDER BY timestamp DESC LIMIT 1")

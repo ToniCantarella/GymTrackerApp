@@ -40,6 +40,8 @@ val databaseModule = module {
     single { get<GymDatabase>().setDao() }
     single { get<GymDatabase>().setSessionDao() }
     single { get<GymDatabase>().sessionDao() }
+    single { get<GymDatabase>().cardioDao() }
+    single { get<GymDatabase>().cardioSessionDao() }
 
     single {
         WorkoutRepository(
@@ -47,7 +49,9 @@ val databaseModule = module {
             exerciseDao = get(),
             setDao = get(),
             setSessionDao = get(),
-            sessionDao = get()
+            sessionDao = get(),
+            cardioDao = get(),
+            cardioSessionDao = get()
         )
     }
 }
