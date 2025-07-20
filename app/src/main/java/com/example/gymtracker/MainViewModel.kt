@@ -35,7 +35,7 @@ class MainViewModel(
                     _uiState.update {
                         it.copy(
                             userHasBeenWelcomed = value,
-                            initialRoute = if (value) Route.Workouts else it.initialRoute,
+                            initialRoute = if (value) Route.Gym else it.initialRoute,
                             loading = false
                         )
                     }

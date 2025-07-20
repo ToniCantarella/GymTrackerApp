@@ -110,12 +110,12 @@ fun GymTrackerApp(
                 WelcomeScreen(
                     onUnderstoodClick = {
                         viewModel.onUserWelcomed()
-                        navController.navigate(Route.Workouts)
+                        navController.navigate(Route.Gym)
                     }
                 )
             }
 
-            navigation<Route.Workouts>(startDestination = Route.SplitList) {
+            navigation<Route.Gym>(startDestination = Route.SplitList) {
                 composable<Route.SplitList> {
                     SplitListScreen(
                         onNavigateToSplit = { navController.navigate(Route.Split(it)) },

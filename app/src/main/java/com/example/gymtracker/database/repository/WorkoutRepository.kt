@@ -10,9 +10,9 @@ import com.example.gymtracker.database.entity.workout.SetEntity
 import com.example.gymtracker.database.entity.workout.SetSessionEntity
 import com.example.gymtracker.database.entity.workout.SplitEntity
 import com.example.gymtracker.database.entity.workout.SplitSessionEntity
+import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
-import com.example.gymtracker.ui.workouts.splitslist.SplitListItem
 import java.time.Instant
 
 data class LatestSplitWithExercises(
@@ -45,13 +45,13 @@ class WorkoutRepository(
     private val setSessionDao: SetSessionDao,
     private val sessionDao: SplitSessionDao
 ) {
-    suspend fun getSplitsWithLatestTimestamp(): List<SplitListItem> {
+    suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem> {
         val splits = splitDao.getAllSplits()
 
         return splits.map {
             val timestamp = sessionDao.getLastSession(it.id)?.timestamp
 
-            SplitListItem(
+            WorkoutListItem(
                 id = it.id,
                 name = it.name,
                 latestTimestamp = timestamp

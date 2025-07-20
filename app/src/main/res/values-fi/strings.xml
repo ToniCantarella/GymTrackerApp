@@ -31,4 +31,5 @@
     <string name="total">Yhteensä</string>
     <string name="clear">Tyhjennä</string>
     <string name="exercise_deletion_subtitle">Oletko varma että haluat poistaa %s?</string>
+    <string name="gym">Sali</string>
 </resources>

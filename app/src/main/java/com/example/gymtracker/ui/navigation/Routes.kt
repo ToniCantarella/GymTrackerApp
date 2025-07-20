@@ -9,7 +9,7 @@ open class Route {
     object Welcome : Route()
 
     @Serializable
-    object Workouts : Route()
+    object Gym : Route()
 
     @Serializable
     object SplitList : Route()
@@ -37,8 +37,8 @@ data class BottomBarRoute<Route>(val titleResId: Int, val route: Route, val icon
 
 val bottomBarRoutes = listOf(
     BottomBarRoute(
-        titleResId = R.string.workouts,
-        route = Route.Workouts,
+        titleResId = R.string.gym,
+        route = Route.Gym,
         iconResInt = R.drawable.weight
     ),
     BottomBarRoute(
