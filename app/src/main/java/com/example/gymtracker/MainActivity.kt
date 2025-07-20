@@ -52,6 +52,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
+import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.stats.StatsOverviewScreen
@@ -129,15 +130,24 @@ fun GymTrackerApp(
                 }
                 composable<Route.CreateSplit> {
                     CreateSplitScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        onCreate = { navController.popBackStack() }
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
             }
 
             navigation<Route.Cardio>(startDestination = Route.CardioList) {
                 composable<Route.CardioList> {
-                    CardioListScreen()
+                    CardioListScreen(
+                        onNavigateToCreateCardio = { navController.navigate(Route.CreateCardio) }
+                    )
+                }
+                composable<Route.CardioItem> {
+
+                }
+                composable<Route.CreateCardio> {
+                    CreateCardioScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
             }
 

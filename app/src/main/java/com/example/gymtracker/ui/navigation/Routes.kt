@@ -27,6 +27,12 @@ open class Route {
     object CardioList : Route()
 
     @Serializable
+    object CardioItem : Route()
+
+    @Serializable
+    object CreateCardio : Route()
+
+    @Serializable
     object Stats : Route()
 
     @Serializable

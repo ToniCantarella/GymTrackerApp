@@ -35,7 +35,10 @@ import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CardioListScreen(viewModel: CardioListViewModel = koinViewModel()) {
+fun CardioListScreen(
+    onNavigateToCreateCardio: () -> Unit,
+    viewModel: CardioListViewModel = koinViewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
@@ -57,7 +60,7 @@ fun CardioListScreen(viewModel: CardioListViewModel = koinViewModel()) {
     )
 
     ProvideFloatingActionButton(
-        onClick = {},
+        onClick = onNavigateToCreateCardio,
         visible = true
     ) {
         Icon(

@@ -12,6 +12,8 @@ const val SPLIT_NAME_MAX_SIZE = 20
 const val EXERCISE_NAME_MAX_SIZE = 20
 const val EXERCISE_DESCRIPTION_MAX_SIZE = 40
 
+const val CARDIO_NAME_MAX_SIZE = 20
+
 class SplitUtil {
 
     fun updateExerciseName(

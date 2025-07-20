@@ -39,4 +39,7 @@
     <string name="clear">Clear</string>
     <string name="exercise_deletion_subtitle">Are you sure you want to delete %s?</string>
     <string name="gym">Gym</string>
+    <string name="steps">Steps</string>
+    <string name="distance">Distance</string>
+    <string name="time">Time</string>
 </resources>

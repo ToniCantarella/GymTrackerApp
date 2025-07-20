@@ -7,6 +7,7 @@ import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.dao.gym.SplitDao
 import com.example.gymtracker.database.dao.gym.SplitSessionDao
+import com.example.gymtracker.database.entity.cardio.CardioEntity
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
@@ -42,10 +43,10 @@ data class WorkoutSession(
 
 class WorkoutRepository(
     private val splitDao: SplitDao,
+    private val splitSessionDao: SplitSessionDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
     private val setSessionDao: SetSessionDao,
-    private val sessionDao: SplitSessionDao,
     private val cardioDao: CardioDao,
     private val cardioSessionDao: CardioSessionDao
 ) {
@@ -53,7 +54,7 @@ class WorkoutRepository(
         val splits = splitDao.getAllSplits()
 
         return splits.map {
-            val timestamp = sessionDao.getLastSession(it.id)?.timestamp
+            val timestamp = splitSessionDao.getLastSession(it.id)?.timestamp
 
             WorkoutListItem(
                 id = it.id,
@@ -89,6 +90,26 @@ class WorkoutRepository(
         }
     }
 
+    suspend fun getAllCardios(): List<WorkoutListItem> {
+        val cardios = cardioDao.getAllCardios()
+        return cardios.map {
+            WorkoutListItem(
+                id = it.id,
+                name = it.name,
+                latestTimestamp = it.latestTimestamp
+            )
+        }
+    }
+
+    suspend fun addCardio(name: String) {
+        cardioDao.insert(
+            CardioEntity(
+                name = name,
+                latestTimestamp = null
+            )
+        )
+    }
+
     suspend fun deleteSplit(splitId: Int) = splitDao.deleteById(splitId)
 
     suspend fun markSessionDone(
@@ -112,7 +133,7 @@ class WorkoutRepository(
         val performedSets = exercises.filter { it.sets.any { set -> set.checked } }
 
         val sessionId = if (performedSets.isNotEmpty()) {
-            sessionDao.insert(
+            splitSessionDao.insert(
                 SplitSessionEntity(
                     splitId = splitId,
                     timestamp = Instant.now()
@@ -203,7 +224,7 @@ class WorkoutRepository(
 
 
     suspend fun getLatestSplitWithExercises(splitId: Int): LatestSplitWithExercises? {
-        val timestamp = sessionDao.getLastSession(splitId)?.timestamp
+        val timestamp = splitSessionDao.getLastSession(splitId)?.timestamp
         val split = splitDao.getSplitById(splitId)
 
         val exercises = exerciseDao.getExercisesBySplitId(splitId)
@@ -244,7 +265,7 @@ class WorkoutRepository(
     }
 
     suspend fun getAllSplitSessions(): List<WorkoutSession> {
-        val sessions = sessionDao.getAllSessions().filterNotNull()
+        val sessions = splitSessionDao.getAllSessions().filterNotNull()
         return getWorkoutSessionsForSplitSessions(sessions)
     }
 
@@ -252,7 +273,7 @@ class WorkoutRepository(
         startDate: Instant,
         endDate: Instant
     ): List<WorkoutSession> {
-        val sessions = sessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
+        val sessions = splitSessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
 
         return getWorkoutSessionsForSplitSessions(sessions)
     }

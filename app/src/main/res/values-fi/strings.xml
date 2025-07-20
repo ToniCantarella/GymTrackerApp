@@ -32,4 +32,7 @@
     <string name="clear">Tyhjennä</string>
     <string name="exercise_deletion_subtitle">Oletko varma että haluat poistaa %s?</string>
     <string name="gym">Sali</string>
+    <string name="steps">Askeleet</string>
+    <string name="distance">Etäisyys</string>
+    <string name="time">Aika</string>
 </resources>

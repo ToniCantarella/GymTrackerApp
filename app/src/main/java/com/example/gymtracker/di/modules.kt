@@ -8,6 +8,7 @@ import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
+import com.example.gymtracker.ui.cardio.createcario.CreateCardioViewModel
 import com.example.gymtracker.ui.stats.StatsOverviewViewModel
 import com.example.gymtracker.ui.workouts.createsplit.CreateSplitViewModel
 import com.example.gymtracker.ui.workouts.split.SplitViewModel
@@ -39,7 +40,7 @@ val databaseModule = module {
     single { get<GymDatabase>().exerciseDao() }
     single { get<GymDatabase>().setDao() }
     single { get<GymDatabase>().setSessionDao() }
-    single { get<GymDatabase>().sessionDao() }
+    single { get<GymDatabase>().splitSessionDao() }
     single { get<GymDatabase>().cardioDao() }
     single { get<GymDatabase>().cardioSessionDao() }
 
@@ -49,7 +50,7 @@ val databaseModule = module {
             exerciseDao = get(),
             setDao = get(),
             setSessionDao = get(),
-            sessionDao = get(),
+            splitSessionDao = get(),
             cardioDao = get(),
             cardioSessionDao = get()
         )
@@ -62,5 +63,6 @@ val viewModelModule = module {
     viewModelOf(::CardioListViewModel)
     viewModelOf(::SplitViewModel)
     viewModelOf(::CreateSplitViewModel)
+    viewModelOf(::CreateCardioViewModel)
     viewModelOf(::StatsOverviewViewModel)
 }

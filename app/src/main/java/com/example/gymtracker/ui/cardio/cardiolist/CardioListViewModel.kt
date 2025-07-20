@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class CardioListUiState(
-    val loading : Boolean= true,
+    val loading: Boolean = true,
     val cardioList: List<WorkoutListItem> = emptyList(),
     val selectingItems: Boolean = false,
     val selectedItems: List<Int> = emptyList()
@@ -18,15 +18,16 @@ data class CardioListUiState(
 
 class CardioListViewModel(
     private val workoutRepository: WorkoutRepository
-): ViewModel() {
+) : ViewModel() {
     private val _uiState = MutableStateFlow(CardioListUiState())
     val uiState = _uiState.asStateFlow()
 
     fun getCardioList() {
         viewModelScope.launch {
-
+            val cardios = workoutRepository.getAllCardios()
             _uiState.update {
                 it.copy(
+                    cardioList = cardios,
                     loading = false
                 )
             }
@@ -66,7 +67,7 @@ class CardioListViewModel(
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-               // workoutRepository.deleteCardios(it)
+                // workoutRepository.deleteCardios(it)
             }
             stopSelectingItems()
             getCardioList()

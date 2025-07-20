@@ -23,7 +23,6 @@ import java.util.UUID
 @Composable
 fun CreateSplitScreen(
     onNavigateBack: () -> Unit,
-    onCreate: () -> Unit,
     viewModel: CreateSplitViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -49,7 +48,7 @@ fun CreateSplitScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = { viewModel.onCreateSplitPressed { onCreate() } },
+        onClick = { viewModel.onCreateSplitPressed { onNavigateBack() } },
         visible = uiState.exercises.last().name.isNotEmpty() && uiState.splitName.isNotEmpty()
     ) {
         Icon(
