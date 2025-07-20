@@ -4,11 +4,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -16,7 +14,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,8 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.window.Dialog
 import com.example.gymtracker.R
+import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
@@ -108,51 +105,43 @@ fun SplitListScreen(
     }
 
     if (deletionDialogOpen) {
-        Dialog(
-            onDismissRequest = { deletionDialogOpen = false }
-        ) {
-            ElevatedCard {
-                Column(
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_large))
+        ConfirmDialog(
+            subtitle = {
+                Text(
+                    text = stringResource(
+                        id = R.string.delete_are_you_sure,
+                        uiState.selectedItems.size
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.onDeleteSplits { deletionDialogOpen = false }
+                    }
                 ) {
                     Text(
-                        text = stringResource(
-                            id = R.string.delete_are_you_sure,
-                            uiState.selectedItems.size
-                        ),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                        text = stringResource(id = R.string.delete)
                     )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        OutlinedButton(
-                            onClick = {
-                                deletionDialogOpen = false
-                                viewModel.stopSelectingItems()
-                            }
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.cancel)
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                        Button(
-                            onClick = {
-                                viewModel.onDeleteSplits { deletionDialogOpen = false }
-                            }
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.delete)
-                            )
-                        }
-                    }
                 }
-            }
-        }
+            },
+            cancelButton = {
+                OutlinedButton(
+                    onClick = {
+                        deletionDialogOpen = false
+                        viewModel.stopSelectingItems()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel)
+                    )
+                }
+            },
+            onDismissRequest = { deletionDialogOpen = false }
+        )
     }
 
     SplitListScreen(

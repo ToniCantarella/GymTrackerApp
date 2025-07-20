@@ -3,6 +3,7 @@ package com.example.gymtracker.ui.workouts.common
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -10,13 +11,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.example.gymtracker.R
+import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.workouts.MAX_EXERCISES
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import kotlinx.coroutines.launch
@@ -27,18 +36,20 @@ fun ExerciseList(
     exercises: List<Exercise>,
     creatingSplit: Boolean,
     onAddExercise: () -> Unit,
-    onRemoveExercise: (exerciseId: UUID) -> Unit,
+    onRemoveExercise: (id: UUID) -> Unit,
     onExerciseNameChange: (id: UUID, name: String) -> Unit,
     onDescriptionChange: (id: UUID, description: String) -> Unit,
-    onAddSet: (id: UUID) -> Unit,
-    onChangeWeight: (exerciseId: UUID, setId: UUID, Double) -> Unit,
-    onChangeRepetitions: (exerciseId: UUID, setId: UUID, Int) -> Unit,
+    onAddSet: (exerciseId: UUID) -> Unit,
+    onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
+    onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
     onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit,
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    var deleteDialogOpen by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<Exercise?>(null) }
 
     LazyColumn(
         state = lazyListState,
@@ -61,7 +72,10 @@ fun ExerciseList(
                         description
                     )
                 },
-                onDelete = { onRemoveExercise(exercise.uuid) },
+                onDelete = {
+                    deleteDialogOpen = true
+                    itemToDelete = exercise
+                },
                 addSet = { onAddSet(exercise.uuid) },
                 onChangeWeight = { setId, weight ->
                     onChangeWeight(
@@ -107,5 +121,46 @@ fun ExerciseList(
                 )
             }
         }
+    }
+    if (deleteDialogOpen) {
+        ConfirmDialog(
+            subtitle = {
+                Text(
+                    text = stringResource(
+                        id = R.string.exercise_deletion_subtitle,
+                        itemToDelete?.name ?: stringResource(id = R.string.exercise)
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        itemToDelete?.let { onRemoveExercise(it.uuid) }
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.delete)
+                    )
+                }
+            },
+            cancelButton = {
+                OutlinedButton(
+                    onClick = {
+                        itemToDelete = null
+                        deleteDialogOpen = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel)
+                    )
+                }
+            },
+            onDismissRequest = {
+                deleteDialogOpen = false
+            }
+        )
     }
 }

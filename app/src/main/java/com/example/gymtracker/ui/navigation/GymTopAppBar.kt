@@ -54,7 +54,7 @@ fun GymTopAppBar(
             visible = debouncedShowTopBar,
             enter = fadeIn() + expandVertically(),
             exit = fadeOut() + shrinkVertically()
-        ){
+        ) {
             TopAppBar(
                 title = viewModel.title,
                 navigationIcon = viewModel.navigationIcon,
@@ -87,7 +87,7 @@ fun ProvideTopAppBar(
 
 @Composable
 fun TopBarTextField(
-    value : String,
+    value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     maxSize: Int = Int.MAX_VALUE

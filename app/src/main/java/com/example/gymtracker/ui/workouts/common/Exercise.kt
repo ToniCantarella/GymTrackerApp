@@ -43,8 +43,8 @@ fun Exercise(
     onDescriptionChange: (description: String) -> Unit,
     onDelete: () -> Unit,
     addSet: () -> Unit,
-    onChangeWeight: (setId: UUID, Double) -> Unit,
-    onChangeRepetitions: (setId: UUID, Int) -> Unit,
+    onChangeWeight: (setId: UUID, weight: Double) -> Unit,
+    onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
     onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
     creatingExercise: Boolean = true
@@ -66,7 +66,8 @@ fun Exercise(
                     .fillMaxWidth()
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                    modifier = Modifier.weight(2f)
                 ) {
                     if (editingExercise) {
                         OutlinedTextField(
@@ -113,7 +114,10 @@ fun Exercise(
                         )
                     }
                 }
-                Column {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.weight(1f)
+                ) {
                     if (!creatingExercise) {
                         IconButton(
                             onClick = {
