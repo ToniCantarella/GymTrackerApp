@@ -63,7 +63,7 @@ fun SplitScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = { viewModel.onFinishWorkoutPressed(onNavigateBack) }
+        onClick = { viewModel.onFinishWorkoutPressed { onNavigateBack() } }
     ) {
         Icon(
             imageVector = Icons.Default.Done,
