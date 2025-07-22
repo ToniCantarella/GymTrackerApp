@@ -114,7 +114,7 @@ fun ExerciseList(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = null
+                    contentDescription = stringResource(id = R.string.add)
                 )
                 Text(
                     text = stringResource(id = R.string.exercise)
