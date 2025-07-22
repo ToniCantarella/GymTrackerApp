@@ -167,38 +167,36 @@ fun CardioContent(
 }
 
 @SuppressLint("DefaultLocale")
-fun formatTime(ms: Long): String {
-    val totalSeconds = ms / 1000
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    val seconds = totalSeconds % 60
-    val milliseconds = ms % 1000
-    return String.format("%02d:%02d:%02d:%03d", hours, minutes, seconds, milliseconds)
-}
-
 @Composable
 private fun StopWatch(
     onPause: (millis: Long) -> Unit,
     onStop: (millis: Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var timeMillis by remember { mutableLongStateOf(0L) }
     var isRunning by remember { mutableStateOf(false) }
-    val amount = 16L
+    var elapsedMillis by remember { mutableLongStateOf(0L) }
+    var lastTickTime by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(isRunning) {
         while (isRunning) {
-            delay(amount)
-            timeMillis += amount
+            val now = System.currentTimeMillis()
+            elapsedMillis += (now - lastTickTime)
+            lastTickTime = now
+            delay(10L)
         }
     }
+
+    val hours = (elapsedMillis / 3600000)
+    val minutes = (elapsedMillis / 60000) % 60
+    val seconds = (elapsedMillis / 1000) % 60
+    val milliseconds = (elapsedMillis % 1000) / 10
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            text = formatTime(timeMillis),
+            text = String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds),
             style = MaterialTheme.typography.displayMedium
         )
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -206,7 +204,7 @@ private fun StopWatch(
                 IconButton(
                     onClick = {
                         isRunning = false
-                        onPause(timeMillis)
+                        onPause(elapsedMillis)
                     }
                 ) {
                     Icon(
@@ -217,7 +215,10 @@ private fun StopWatch(
                 }
             } else {
                 IconButton(
-                    onClick = { isRunning = true }
+                    onClick = {
+                        lastTickTime = System.currentTimeMillis()
+                        isRunning = true
+                    }
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.timer_play),
@@ -229,8 +230,8 @@ private fun StopWatch(
             IconButton(
                 onClick = {
                     isRunning = false
-                    timeMillis = 0L
-                    onStop(timeMillis)
+                    elapsedMillis = 0L
+                    onStop(elapsedMillis)
                 }
             ) {
                 Icon(
