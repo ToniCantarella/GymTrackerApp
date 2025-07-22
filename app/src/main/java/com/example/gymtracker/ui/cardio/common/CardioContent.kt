@@ -10,17 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -31,15 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
+import com.example.gymtracker.ui.common.NumericTextField
 import com.example.gymtracker.utility.toDateAndTimeString
 import com.example.gymtracker.utility.toReadableString
 import kotlinx.coroutines.delay
@@ -96,22 +89,9 @@ fun CardioContent(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                var stepsString by remember { mutableStateOf(steps.toString()) }
-                OutlinedTextField(
-                    value = stepsString,
-                    onValueChange = {
-                        stepsString = it
-                        onStepsChange(it.toIntOrNull() ?: 0)
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    textStyle = TextStyle(textAlign = TextAlign.End),
-                    modifier = Modifier.width(60.dp)
+                NumericTextField(
+                    value = steps,
+                    onValueChange = onStepsChange
                 )
                 Text(
                     text = stringResource(id = R.string.steps)
@@ -146,22 +126,9 @@ fun CardioContent(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                var distanceString by remember { mutableStateOf(distance.toString()) }
-                OutlinedTextField(
-                    value = distanceString,
-                    onValueChange = {
-                        distanceString = it
-                        onDistanceChange(it.toDoubleOrNull() ?: 0.0)
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    textStyle = TextStyle(textAlign = TextAlign.End),
-                    modifier = Modifier.width(60.dp)
+                NumericTextField(
+                    value = distance,
+                    onValueChange = onDistanceChange
                 )
                 Text(
                     text = "km"
