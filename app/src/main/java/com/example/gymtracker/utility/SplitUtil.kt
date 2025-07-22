@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts
+package com.example.gymtracker.utility
 
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet

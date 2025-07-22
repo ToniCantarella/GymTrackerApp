@@ -4,9 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioViewModel
 import com.example.gymtracker.ui.stats.StatsOverviewViewModel
@@ -26,6 +29,18 @@ val appModule = module {
     }
 }
 
+val MIGRATION_1_2 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // Add the new column with a default value
+        database.execSQL("ALTER TABLE cardios ADD COLUMN steps INTEGER")
+        database.execSQL("ALTER TABLE cardios ADD COLUMN stepsTimestamp INTEGER")
+        database.execSQL("ALTER TABLE cardios ADD COLUMN distance REAL")
+        database.execSQL("ALTER TABLE cardios ADD COLUMN distanceTimestamp INTEGER")
+        database.execSQL("ALTER TABLE cardios ADD COLUMN duration INTEGER")
+        database.execSQL("ALTER TABLE cardios ADD COLUMN durationTimestamp INTEGER")
+    }
+}
+
 val databaseModule = module {
     single {
         Room.databaseBuilder(
@@ -33,6 +48,7 @@ val databaseModule = module {
             GymDatabase::class.java,
             "gym-tracker-db"
         )
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 
@@ -61,6 +77,7 @@ val viewModelModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::SplitListViewModel)
     viewModelOf(::CardioListViewModel)
+    viewModelOf(::CardioItemViewModel)
     viewModelOf(::SplitViewModel)
     viewModelOf(::CreateSplitViewModel)
     viewModelOf(::CreateCardioViewModel)

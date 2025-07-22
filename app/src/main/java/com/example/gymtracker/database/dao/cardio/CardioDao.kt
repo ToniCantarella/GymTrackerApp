@@ -15,7 +15,7 @@ interface CardioDao {
     suspend fun updateCardio(cardio: CardioEntity)
 
     @Query("SELECT * FROM cardios")
-    suspend fun getAllCardios(): List<CardioEntity>
+    suspend fun getAllCardio(): List<CardioEntity>
 
     @Query("SELECT * FROM cardios WHERE id = :id")
     suspend fun getCardioById(id: Int): CardioEntity

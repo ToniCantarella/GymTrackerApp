@@ -51,6 +51,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.example.gymtracker.ui.cardio.cardioitem.CardioScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
@@ -138,11 +139,14 @@ fun GymTrackerApp(
             navigation<Route.Cardio>(startDestination = Route.CardioList) {
                 composable<Route.CardioList> {
                     CardioListScreen(
+                        onNavigateToCardioItem = {navController.navigate(Route.CardioItem(it))},
                         onNavigateToCreateCardio = { navController.navigate(Route.CreateCardio) }
                     )
                 }
                 composable<Route.CardioItem> {
-
+                    CardioScreen(
+                        onBackNavigate = { navController.popBackStack() }
+                    )
                 }
                 composable<Route.CreateCardio> {
                     CreateCardioScreen(

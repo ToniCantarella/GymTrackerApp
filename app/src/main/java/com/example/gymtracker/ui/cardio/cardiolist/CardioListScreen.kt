@@ -36,6 +36,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CardioListScreen(
+    onNavigateToCardioItem: (id: Int) -> Unit,
     onNavigateToCreateCardio: () -> Unit,
     viewModel: CardioListViewModel = koinViewModel()
 ) {
@@ -85,7 +86,7 @@ fun CardioListScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.onDeleteCardios { deletionDialogOpen = false }
+                        viewModel.onDeleteCardioList { deletionDialogOpen = false }
                     }
                 ) {
                     Text(
@@ -115,7 +116,7 @@ fun CardioListScreen(
         selectingItems = uiState.selectingItems,
         selectedItems = uiState.selectedItems,
         onSelect = viewModel::onSelectItem,
-        onCardioClick = {},
+        onCardioClick = onNavigateToCardioItem,
         onCardioHold = viewModel::startSelectingItems
     )
 }

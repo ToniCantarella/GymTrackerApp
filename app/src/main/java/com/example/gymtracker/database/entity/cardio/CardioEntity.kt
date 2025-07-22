@@ -12,7 +12,13 @@ data class CardioEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
-    val latestTimestamp: Instant?
+    val steps: Int? = null,
+    val stepsTimestamp: Instant? = null,
+    val distance: Double? = null,
+    val distanceTimestamp: Instant? = null,
+    val duration: Duration? = null,
+    val durationTimestamp: Instant? = null,
+    val latestTimestamp: Instant? = null
 )
 
 @Entity(

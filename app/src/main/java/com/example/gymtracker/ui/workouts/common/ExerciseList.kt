@@ -26,8 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.workouts.MAX_EXERCISES
 import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.utility.MAX_EXERCISES
 import kotlinx.coroutines.launch
 import java.util.UUID
 

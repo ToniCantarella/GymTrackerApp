@@ -8,11 +8,13 @@ import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.dao.gym.SplitDao
 import com.example.gymtracker.database.dao.gym.SplitSessionDao
 import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import com.example.gymtracker.database.entity.gym.SplitEntity
 import com.example.gymtracker.database.entity.gym.SplitSessionEntity
+import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
@@ -90,29 +92,9 @@ class WorkoutRepository(
         }
     }
 
-    suspend fun getAllCardios(): List<WorkoutListItem> {
-        val cardios = cardioDao.getAllCardios()
-        return cardios.map {
-            WorkoutListItem(
-                id = it.id,
-                name = it.name,
-                latestTimestamp = it.latestTimestamp
-            )
-        }
-    }
-
-    suspend fun addCardio(name: String) {
-        cardioDao.insert(
-            CardioEntity(
-                name = name,
-                latestTimestamp = null
-            )
-        )
-    }
-
     suspend fun deleteSplit(splitId: Int) = splitDao.deleteById(splitId)
 
-    suspend fun markSessionDone(
+    suspend fun markSplitSessionDone(
         splitId: Int,
         splitName: String? = null,
         exercises: List<Exercise>
@@ -276,6 +258,69 @@ class WorkoutRepository(
         val sessions = splitSessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
 
         return getWorkoutSessionsForSplitSessions(sessions)
+    }
+
+
+    suspend fun getLatestCardio(id: Int): Cardio {
+        val cardio = cardioDao.getCardioById(id)
+
+        return Cardio(
+            name = cardio.name,
+            steps = cardio.steps,
+            stepsTimestamp = cardio.stepsTimestamp,
+            distance = cardio.distance,
+            distanceTimestamp = cardio.distanceTimestamp,
+            duration = cardio.duration,
+            durationTimestamp = cardio.durationTimestamp,
+            latestTimestamp = cardio.latestTimestamp
+        )
+    }
+
+    suspend fun getCardioListWithLatestTimestamp(): List<WorkoutListItem> {
+        val cardioList = cardioDao.getAllCardio()
+        return cardioList.map {
+            WorkoutListItem(
+                id = it.id,
+                name = it.name,
+                latestTimestamp = it.latestTimestamp
+            )
+        }
+    }
+
+    suspend fun addCardio(name: String) {
+        cardioDao.insert(
+            CardioEntity(
+                name = name
+            )
+        )
+    }
+
+    suspend fun deleteCardio(cardioId: Int) = cardioDao.deleteById(cardioId)
+
+    suspend fun markCardioSessionDone(id: Int, cardio: Cardio) {
+        val cardioToUpdate = cardioDao.getCardioById(id)
+        val timestamp = Instant.now()
+        cardioDao.updateCardio(
+            cardioToUpdate.copy(
+                name = if (cardio.name.isNotEmpty() && cardio.name != cardioToUpdate.name) cardio.name else cardioToUpdate.name,
+                steps = cardio.steps ?: cardioToUpdate.steps,
+                stepsTimestamp = if (cardio.steps != null) timestamp else cardioToUpdate.stepsTimestamp,
+                distance = cardio.distance ?: cardioToUpdate.distance,
+                distanceTimestamp = if (cardio.distance != null) timestamp else cardioToUpdate.distanceTimestamp,
+                duration = cardio.duration ?: cardioToUpdate.duration,
+                durationTimestamp = if (cardio.duration != null) timestamp else cardioToUpdate.durationTimestamp,
+                latestTimestamp = timestamp
+            )
+        )
+        cardioSessionDao.insert(
+            CardioSessionEntity(
+                cardioId = id,
+                timestamp = timestamp,
+                steps = cardio.steps,
+                distance = cardio.distance,
+                duration = cardio.duration
+            )
+        )
     }
 
     private suspend fun getWorkoutSessionsForSplitSessions(sessions: List<SplitSessionEntity>): List<WorkoutSession> {

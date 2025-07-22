@@ -14,9 +14,9 @@ import com.example.gymtracker.R
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
-import com.example.gymtracker.ui.workouts.SPLIT_NAME_MAX_SIZE
 import com.example.gymtracker.ui.workouts.common.ExerciseList
 import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 

@@ -36,7 +36,7 @@ import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.ui.workouts.MAX_SPLITS
+import com.example.gymtracker.utility.MAX_SPLITS
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 

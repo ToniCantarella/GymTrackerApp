@@ -24,10 +24,10 @@ class CardioListViewModel(
 
     fun getCardioList() {
         viewModelScope.launch {
-            val cardios = workoutRepository.getAllCardios()
+            val cardioList = workoutRepository.getCardioListWithLatestTimestamp()
             _uiState.update {
                 it.copy(
-                    cardioList = cardios,
+                    cardioList = cardioList,
                     loading = false
                 )
             }
@@ -62,12 +62,12 @@ class CardioListViewModel(
         }
     }
 
-    fun onDeleteCardios(onDeletionDone: () -> Unit) {
+    fun onDeleteCardioList(onDeletionDone: () -> Unit) {
         val itemsToDelete = uiState.value.selectedItems
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-                // workoutRepository.deleteCardios(it)
+                workoutRepository.deleteCardio(it)
             }
             stopSelectingItems()
             getCardioList()
