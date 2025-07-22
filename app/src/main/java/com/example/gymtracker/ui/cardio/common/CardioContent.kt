@@ -2,6 +2,7 @@ package com.example.gymtracker.ui.cardio.common
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -86,10 +87,13 @@ fun CardioContent(
             }
         ) {
             Row(
-                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.footprint),
+                    contentDescription = stringResource(id = R.string.steps)
+                )
                 NumericTextField(
                     value = steps,
                     onValueChange = onStepsChange,
@@ -97,7 +101,7 @@ fun CardioContent(
                     modifier = Modifier.width(100.dp)
                 )
                 Text(
-                    text = stringResource(id = R.string.steps)
+                    text = stringResource(id = R.string.steps_count)
                 )
             }
         }
@@ -125,13 +129,18 @@ fun CardioContent(
             }
         ) {
             Row(
-                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.path),
+                    contentDescription = stringResource(id = R.string.distance)
+                )
                 NumericTextField(
                     value = distance,
-                    onValueChange = onDistanceChange
+                    onValueChange = onDistanceChange,
+                    valueMaxLength = 6,
+                    modifier = Modifier.width(100.dp)
                 )
                 Text(
                     text = stringResource(UnitUtil.distanceUnitStringId)
@@ -161,10 +170,19 @@ fun CardioContent(
                 }
             }
         ) {
-            StopWatch(
-                onPause = { onDurationChange(Duration.ofMillis(it)) },
-                onStop = { onDurationChange(Duration.ofMillis(it)) }
-            )
+            Box(
+                contentAlignment = Alignment.Center
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.timer),
+                    contentDescription = stringResource(id = R.string.time),
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                StopWatch(
+                    onPause = { onDurationChange(Duration.ofMillis(it)) },
+                    onStop = { onDurationChange(Duration.ofMillis(it)) }
+                )
+            }
         }
     }
 }

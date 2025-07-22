@@ -26,7 +26,7 @@
     <string name="exercise">Exercise</string>
     <string name="done">Done</string>
     <string name="set">Set</string>
-    <string name="repetitions">Reps</string>
+    <string name="repetitions">Repetitions</string>
     <string name="description">Description</string>
     <string name="optional">Optional</string>
     <string name="close">Close</string>
@@ -43,4 +43,6 @@
     <string name="distance">Distance</string>
     <string name="time">Time</string>
     <string name="save">Save</string>
+    <string name="repetitions_count">Reps</string>
+    <string name="steps_count">Steps</string>
 </resources>

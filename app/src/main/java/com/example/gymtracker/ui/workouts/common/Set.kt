@@ -74,7 +74,7 @@ fun Set(
                 onValueChange = onChangeRepetitions
             )
             Text(
-                text = stringResource(id = R.string.repetitions),
+                text = stringResource(id = R.string.repetitions_count),
                 style = MaterialTheme.typography.labelMedium
             )
         }
