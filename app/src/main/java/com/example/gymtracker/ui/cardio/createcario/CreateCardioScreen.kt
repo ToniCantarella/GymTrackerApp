@@ -63,7 +63,7 @@ fun CreateCardioScreen(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.save),
-            contentDescription = null
+            contentDescription = stringResource(id = R.string.save)
         )
     }
 
