@@ -51,7 +51,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.gymtracker.ui.cardio.cardioitem.CardioScreen
+import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
@@ -68,14 +68,15 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
 
+        val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition {
             viewModel.uiState.value.loading
         }
 
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             GymTrackerTheme {
@@ -139,13 +140,13 @@ fun GymTrackerApp(
             navigation<Route.Cardio>(startDestination = Route.CardioList) {
                 composable<Route.CardioList> {
                     CardioListScreen(
-                        onNavigateToCardioItem = {navController.navigate(Route.CardioItem(it))},
+                        onNavigateToCardioItem = { navController.navigate(Route.CardioItem(it)) },
                         onNavigateToCreateCardio = { navController.navigate(Route.CreateCardio) }
                     )
                 }
                 composable<Route.CardioItem> {
-                    CardioScreen(
-                        onBackNavigate = { navController.popBackStack() }
+                    CardioItemScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 composable<Route.CreateCardio> {

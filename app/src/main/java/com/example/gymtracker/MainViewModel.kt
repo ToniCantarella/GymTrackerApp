@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,18 +29,22 @@ class MainViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
+        checkUserPreferences()
+    }
+
+    fun checkUserPreferences() {
         viewModelScope.launch {
-            dataStore.data
-                .map { preferences -> preferences[USER_HAS_BEEN_WELCOMED] ?: false }
-                .collect { value ->
-                    _uiState.update {
-                        it.copy(
-                            userHasBeenWelcomed = value,
-                            initialRoute = if (value) Route.Gym else it.initialRoute,
-                            loading = false
-                        )
-                    }
-                }
+            val hasBeenWelcomed = dataStore.data
+                .map { it[USER_HAS_BEEN_WELCOMED] ?: false }
+                .first()
+
+            _uiState.update {
+                it.copy(
+                    userHasBeenWelcomed = hasBeenWelcomed,
+                    initialRoute = if (hasBeenWelcomed) Route.Gym else it.initialRoute,
+                    loading = false
+                )
+            }
         }
     }
 

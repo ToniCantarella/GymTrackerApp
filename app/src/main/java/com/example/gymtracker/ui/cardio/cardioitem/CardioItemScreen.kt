@@ -24,8 +24,8 @@ import com.example.gymtracker.utility.CARDIO_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CardioScreen(
-    onBackNavigate: () -> Unit,
+fun CardioItemScreen(
+    onNavigateBack: () -> Unit,
     viewModel: CardioItemViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -44,7 +44,7 @@ fun CardioScreen(
         },
         navigationItem = {
             IconButton(
-                onClick = onBackNavigate
+                onClick = onNavigateBack
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -56,7 +56,7 @@ fun CardioScreen(
 
     ProvideFloatingActionButton(
         onClick = {
-            viewModel.onFinishPressed { onBackNavigate() }
+            viewModel.onFinishPressed { onNavigateBack() }
         },
         visible = true
     ) {
