@@ -36,14 +36,15 @@ fun NumericTextField(
 fun NumericTextField(
     value: Double?,
     onValueChange: (value: Double) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    valueMaxLength: Int = 3
 ) {
     GenericNumericTextField(
         value = value,
         onValueChange = { onValueChange(it.toDoubleOrNull() ?: 0.0) },
         valueValidator = {
             val parts = it.split(".")
-            parts.size <= 2 && parts[0].length <= 3 && (parts.getOrNull(1)?.length ?: 0) <= 2
+            parts.size <= 2 && parts[0].length <= valueMaxLength && (parts.getOrNull(1)?.length ?: 0) <= 2
         },
         modifier = modifier.width(80.dp)
     )
