@@ -39,21 +39,21 @@ open class Route {
     object StatsOverview : Route()
 }
 
-data class BottomBarRoute<Route>(val titleResId: Int, val route: Route, val iconResInt: Int)
+data class BottomBarRoute(val titleResInt: Int, val route: Route, val iconResInt: Int)
 
 val bottomBarRoutes = listOf(
     BottomBarRoute(
-        titleResId = R.string.gym,
+        titleResInt = R.string.gym,
         route = Route.Gym,
         iconResInt = R.drawable.weight
     ),
     BottomBarRoute(
-        titleResId = R.string.cardio,
+        titleResInt = R.string.cardio,
         route = Route.Cardio,
         iconResInt = R.drawable.run
     ),
     BottomBarRoute(
-        titleResId = R.string.stats,
+        titleResInt = R.string.stats,
         route = Route.Stats,
         iconResInt = R.drawable.stats
     )

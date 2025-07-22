@@ -60,7 +60,7 @@ fun GymScaffold(
                             },
                             label = {
                                 Text(
-                                    text = stringResource(id = bottomBarRoute.titleResId)
+                                    text = stringResource(id = bottomBarRoute.titleResInt)
                                 )
                             }
                         )
