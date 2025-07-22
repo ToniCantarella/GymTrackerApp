@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -91,7 +92,9 @@ fun CardioContent(
             ) {
                 NumericTextField(
                     value = steps,
-                    onValueChange = onStepsChange
+                    onValueChange = onStepsChange,
+                    valueMaxLength = 6,
+                    modifier = Modifier.width(100.dp)
                 )
                 Text(
                     text = stringResource(id = R.string.steps)

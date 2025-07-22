@@ -15,17 +15,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 
 @Composable
 fun NumericTextField(
     value: Int?,
     onValueChange: (value: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    valueMaxLength: Int = 3
 ) {
     GenericNumericTextField(
         value = value,
         onValueChange = { onValueChange(it.toIntOrNull() ?: 0) },
-        modifier = modifier
+        valueValidator = { it.length <= valueMaxLength && it.isDigitsOnly() },
+        modifier = modifier.width(60.dp)
     )
 }
 
@@ -38,7 +41,11 @@ fun NumericTextField(
     GenericNumericTextField(
         value = value,
         onValueChange = { onValueChange(it.toDoubleOrNull() ?: 0.0) },
-        modifier = modifier
+        valueValidator = {
+            val parts = it.split(".")
+            parts.size <= 2 && parts[0].length <= 3 && (parts.getOrNull(1)?.length ?: 0) <= 2
+        },
+        modifier = modifier.width(80.dp)
     )
 }
 
@@ -46,14 +53,18 @@ fun NumericTextField(
 private fun GenericNumericTextField(
     value: Number?,
     onValueChange: (value: String) -> Unit,
+    valueValidator: (value: String) -> Boolean,
     modifier: Modifier = Modifier
 ) {
     var valueString by remember { mutableStateOf(value.toString()) }
     OutlinedTextField(
         value = valueString,
         onValueChange = {
-            valueString = it
-            onValueChange(it)
+            val filtered = it.filter { input -> input.isDigit() || input == '.' }
+            if (valueValidator(filtered)) {
+                valueString = filtered
+                onValueChange(filtered)
+            }
         },
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Number
@@ -62,7 +73,8 @@ private fun GenericNumericTextField(
             unfocusedContainerColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
+        maxLines = 1,
         textStyle = TextStyle(textAlign = TextAlign.End),
-        modifier = modifier.width(60.dp)
+        modifier = modifier
     )
 }
