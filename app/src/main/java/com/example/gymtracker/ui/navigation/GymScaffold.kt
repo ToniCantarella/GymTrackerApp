@@ -54,7 +54,7 @@ fun GymScaffold(
                             icon = {
                                 Icon(
                                     painter = painterResource(bottomBarRoute.iconResInt),
-                                    contentDescription = null,
+                                    contentDescription = stringResource(id = bottomBarRoute.titleResInt),
                                     modifier = Modifier.size(24.dp)
                                 )
                             },
