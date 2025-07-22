@@ -18,6 +18,9 @@ import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
+import com.example.gymtracker.utility.DistanceUnit
+import com.example.gymtracker.utility.UnitUtil
+import com.example.gymtracker.utility.WeightUnit
 import java.time.Instant
 
 data class LatestSplitWithExercises(
@@ -84,7 +87,7 @@ class WorkoutRepository(
                     SetEntity(
                         exerciseId = exerciseId,
                         uuid = set.uuid,
-                        weight = set.weight,
+                        weight = convertWeightToDb(set.weight),
                         repetitions = set.repetitions
                     )
                 )
@@ -173,7 +176,7 @@ class WorkoutRepository(
                     SetEntity(
                         exerciseId = exerciseId,
                         uuid = set.uuid,
-                        weight = set.weight,
+                        weight = convertWeightToDb(set.weight),
                         repetitions = set.repetitions
                     )
                 ).toInt()
@@ -183,7 +186,7 @@ class WorkoutRepository(
                 if (currentSet != null && setInfoChanged) {
                     setDao.updateSet(
                         currentSet.copy(
-                            weight = set.weight,
+                            weight = convertWeightToDb(set.weight),
                             repetitions = set.repetitions
                         )
                     )
@@ -195,7 +198,7 @@ class WorkoutRepository(
                             setId = setId,
                             sessionId = sessionId,
                             uuid = set.uuid,
-                            weight = set.weight,
+                            weight = convertWeightToDb(set.weight),
                             repetitions = set.repetitions
                         )
                     )
@@ -220,7 +223,7 @@ class WorkoutRepository(
                 sets = sets.map { set ->
                     WorkoutSet(
                         uuid = set.uuid,
-                        weight = set.weight,
+                        weight = convertWeightFromDb(set.weight),
                         repetitions = set.repetitions
                     )
                 }
@@ -301,7 +304,7 @@ class WorkoutRepository(
             name = cardio.name,
             steps = cardio.steps,
             stepsTimestamp = cardio.stepsTimestamp,
-            distance = cardio.distance,
+            distance = if (cardio.distance != null) convertDistanceFromDb(cardio.distance) else null,
             distanceTimestamp = cardio.distanceTimestamp,
             duration = cardio.duration,
             durationTimestamp = cardio.durationTimestamp,
@@ -333,12 +336,14 @@ class WorkoutRepository(
     suspend fun markCardioSessionDone(id: Int, cardio: Cardio) {
         val cardioToUpdate = cardioDao.getCardioById(id)
         val timestamp = Instant.now()
+        val distance = cardio.distance ?: cardioToUpdate.distance
+        val distanceToUpdate = if (distance != null) convertDistanceToDb(distance) else null
         cardioDao.updateCardio(
             cardioToUpdate.copy(
                 name = if (cardio.name.isNotEmpty() && cardio.name != cardioToUpdate.name) cardio.name else cardioToUpdate.name,
                 steps = cardio.steps ?: cardioToUpdate.steps,
                 stepsTimestamp = if (cardio.steps != null) timestamp else cardioToUpdate.stepsTimestamp,
-                distance = cardio.distance ?: cardioToUpdate.distance,
+                distance = distanceToUpdate,
                 distanceTimestamp = if (cardio.distance != null) timestamp else cardioToUpdate.distanceTimestamp,
                 duration = cardio.duration ?: cardioToUpdate.duration,
                 durationTimestamp = if (cardio.duration != null) timestamp else cardioToUpdate.durationTimestamp,
@@ -389,4 +394,29 @@ class WorkoutRepository(
             } else null
         }
     }
+
+    private fun convertWeightToDb(weight: Double): Double =
+        if (UnitUtil.weightUnit == WeightUnit.KILOGRAM)
+            weight
+        else
+            UnitUtil.lbToKg(weight)
+
+
+    private fun convertWeightFromDb(weight: Double): Double =
+        if (UnitUtil.weightUnit == WeightUnit.KILOGRAM)
+            weight
+        else
+            UnitUtil.kgToLb(weight)
+
+    private fun convertDistanceToDb(distance: Double): Double =
+        if (UnitUtil.distanceUnit == DistanceUnit.KILOMETER)
+            distance
+        else
+            UnitUtil.miToKm(distance)
+
+    private fun convertDistanceFromDb(distance: Double): Double =
+        if (UnitUtil.distanceUnit == DistanceUnit.KILOMETER)
+            distance
+        else
+            UnitUtil.kmToMi(distance)
 }

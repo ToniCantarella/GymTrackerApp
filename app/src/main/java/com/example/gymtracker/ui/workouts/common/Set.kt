@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.NumericTextField
 import com.example.gymtracker.ui.workouts.entity.WorkoutSet
+import com.example.gymtracker.utility.UnitUtil
 
 @Composable
 fun Set(
@@ -65,7 +66,7 @@ fun Set(
                 onValueChange = onChangeWeight
             )
             Text(
-                text = "kg",
+                text = stringResource(UnitUtil.weightUnitStringId),
                 style = MaterialTheme.typography.labelMedium
             )
             NumericTextField(

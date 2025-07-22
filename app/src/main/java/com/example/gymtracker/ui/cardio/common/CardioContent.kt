@@ -33,12 +33,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.NumericTextField
+import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.toDateAndTimeString
 import com.example.gymtracker.utility.toReadableString
 import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.Instant
-
 
 @Composable
 fun CardioContent(
@@ -109,7 +109,7 @@ fun CardioContent(
                     LastTimeRow(
                         valueText = {
                             Text(
-                                text = "${previousDistance}km"
+                                text = "${previousDistance}${stringResource(UnitUtil.distanceUnitStringId)}"
                             )
                         },
                         dateText = {
@@ -131,7 +131,7 @@ fun CardioContent(
                     onValueChange = onDistanceChange
                 )
                 Text(
-                    text = "km"
+                    text = stringResource(UnitUtil.distanceUnitStringId)
                 )
             }
         }
