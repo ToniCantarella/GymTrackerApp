@@ -61,7 +61,7 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkoutSessions() {
-        val sessions = workoutRepository.getAllSplitSessions()
+        val sessions = workoutRepository.getAllWorkoutSessions()
         _uiState.update {
             it.copy(
                 allWorkoutSessions = sessions
@@ -70,7 +70,7 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchWorkoutSessionsBetweenDates(startDate: Instant, endDate: Instant) {
-        val sessions = workoutRepository.getSplitSessionsBetweenDates(
+        val sessions = workoutRepository.getWorkoutSessionsBetweenDates(
             startDate = startDate,
             endDate = endDate
         )

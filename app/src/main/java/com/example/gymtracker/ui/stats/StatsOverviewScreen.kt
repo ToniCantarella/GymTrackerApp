@@ -133,7 +133,7 @@ private fun StatsOverviewScreen(
                     workoutSessions = workoutSessionsBetweenDates
                 )
             }
-            if(workoutSessions.isNotEmpty()){
+            if (workoutSessions.isNotEmpty()) {
                 item {
                     PieChartCard(
                         workouts = workouts,
@@ -171,6 +171,13 @@ val highlightColors = listOf(
     Color(0xFF7D9EFF),
     Color(0xFFD17DFF),
     Color(0xFFFFFFFF),
+    Color(0xFFFFB27D),
+    Color(0xFFB2FF7D),
+    Color(0xFF7DFFF5),
+    Color(0xFF7DD1FF),
+    Color(0xFFB77DFF),
+    Color(0xFFFF7DEF),
+    Color(0xFF7DFF7D)
 )
 
 @OptIn(ExperimentalTime::class)

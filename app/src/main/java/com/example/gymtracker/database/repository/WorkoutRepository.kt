@@ -237,13 +237,47 @@ class WorkoutRepository(
 
     suspend fun getAllWorkouts(): List<Workout> {
         val splits = splitDao.getAllSplits()
+        val cardio = cardioDao.getAllCardio()
 
         return splits.map {
             Workout(
                 name = it.name,
                 type = WorkoutType.GYM
             )
+        } + cardio.map {
+            Workout(
+                name = it.name,
+                type = WorkoutType.CARDIO
+            )
         }
+    }
+
+    suspend fun getWorkoutSessionsBetweenDates(
+        startDate: Instant,
+        endDate: Instant
+    ): List<WorkoutSession> {
+        val splitSessions = getSplitSessionsBetweenDates(startDate, endDate)
+        val cardioSessions = getCardioSessionsBetweenDates(startDate, endDate)
+        return splitSessions + cardioSessions
+    }
+
+    suspend fun getAllWorkoutSessions(): List<WorkoutSession> {
+        val splitSessions = getAllSplitSessions()
+        val cardioSessions = getAllCardioSessions()
+        return splitSessions + cardioSessions
+    }
+
+    suspend fun getAllCardioSessions(): List<WorkoutSession> {
+        val sessions = cardioSessionDao.getAllSessions().filterNotNull()
+        return getWorkoutSessionsForCardioSessions(sessions)
+    }
+
+    suspend fun getCardioSessionsBetweenDates(
+        startDate: Instant,
+        endDate: Instant
+    ): List<WorkoutSession> {
+        val sessions = cardioSessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
+        return getWorkoutSessionsForCardioSessions(sessions)
     }
 
     suspend fun getAllSplitSessions(): List<WorkoutSession> {
@@ -256,7 +290,6 @@ class WorkoutRepository(
         endDate: Instant
     ): List<WorkoutSession> {
         val sessions = splitSessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
-
         return getWorkoutSessionsForSplitSessions(sessions)
     }
 
@@ -335,6 +368,23 @@ class WorkoutRepository(
                     name = splitName,
                     timestamp = session.timestamp,
                     type = WorkoutType.GYM
+                )
+            } else null
+        }
+    }
+
+    private suspend fun getWorkoutSessionsForCardioSessions(sessions: List<CardioSessionEntity>): List<WorkoutSession> {
+        if (sessions.isEmpty()) return emptyList()
+
+        val cardioList = cardioDao.getAllCardio().associateBy { it.id }
+
+        return sessions.mapNotNull { session ->
+            val cardioName = cardioList[session.cardioId]?.name
+            if (cardioName != null) {
+                WorkoutSession(
+                    name = cardioName,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.CARDIO
                 )
             } else null
         }
