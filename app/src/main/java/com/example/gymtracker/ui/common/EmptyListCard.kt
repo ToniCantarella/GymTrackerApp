@@ -16,7 +16,7 @@ import com.example.gymtracker.R
 
 @Composable
 fun EmptyListCard(
-    icon: Painter,
+    iconPainter: Painter,
     subtitle: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -29,7 +29,7 @@ fun EmptyListCard(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
         ) {
             Icon(
-                painter = icon,
+                painter = iconPainter,
                 contentDescription = null,
                 modifier = Modifier.size(80.dp)
             )

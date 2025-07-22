@@ -168,7 +168,7 @@ fun SplitListScreen(
             CircularProgressIndicator()
         } else if (splits.isEmpty()) {
             EmptyListCard(
-                icon = painterResource(id = R.drawable.weight),
+                iconPainter = painterResource(id = R.drawable.weight),
                 subtitle = {
                     Text(
                         text = stringResource(id = R.string.workouts_intro),

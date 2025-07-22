@@ -139,7 +139,7 @@ private fun CardioListScreen(
             CircularProgressIndicator()
         } else if (cardioList.isEmpty()) {
             EmptyListCard(
-                icon = painterResource(id = R.drawable.run),
+                iconPainter = painterResource(id = R.drawable.run),
                 subtitle = {
                     Text(
                         text = stringResource(id = R.string.cardio_intro),
