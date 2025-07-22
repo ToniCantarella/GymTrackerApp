@@ -151,7 +151,7 @@ fun Exercise(
                     Set(
                         set = set,
                         setName = "${stringResource(id = R.string.set)} ${index + 1}",
-                        deletionEnabled = index != 0,
+                        deletionEnabled = exercise.sets.size > 1,
                         onChangeWeight = { onChangeWeight(set.uuid, it) },
                         onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
                         onRemoveSet = { onRemoveSet(set.uuid) },
