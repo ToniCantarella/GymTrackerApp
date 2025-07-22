@@ -34,7 +34,6 @@ import java.util.UUID
 @Composable
 fun ExerciseList(
     exercises: List<Exercise>,
-    creatingSplit: Boolean,
     onAddExercise: () -> Unit,
     onRemoveExercise: (id: UUID) -> Unit,
     onExerciseNameChange: (id: UUID, name: String) -> Unit,
@@ -42,9 +41,10 @@ fun ExerciseList(
     onAddSet: (exerciseId: UUID) -> Unit,
     onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
-    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit,
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    creatingSplit: Boolean = false,
+    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> }
 ) {
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()

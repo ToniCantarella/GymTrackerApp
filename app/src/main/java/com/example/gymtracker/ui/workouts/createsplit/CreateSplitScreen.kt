@@ -53,7 +53,7 @@ fun CreateSplitScreen(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.save),
-            contentDescription = null
+            contentDescription = stringResource(id = R.string.save)
         )
     }
 
@@ -93,7 +93,6 @@ private fun CreateSplitScreen(
             onAddSet = addSet,
             onChangeWeight = onChangeWeight,
             onChangeRepetitions = onChangeRepetitions,
-            onCheckSet = { _, _, _ -> },
             onRemoveSet = onRemoveSet
         )
     }

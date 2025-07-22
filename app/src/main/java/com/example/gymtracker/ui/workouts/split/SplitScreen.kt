@@ -122,7 +122,6 @@ fun SplitScreen(
             }
             ExerciseList(
                 exercises = exercises,
-                creatingSplit = false,
                 onAddExercise = addExercise,
                 onRemoveExercise = onRemoveExercise,
                 onExerciseNameChange = onExerciseNameChange,

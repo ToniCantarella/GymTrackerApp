@@ -35,4 +35,5 @@
     <string name="steps">Askeleet</string>
     <string name="distance">Etäisyys</string>
     <string name="time">Aika</string>
+    <string name="save">Tallenna</string>
 </resources>
