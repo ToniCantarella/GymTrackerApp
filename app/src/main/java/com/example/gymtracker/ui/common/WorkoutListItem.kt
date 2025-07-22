@@ -30,7 +30,7 @@ data class WorkoutListItem(
 fun WorkoutListItem(
     workout: WorkoutListItem,
     selectingItems: Boolean,
-    isSelected: Boolean,
+    selected: Boolean,
     onSelect: (id: Int) -> Unit,
     onHold: () -> Unit,
     onClick: () -> Unit,
@@ -65,7 +65,7 @@ fun WorkoutListItem(
             }
             if (selectingItems) {
                 Checkbox(
-                    checked = isSelected,
+                    checked = selected,
                     onCheckedChange = {
                         onSelect(workout.id)
                     }

@@ -169,7 +169,12 @@ fun SplitListScreen(
         } else if (splits.isEmpty()) {
             EmptyListCard(
                 icon = painterResource(id = R.drawable.weight),
-                subtitle = stringResource(id = R.string.workouts_intro)
+                subtitle = {
+                    Text(
+                        text = stringResource(id = R.string.workouts_intro),
+                        textAlign = TextAlign.Center
+                    )
+                }
             )
         } else {
             Column(
@@ -179,7 +184,7 @@ fun SplitListScreen(
                     WorkoutListItem(
                         workout = split,
                         selectingItems = selectingItems,
-                        isSelected = selectedItems.contains(split.id),
+                        selected = selectedItems.contains(split.id),
                         onSelect = onSelect,
                         onHold = { onSplitHold(split.id) },
                         onClick = { onSplitClick(split.id) }

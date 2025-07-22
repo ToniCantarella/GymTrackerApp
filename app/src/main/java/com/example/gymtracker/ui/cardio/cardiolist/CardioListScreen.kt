@@ -140,7 +140,12 @@ private fun CardioListScreen(
         } else if (cardioList.isEmpty()) {
             EmptyListCard(
                 icon = painterResource(id = R.drawable.run),
-                subtitle = stringResource(id = R.string.cardio_intro)
+                subtitle = {
+                    Text(
+                        text = stringResource(id = R.string.cardio_intro),
+                        textAlign = TextAlign.Center
+                    )
+                }
             )
         } else {
             Column(
@@ -150,7 +155,7 @@ private fun CardioListScreen(
                     WorkoutListItem(
                         workout = cardio,
                         selectingItems = selectingItems,
-                        isSelected = selectedItems.contains(cardio.id),
+                        selected = selectedItems.contains(cardio.id),
                         onSelect = onSelect,
                         onHold = { onCardioHold(cardio.id) },
                         onClick = { onCardioClick(cardio.id) }
