@@ -62,7 +62,7 @@ fun CardioItemScreen(
     ) {
         Icon(
             imageVector = Icons.Default.Done,
-            contentDescription = null
+            contentDescription = stringResource(id = R.string.done)
         )
     }
 
