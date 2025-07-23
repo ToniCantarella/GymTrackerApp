@@ -63,7 +63,7 @@ fun CardioListScreen(
 
     ProvideFloatingActionButton(
         onClick = onNavigateToCreateCardio,
-        visible = uiState.cardioList.size <= MAX_CARDIO
+        visible = uiState.cardioList.size < MAX_CARDIO
     ) {
         Icon(
             imageVector = Icons.Default.Add,
