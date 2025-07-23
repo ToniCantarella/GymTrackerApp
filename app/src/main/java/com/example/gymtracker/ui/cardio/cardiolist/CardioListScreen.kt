@@ -32,6 +32,7 @@ import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
+import com.example.gymtracker.utility.MAX_CARDIO
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -62,7 +63,7 @@ fun CardioListScreen(
 
     ProvideFloatingActionButton(
         onClick = onNavigateToCreateCardio,
-        visible = true
+        visible = uiState.cardioList.size <= MAX_CARDIO
     ) {
         Icon(
             imageVector = Icons.Default.Add,

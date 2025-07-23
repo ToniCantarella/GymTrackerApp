@@ -32,14 +32,14 @@ data class LatestSplitWithExercises(
 )
 
 data class Workout(
+    val id: Int,
     val name: String,
     val type: WorkoutType
 )
 
 data class WorkoutSession(
-    val name: String,
+    val workout: Workout,
     val timestamp: Instant,
-    val type: WorkoutType
 )
 
 class WorkoutRepository(
@@ -245,11 +245,13 @@ class WorkoutRepository(
 
         return splits.map {
             Workout(
+                id = it.id,
                 name = it.name,
                 type = WorkoutType.GYM
             )
         } + cardio.map {
             Workout(
+                id = it.id,
                 name = it.name,
                 type = WorkoutType.CARDIO
             )
@@ -387,12 +389,15 @@ class WorkoutRepository(
         val splits = workoutDao.getAllSplits().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
-            val splitName = splits[session.workoutId]?.name
-            if (splitName != null) {
+            val split = splits[session.workoutId]
+            if (split != null) {
                 WorkoutSession(
-                    name = splitName,
+                    workout = Workout(
+                        id = split.id,
+                        name = split.name,
+                        type = split.type
+                    ),
                     timestamp = session.timestamp,
-                    type = WorkoutType.GYM
                 )
             } else null
         }
@@ -404,12 +409,15 @@ class WorkoutRepository(
         val cardioList = workoutDao.getAllCardio().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
-            val cardioName = cardioList[session.cardioId]?.name
-            if (cardioName != null) {
+            val cardio = cardioList[session.cardioId]
+            if (cardio != null) {
                 WorkoutSession(
-                    name = cardioName,
+                    workout = Workout(
+                        id = cardio.id,
+                        name = cardio.name,
+                        type = cardio.type
+                    ),
                     timestamp = session.timestamp,
-                    type = WorkoutType.CARDIO
                 )
             } else null
         }

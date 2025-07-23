@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,11 +46,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
+import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.database.repository.Workout
 import com.example.gymtracker.database.repository.WorkoutSession
-import com.example.gymtracker.database.repository.WorkoutType
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
+import com.example.gymtracker.utility.MAX_CARDIO
+import com.example.gymtracker.utility.MAX_SPLITS
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -164,20 +168,21 @@ private fun StatsCard(
 }
 
 val highlightColors = listOf(
-    Color(0xFFFF7D7D),
-    Color(0xFFFFDF7D),
-    Color(0xFFAAFF7D),
-    Color(0xFF7DFFDA),
-    Color(0xFF7D9EFF),
-    Color(0xFFD17DFF),
-    Color(0xFFFFFFFF),
-    Color(0xFFFFB27D),
-    Color(0xFFB2FF7D),
-    Color(0xFF7DFFF5),
-    Color(0xFF7DD1FF),
-    Color(0xFFB77DFF),
-    Color(0xFFFF7DEF),
-    Color(0xFF7DFF7D)
+    Color(0xFFE91E63),
+    Color(0xFF3F51B5),
+    Color(0xFFFF9800),
+    Color(0xFF4CAF50),
+    Color(0xFF9C27B0),
+    Color(0xFF00BCD4),
+    Color(0xFFFFEB3B),
+    Color(0xFF795548),
+    Color(0xFF91CCFF),
+    Color(0xFFFFAAA4),
+    Color(0xFF607D8B),
+    Color(0xFF8BC34A),
+    Color(0xFFF3FFA7),
+    Color(0xFFFF6B09),
+    Color(0xFF673AB7)
 )
 
 @OptIn(ExperimentalTime::class)
@@ -205,8 +210,8 @@ private fun Calendar(
             it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
         }
     }
-    val workoutsByName: Map<String, Workout> = remember(workouts) {
-        workouts.associateBy { it.name }
+    val workoutsById: Map<Int, Workout> = remember(workouts) {
+        workouts.associateBy { it.id }
     }
 
     StatsCard(modifier = modifier) {
@@ -231,75 +236,76 @@ private fun Calendar(
                     text = dayOfWeek.getDisplayName(
                         TextStyle.SHORT,
                         Locale.getDefault()
-                    ),
+                    )
                 )
             }
         }
+
         HorizontalCalendar(
             state = state,
             dayContent = { day ->
-                val sessionsOnDay = sessionsByDate[day.date].orEmpty()
+                val sessionsOnDay = sessionsByDate[day.date]
 
                 Day(
-                    day = day,
+                    day = day
                 ) {
-                    sessionsOnDay.forEach { session ->
-                        val workoutIndex = workouts.indexOf(workoutsByName[session.name])
-                        WorkoutIcon(
-                            painter =
-                                if (session.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
-                                else painterResource(id = R.drawable.run),
-                            tint = if (workoutIndex < 0) Color.Transparent else highlightColors[workoutIndex]
-                        )
+                    if (sessionsOnDay?.isNotEmpty() == true) {
+                        sessionsOnDay.forEach { session ->
+                            val workoutIndex = workouts.indexOf(workoutsById[session.workout.id])
+                            WorkoutIcon(
+                                painter =
+                                    if (session.workout.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
+                                    else painterResource(id = R.drawable.run),
+                                tint = if (workoutIndex < 0) Color.Transparent else highlightColors[workoutIndex]
+                            )
+                        }
                     }
                 }
             }
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_small))
-        ) {
-            WorkoutFooter(
-                workouts = workouts,
-                workoutSessions = workoutSessions,
-                workoutsByName = workoutsByName
-            )
-        }
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
+        WorkoutLegends(
+            workouts = workouts,
+            workoutSessions = workoutSessions
+        )
     }
 }
 
 @Composable
-fun WorkoutFooter(
+fun WorkoutLegends(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
-    workoutsByName: Map<String, Workout>,
     modifier: Modifier = Modifier
 ) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-        modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
     ) {
-        workouts.forEach { workout ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WorkoutIcon(
-                    painter =
-                        if (workout.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
-                        else painterResource(id = R.drawable.run),
-                    tint = highlightColors[workouts.indexOf(workoutsByName[workout.name])]
-                )
-                Text(
-                    text = workout.name
-                )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            workouts.forEachIndexed { index, workout ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    WorkoutIcon(
+                        painter =
+                            if (workout.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
+                            else painterResource(id = R.drawable.run),
+                        tint = highlightColors[index]
+                    )
+                    Text(
+                        text = workout.name
+                    )
+                }
             }
         }
+        Text(
+            text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
+        )
     }
-    Text(
-        text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
-    )
 }
 
 @Composable
@@ -358,17 +364,18 @@ private fun PieChartCard(
     modifier: Modifier = Modifier
 ) {
     val sessionsByName = remember(workoutSessions) {
-        workoutSessions.groupBy { it.name }
+        workoutSessions.groupBy { it.workout.name }
     }
-    val workoutsByName: Map<String, Workout> = remember(workouts) {
-        workouts.associateBy { it.name }
+    val workoutsById: Map<Int, Workout> = remember(workouts) {
+        workouts.associateBy { it.id }
     }
 
     StatsCard(modifier = modifier) {
         var data by remember(sessionsByName) {
             mutableStateOf(
                 sessionsByName.map { session ->
-                    val workoutIndex = workouts.indexOf(workoutsByName[session.key])
+                    val workoutIndex =
+                        workouts.indexOf(workoutsById[session.value.first().workout.id])
                     val color =
                         if (workoutIndex < 0) Color.Transparent else highlightColors[workoutIndex]
                     Pie(
@@ -405,60 +412,36 @@ private fun PieChartCard(
 
 @Composable
 private fun StatsScreenForPreview() {
+    val workouts = List (MAX_SPLITS + MAX_CARDIO) {
+        Workout(
+            id = it,
+            name = "workout ${it + 1}",
+            type = if (it < MAX_SPLITS) WorkoutType.GYM else WorkoutType.CARDIO
+        )
+    }
+
+    val now = Instant.now()
+
+    val workoutsBetweenDates = List(20) {
+        val timestamp = if (it > 4) now.minus(Duration.ofDays(it.toLong())) else now
+        WorkoutSession(
+            workout = workouts.random(),
+            timestamp = timestamp
+        )
+    }
+
+    val workoutsAllTime = List(10) {
+        WorkoutSession(
+            workout = workouts.random(),
+            timestamp = now.minus(Duration.ofDays(it.toLong()))
+        )
+    } + workoutsBetweenDates
+
     StatsOverviewScreen(
         loading = false,
-        workouts = listOf(
-            Workout(
-                name = "My workout",
-                type = WorkoutType.GYM
-            ),
-            Workout(
-                name = "My cardio",
-                type = WorkoutType.CARDIO
-            ),
-            Workout(
-                name = "Super workout",
-                type = WorkoutType.GYM
-            ),
-            Workout(
-                name = "Super cardio",
-                type = WorkoutType.CARDIO
-            )
-        ),
-        workoutSessionsBetweenDates = listOf(
-            WorkoutSession(
-                name = "My workout",
-                timestamp = Instant.now().minus(Duration.ofDays(1)),
-                type = WorkoutType.GYM
-            ),
-            WorkoutSession(
-                name = "My cardio",
-                timestamp = Instant.now(),
-                type = WorkoutType.CARDIO
-            )
-        ),
-        workoutSessions = listOf(
-            WorkoutSession(
-                name = "My workout",
-                timestamp = Instant.now().minus(Duration.ofDays(1)),
-                type = WorkoutType.GYM
-            ),
-            WorkoutSession(
-                name = "My cardio",
-                timestamp = Instant.now(),
-                type = WorkoutType.CARDIO
-            ),
-            WorkoutSession(
-                name = "Super workout",
-                timestamp = Instant.now().minus(Duration.ofDays(40)),
-                type = WorkoutType.GYM
-            ),
-            WorkoutSession(
-                name = "Super cardio",
-                timestamp = Instant.now().minus(Duration.ofDays(50)),
-                type = WorkoutType.CARDIO
-            )
-        )
+        workouts = workouts,
+        workoutSessionsBetweenDates = workoutsBetweenDates,
+        workoutSessions = workoutsAllTime
     )
 }
 
