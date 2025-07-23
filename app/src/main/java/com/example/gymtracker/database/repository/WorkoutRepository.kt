@@ -348,7 +348,7 @@ class WorkoutRepository(
         )
     }
 
-    suspend fun deleteCardio(cardioId: Int) = cardioDao.deleteById(cardioId)
+    suspend fun deleteCardio(cardioId: Int) = workoutDao.deleteById(cardioId)
 
     suspend fun markCardioSessionDone(id: Int, cardio: Cardio) {
         val workout = workoutDao.getById(id)

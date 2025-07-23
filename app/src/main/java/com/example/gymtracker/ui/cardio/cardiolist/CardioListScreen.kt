@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,13 +51,35 @@ fun CardioListScreen(
 
     ProvideTopAppBar(
         actions = {
-            IconButton(
-                onClick = {}
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.delete)
-                )
+            if (uiState.selectingItems) {
+                IconButton(
+                    onClick = viewModel::stopSelectingItems
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(id = R.string.close)
+                    )
+                }
+                IconButton(
+                    onClick = { deletionDialogOpen = true },
+                    enabled = uiState.selectedItems.isNotEmpty()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        tint = MaterialTheme.colorScheme.error,
+                        contentDescription = stringResource(id = R.string.delete)
+                    )
+                }
+            } else {
+                IconButton(
+                    onClick = viewModel::startSelectingItems,
+                    enabled = uiState.cardioList.isNotEmpty()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(id = R.string.delete)
+                    )
+                }
             }
         }
     )
