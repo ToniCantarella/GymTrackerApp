@@ -17,8 +17,8 @@ interface CardioDao {
     @Query("SELECT * FROM cardios")
     suspend fun getAllCardio(): List<CardioEntity>
 
-    @Query("SELECT * FROM cardios WHERE id = :id")
-    suspend fun getCardioById(id: Int): CardioEntity
+    @Query("SELECT * FROM cardios WHERE workoutId = :workoutId")
+    suspend fun getCardioByWorkoutId(workoutId: Int): CardioEntity
 
     @Query("DELETE FROM cardios WHERE id = :id")
     suspend fun deleteById(id: Int)

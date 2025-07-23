@@ -4,31 +4,31 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.example.gymtracker.database.dao.WorkoutDao
 import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.gym.ExerciseDao
+import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
-import com.example.gymtracker.database.dao.gym.SplitDao
-import com.example.gymtracker.database.dao.gym.SplitSessionDao
+import com.example.gymtracker.database.entity.WorkoutEntity
 import com.example.gymtracker.database.entity.cardio.CardioEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
+import com.example.gymtracker.database.entity.gym.GymSessionEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
-import com.example.gymtracker.database.entity.gym.SplitEntity
-import com.example.gymtracker.database.entity.gym.SplitSessionEntity
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
 @Database(
     entities = [
-        SplitEntity::class,
+        WorkoutEntity::class,
         ExerciseEntity::class,
         SetEntity::class,
         SetSessionEntity::class,
-        SplitSessionEntity::class,
+        GymSessionEntity::class,
         CardioEntity::class,
         CardioSessionEntity::class
     ],
@@ -36,11 +36,11 @@ import java.util.UUID
 )
 @TypeConverters(Converters::class)
 abstract class GymDatabase : RoomDatabase() {
-    abstract fun splitDao(): SplitDao
+    abstract fun workoutDao(): WorkoutDao
     abstract fun exerciseDao(): ExerciseDao
     abstract fun setDao(): SetDao
     abstract fun setSessionDao(): SetSessionDao
-    abstract fun splitSessionDao(): SplitSessionDao
+    abstract fun splitSessionDao(): GymSessionDao
     abstract fun cardioDao(): CardioDao
     abstract fun cardioSessionDao(): CardioSessionDao
 }

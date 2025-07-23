@@ -39,7 +39,7 @@ data class SetEntity(
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = SplitSessionEntity::class,
+            entity = GymSessionEntity::class,
             parentColumns = ["id"],
             childColumns = ["sessionId"],
             onDelete = ForeignKey.CASCADE

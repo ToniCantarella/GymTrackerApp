@@ -4,23 +4,24 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.gymtracker.database.entity.WorkoutEntity
 import kotlinx.serialization.Contextual
 import java.util.UUID
 
 @Entity(
     tableName = "exercises",
     foreignKeys = [ForeignKey(
-        entity = SplitEntity::class,
+        entity = WorkoutEntity::class,
         parentColumns = ["id"],
-        childColumns = ["splitId"],
+        childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index("splitId")]
+    indices = [Index("workoutId")]
 )
 data class ExerciseEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val splitId: Int,
+    val workoutId: Int,
     @Contextual
     val uuid: UUID,
     val name: String,

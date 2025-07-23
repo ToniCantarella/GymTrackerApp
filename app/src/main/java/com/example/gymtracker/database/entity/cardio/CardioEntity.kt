@@ -4,21 +4,29 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.gymtracker.database.entity.WorkoutEntity
 import java.time.Duration
 import java.time.Instant
 
-@Entity(tableName = "cardios")
+@Entity(
+    tableName = "cardios",
+    foreignKeys = [ForeignKey(
+        entity = WorkoutEntity::class,
+        parentColumns = ["id"],
+        childColumns = ["workoutId"],
+        onDelete = ForeignKey.CASCADE
+    )],
+    indices = [
+        Index("workoutId")
+    ]
+)
 data class CardioEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String,
+    val workoutId: Int = 0,
     val steps: Int? = null,
-    val stepsTimestamp: Instant? = null,
     val distance: Double? = null,
-    val distanceTimestamp: Instant? = null,
-    val duration: Duration? = null,
-    val durationTimestamp: Instant? = null,
-    val latestTimestamp: Instant? = null
+    val duration: Duration? = null
 )
 
 @Entity(

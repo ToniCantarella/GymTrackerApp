@@ -1,0 +1,22 @@
+package com.example.gymtracker.database.dao.gym
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import com.example.gymtracker.database.entity.gym.GymSessionEntity
+import java.time.Instant
+
+@Dao
+interface GymSessionDao {
+    @Insert
+    suspend fun insert(session: GymSessionEntity): Long
+
+    @Query("SELECT * FROM gym_sessions")
+    suspend fun getAllSessions(): List<GymSessionEntity?>
+
+    @Query("SELECT * FROM gym_sessions WHERE workoutId = :splitId ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLastSession(splitId: Int): GymSessionEntity?
+
+    @Query("SELECT * FROM gym_sessions WHERE timestamp BETWEEN :start AND :end")
+    suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<GymSessionEntity?>
+}

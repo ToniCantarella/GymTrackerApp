@@ -4,31 +4,25 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.gymtracker.database.entity.WorkoutEntity
 import java.time.Instant
 
-@Entity(tableName = "splits")
-data class SplitEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String
-)
-
 @Entity(
-    tableName = "split_sessions",
+    tableName = "gym_sessions",
     foreignKeys = [ForeignKey(
-        entity = SplitEntity::class,
+        entity = WorkoutEntity::class,
         parentColumns = ["id"],
-        childColumns = ["splitId"],
+        childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE
     )],
     indices = [
-        Index("splitId"),
+        Index("workoutId"),
         Index("timestamp")
     ]
 )
-data class SplitSessionEntity(
+data class GymSessionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val splitId: Int,
+    val workoutId: Int,
     val timestamp: Instant
 )
