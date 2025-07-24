@@ -14,7 +14,7 @@ interface WorkoutDao {
     @Update
     suspend fun updateWorkout(workout: WorkoutEntity)
 
-    @Query("SELECT * FROM workouts")
+    @Query("SELECT * FROM workouts ORDER BY type DESC")
     suspend fun getAllWorkouts(): List<WorkoutEntity>
 
     @Query("SELECT * FROM workouts WHERE type = 'GYM'")
