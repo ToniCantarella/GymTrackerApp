@@ -38,4 +38,5 @@
     <string name="save">Tallenna</string>
     <string name="repetitions_count">Toistoa</string>
     <string name="steps_count">Askelta</string>
+    <string name="select">Valitse</string>
 </resources>

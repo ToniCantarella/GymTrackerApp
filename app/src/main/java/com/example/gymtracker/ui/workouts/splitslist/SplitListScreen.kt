@@ -80,8 +80,8 @@ fun SplitListScreen(
                     enabled = uiState.splits.isNotEmpty()
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(id = R.string.delete)
+                        painter = painterResource(id = R.drawable.checklist),
+                        contentDescription = stringResource(id = R.string.select)
                     )
                 }
             }
