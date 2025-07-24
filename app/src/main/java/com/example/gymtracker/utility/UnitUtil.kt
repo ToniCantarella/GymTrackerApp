@@ -1,8 +1,6 @@
 package com.example.gymtracker.utility
 
 import com.example.gymtracker.R
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.Locale
 
 enum class WeightUnit {
@@ -16,38 +14,27 @@ enum class DistanceUnit {
 }
 
 object UnitUtil {
+    private const val WEIGHT_CONVERSION_DOUBLE = 2.2046226218
+    private const val DISTANCE_CONVERSION_DOUBLE = 0.6213711922
+
+    private val isImperial: Boolean
+        get() = Locale.getDefault().country.uppercase() in setOf("US", "LR", "MM")
+
     val weightUnit: WeightUnit
-    val distanceUnit: DistanceUnit
+        get() = if (isImperial) WeightUnit.POUND else WeightUnit.KILOGRAM
 
     val weightUnitStringId: Int
+        get() = if (isImperial) R.string.lb else R.string.kg
+
+    val distanceUnit: DistanceUnit
+        get() = if (isImperial) DistanceUnit.MILE else DistanceUnit.KILOMETER
+
     val distanceUnitStringId: Int
+        get() = if (isImperial) R.string.mi else R.string.km
 
-    init {
-        val country = Locale.getDefault().country.uppercase()
-        val isImperial = country in setOf("US", "LR", "MM")
+    fun kgToLb(kg: Double): Double = kg * WEIGHT_CONVERSION_DOUBLE
+    fun lbToKg(lb: Double): Double = lb / WEIGHT_CONVERSION_DOUBLE
 
-        if (isImperial) {
-            weightUnit = WeightUnit.POUND
-            weightUnitStringId = R.string.lb
-
-            distanceUnit = DistanceUnit.MILE
-            distanceUnitStringId = R.string.mi
-        }else {
-            weightUnit = WeightUnit.KILOGRAM
-            weightUnitStringId = R.string.kg
-
-            distanceUnit = DistanceUnit.KILOMETER
-            distanceUnitStringId = R.string.km
-        }
-    }
-
-    fun kgToLb(kg: Double): Double = (kg * 2.20462).roundTo(2)
-    fun lbToKg(lb: Double): Double = (lb / 2.20462).roundTo(2)
-
-    fun kmToMi(km: Double): Double = (km * 0.621371).roundTo(1)
-    fun miToKm(mi: Double): Double = (mi / 0.621371).roundTo(1)
-
-    private fun Double.roundTo(decimals: Int): Double {
-        return BigDecimal(this).setScale(decimals, RoundingMode.HALF_UP).toDouble()
-    }
+    fun kmToMi(km: Double): Double = km * DISTANCE_CONVERSION_DOUBLE
+    fun miToKm(mi: Double): Double = mi / DISTANCE_CONVERSION_DOUBLE
 }

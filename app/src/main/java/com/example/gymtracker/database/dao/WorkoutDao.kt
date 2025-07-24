@@ -12,13 +12,16 @@ interface WorkoutDao {
     suspend fun insert(workout: WorkoutEntity): Long
 
     @Update
-    suspend fun updateSplit(workout: WorkoutEntity)
+    suspend fun updateWorkout(workout: WorkoutEntity)
+
+    @Query("SELECT * FROM workouts")
+    suspend fun getAllWorkouts(): List<WorkoutEntity>
 
     @Query("SELECT * FROM workouts WHERE type = 'GYM'")
-    suspend fun getAllSplits(): List<WorkoutEntity>
+    suspend fun getAllGymWorkouts(): List<WorkoutEntity>
 
     @Query("SELECT * FROM workouts WHERE type = 'CARDIO'")
-    suspend fun getAllCardio(): List<WorkoutEntity>
+    suspend fun getAllCardioWorkouts(): List<WorkoutEntity>
 
     @Query("SELECT * FROM workouts WHERE id = :id")
     suspend fun getById(id: Int): WorkoutEntity

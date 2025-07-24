@@ -14,17 +14,11 @@ interface CardioSessionDao {
     @Query("SELECT * FROM cardio_sessions")
     suspend fun getAllSessions(): List<CardioSessionEntity?>
 
+    @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId ORDER BY timestamp DESC")
+    suspend fun getAllSessionsForCardio(cardioId: Int): List<CardioSessionEntity>
+
     @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastSession(cardioId: Int): CardioSessionEntity?
-
-    @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId AND steps IS NOT NULL ORDER BY timestamp DESC LIMIT 1")
-    suspend fun getLastStepSession(cardioId: Int): CardioSessionEntity?
-
-    @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId AND distance IS NOT NULL ORDER BY timestamp DESC LIMIT 1")
-    suspend fun getLastDistanceSession(cardioId: Int): CardioSessionEntity?
-
-    @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId AND duration IS NOT NULL ORDER BY timestamp DESC LIMIT 1")
-    suspend fun getLastDurationSession(cardioId: Int): CardioSessionEntity?
 
     @Query("SELECT * FROM cardio_sessions WHERE timestamp BETWEEN :start AND :end")
     suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<CardioSessionEntity?>

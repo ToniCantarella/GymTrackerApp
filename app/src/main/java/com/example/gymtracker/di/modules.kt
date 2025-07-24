@@ -7,6 +7,7 @@ import androidx.room.Room
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.database.repository.WorkoutRepositoryImpl
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioViewModel
@@ -45,8 +46,8 @@ val databaseModule = module {
     single { get<GymDatabase>().cardioDao() }
     single { get<GymDatabase>().cardioSessionDao() }
 
-    single {
-        WorkoutRepository(
+    single<WorkoutRepository> {
+        WorkoutRepositoryImpl(
             workoutDao = get(),
             exerciseDao = get(),
             setDao = get(),

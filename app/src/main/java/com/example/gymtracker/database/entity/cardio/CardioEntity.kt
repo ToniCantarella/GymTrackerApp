@@ -47,7 +47,7 @@ data class CardioSessionEntity(
     val id: Int = 0,
     val cardioId: Int,
     val timestamp: Instant,
-    val steps: Int?,
-    val distance: Double?,
-    val duration: Duration?
+    val steps: Int? = null,
+    val distance: Double? = null,
+    val duration: Duration? = null
 )

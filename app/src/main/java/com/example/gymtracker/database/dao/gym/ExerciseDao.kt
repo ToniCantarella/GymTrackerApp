@@ -18,8 +18,8 @@ interface ExerciseDao {
     @Delete
     suspend fun deleteExercises(exercises: List<ExerciseEntity>)
 
-    @Query("SELECT * FROM exercises WHERE workoutId = :splitId")
-    suspend fun getExercisesBySplitId(splitId: Int): List<ExerciseEntity>
+    @Query("SELECT * FROM exercises WHERE workoutId = :workoutId")
+    suspend fun getExercisesByWorkoutId(workoutId: Int): List<ExerciseEntity>
 
     @Query("SELECT * FROM exercises WHERE id = :exerciseId")
     suspend fun getExercisesById(exerciseId: Int): ExerciseEntity
