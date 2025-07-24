@@ -41,7 +41,7 @@ fun Exercise(
     placeholderName: String,
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
-    onDelete: () -> Unit,
+    onDeletePressed: () -> Unit,
     addSet: () -> Unit,
     onChangeWeight: (setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
@@ -134,7 +134,7 @@ fun Exercise(
                     }
                     if (editingExercise) {
                         IconButton(
-                            onClick = onDelete
+                            onClick = onDeletePressed
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -214,7 +214,7 @@ fun ExerciseForPreview(
         placeholderName = "${stringResource(id = R.string.exercise)} 1",
         onNameChange = {},
         onDescriptionChange = {},
-        onDelete = {},
+        onDeletePressed = {},
         addSet = {},
         onChangeWeight = { _, _ -> },
         onChangeRepetitions = { _, _ -> },

@@ -62,9 +62,11 @@ fun ExerciseList(
             .fillMaxSize()
     ) {
         itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
+            val placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}"
+
             Exercise(
                 exercise = exercise,
-                placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}",
+                placeholderName = placeholderName,
                 onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
                 onDescriptionChange = { description ->
                     onDescriptionChange(
@@ -72,9 +74,11 @@ fun ExerciseList(
                         description
                     )
                 },
-                onDelete = {
+                onDeletePressed = {
                     deleteDialogOpen = true
-                    itemToDelete = exercise
+                    itemToDelete = exercise.copy(
+                        name = exercise.name.ifBlank { placeholderName }
+                    )
                 },
                 addSet = { onAddSet(exercise.uuid) },
                 onChangeWeight = { setId, weight ->
@@ -122,13 +126,14 @@ fun ExerciseList(
             }
         }
     }
-    if (deleteDialogOpen) {
+
+    if (deleteDialogOpen && itemToDelete != null) {
         ConfirmDialog(
             subtitle = {
                 Text(
                     text = stringResource(
                         id = R.string.exercise_deletion_subtitle,
-                        itemToDelete?.name ?: stringResource(id = R.string.exercise)
+                        itemToDelete!!.name
                     ),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
@@ -138,7 +143,8 @@ fun ExerciseList(
             confirmButton = {
                 Button(
                     onClick = {
-                        itemToDelete?.let { onRemoveExercise(it.uuid) }
+                        onRemoveExercise(itemToDelete!!.uuid)
+                        deleteDialogOpen = false
                     }
                 ) {
                     Text(
