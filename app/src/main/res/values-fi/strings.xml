@@ -39,4 +39,5 @@
     <string name="repetitions_count">Toistoa</string>
     <string name="steps_count">Askelta</string>
     <string name="select">Valitse</string>
+    <string name="all_time">Koko ajalta</string>
 </resources>
