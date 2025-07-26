@@ -11,6 +11,7 @@ import com.example.gymtracker.database.repository.WorkoutRepositoryImpl
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioViewModel
+import com.example.gymtracker.ui.info.InfoViewModel
 import com.example.gymtracker.ui.stats.StatsOverviewViewModel
 import com.example.gymtracker.ui.workouts.createsplit.CreateSplitViewModel
 import com.example.gymtracker.ui.workouts.split.SplitViewModel
@@ -48,6 +49,7 @@ val databaseModule = module {
 
     single<WorkoutRepository> {
         WorkoutRepositoryImpl(
+            db = get(),
             workoutDao = get(),
             exerciseDao = get(),
             setDao = get(),
@@ -68,4 +70,5 @@ val viewModelModule = module {
     viewModelOf(::CreateSplitViewModel)
     viewModelOf(::CreateCardioViewModel)
     viewModelOf(::StatsOverviewViewModel)
+    viewModelOf(::InfoViewModel)
 }

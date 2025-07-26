@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
+import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.stats.StatsOverviewScreen
@@ -162,6 +163,12 @@ fun GymTrackerApp(
                         onNavigateBack = { navController.popBackStack() }
                     )
                 }
+            }
+
+            composable<Route.Info> {
+                InfoScreen(
+                    onDeleteFinished = {navController.navigate(Route.Welcome)}
+                )
             }
         }
     }

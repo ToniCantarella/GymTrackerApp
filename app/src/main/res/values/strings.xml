@@ -47,4 +47,10 @@
     <string name="steps_count">Steps</string>
     <string name="select">Select</string>
     <string name="all_time">All time</string>
+    <string name="info">Info</string>
+    <string name="version">Version</string>
+    <string name="calendar_library">Calendar library</string>
+    <string name="chart_library">Chart library</string>
+    <string name="delete_all_data">Delete all data</string>
+    <string name="delete_all_data_confirmation_subtitle">Are you sure you want to delete everything? This cannot be undone.</string>
 </resources>

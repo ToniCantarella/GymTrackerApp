@@ -37,6 +37,9 @@ open class Route {
 
     @Serializable
     object StatsOverview : Route()
+
+    @Serializable
+    object Info: Route()
 }
 
 data class BottomBarRoute(val titleResInt: Int, val route: Route, val iconResInt: Int)
@@ -56,5 +59,10 @@ val bottomBarRoutes = listOf(
         titleResInt = R.string.stats,
         route = Route.Stats,
         iconResInt = R.drawable.stats
+    ),
+    BottomBarRoute(
+        titleResInt = R.string.info,
+        route = Route.Info,
+        iconResInt = R.drawable.info
     )
 )

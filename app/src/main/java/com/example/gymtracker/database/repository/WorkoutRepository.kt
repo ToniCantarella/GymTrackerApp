@@ -1,5 +1,6 @@
 package com.example.gymtracker.database.repository
 
+import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.dao.WorkoutDao
 import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
@@ -22,6 +23,9 @@ import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 import com.example.gymtracker.utility.DistanceUnit
 import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.WeightUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.Instant
 
 data class LatestSplitWithExercises(
@@ -63,9 +67,11 @@ interface WorkoutRepository {
         startDate: Instant,
         endDate: Instant
     ): List<WorkoutSession>
+    suspend fun deleteAllData()
 }
 
 class WorkoutRepositoryImpl(
+    private val db: GymDatabase,
     private val workoutDao: WorkoutDao,
     private val gymSessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
@@ -390,6 +396,12 @@ class WorkoutRepositoryImpl(
         val gymSessions = getGymSessionsBetweenDates(startDate, endDate)
         val cardioSessions = getCardioSessionsBetweenDates(startDate, endDate)
         return gymSessions + cardioSessions
+    }
+
+    override suspend fun deleteAllData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            db.clearAllTables()
+        }
     }
 
     private suspend fun getAllGymWorkoutSessions(): List<WorkoutSession> {

@@ -40,4 +40,10 @@
     <string name="steps_count">Askelta</string>
     <string name="select">Valitse</string>
     <string name="all_time">Koko ajalta</string>
+    <string name="info">Tietoja</string>
+    <string name="version">Versio</string>
+    <string name="calendar_library">Kalenterikirjasto</string>
+    <string name="chart_library">Graafikirjasto</string>
+    <string name="delete_all_data">Poista kaikki tiedot</string>
+    <string name="delete_all_data_confirmation_subtitle">Oletko varma, että tahdot poistaa kaiken? Tätä toimintoa ei voi kumota.</string>
 </resources>
