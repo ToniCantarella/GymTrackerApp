@@ -51,6 +51,15 @@ class StatsOverviewViewModel(
         }
     }
 
+    fun getMonthData(startDate: Instant, endDate: Instant) {
+        viewModelScope.launch {
+            fetchWorkoutSessionsBetweenDates(
+                startDate = startDate,
+                endDate = endDate
+            )
+        }
+    }
+
     private suspend fun fetchAllWorkouts() {
         val workouts = workoutRepository.getAllWorkouts()
         _uiState.update {

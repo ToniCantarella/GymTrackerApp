@@ -1,6 +1,7 @@
 package com.example.gymtracker.ui.stats
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -31,11 +32,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,24 +63,26 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
-import com.kizitonwose.calendar.core.YearMonth
 import com.kizitonwose.calendar.core.daysOfWeek
-import com.kizitonwose.calendar.core.minusMonths
-import com.kizitonwose.calendar.core.plusMonths
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
-import kotlinx.datetime.Clock
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaDayOfWeek
+import kotlinx.datetime.toJavaYearMonth
 import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinYearMonth
 import kotlinx.datetime.todayIn
 import org.koin.androidx.compose.koinViewModel
 import java.time.Duration
 import java.time.Instant
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @Composable
@@ -109,7 +114,8 @@ fun StatsOverviewScreen(
         loading = uiState.loading,
         workouts = uiState.workouts,
         workoutSessions = uiState.allWorkoutSessions,
-        workoutSessionsBetweenDates = uiState.workoutSessionsBetweenDates
+        workoutSessionsBetweenDates = uiState.workoutSessionsBetweenDates,
+        getMonthData = viewModel::getMonthData
     )
 }
 
@@ -118,7 +124,8 @@ private fun StatsOverviewScreen(
     loading: Boolean,
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
-    workoutSessionsBetweenDates: List<WorkoutSession>
+    workoutSessionsBetweenDates: List<WorkoutSession>,
+    getMonthData: (startDate: Instant, endDate: Instant) -> Unit
 ) {
     if (loading) {
         Box(
@@ -145,7 +152,8 @@ private fun StatsOverviewScreen(
             item {
                 CalendarCard(
                     workouts = workouts,
-                    workoutSessions = workoutSessionsBetweenDates
+                    workoutSessions = workoutSessionsBetweenDates,
+                    getMonthData = getMonthData
                 )
             }
             if (gymWorkouts.isNotEmpty()) {
@@ -201,6 +209,7 @@ val highlightColors = listOf(
 private fun CalendarCard(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
+    getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currentMonth = remember { YearMonth.now() }
@@ -209,9 +218,9 @@ private fun CalendarCard(
     val daysOfWeek = remember { daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY) }
 
     val state = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
-        firstVisibleMonth = currentMonth,
+        startMonth = startMonth.toKotlinYearMonth(),
+        endMonth = endMonth.toKotlinYearMonth(),
+        firstVisibleMonth = currentMonth.toKotlinYearMonth(),
         firstDayOfWeek = daysOfWeek.first()
     )
 
@@ -225,9 +234,33 @@ private fun CalendarCard(
         workouts.associateBy { it.id }
     }
 
+    LaunchedEffect(state) {
+        snapshotFlow { state.firstVisibleMonth.yearMonth }
+            .distinctUntilChanged()
+            .collect { visibleMonth ->
+                val zoneId = ZoneId.systemDefault()
+
+                val startDate: Instant = visibleMonth.toJavaYearMonth()
+                    .atDay(1)
+                    .atStartOfDay(zoneId)
+                    .toInstant()
+
+                val endDate: Instant = visibleMonth.toJavaYearMonth()
+                    .atEndOfMonth()
+                    .plusDays(1)
+                    .atStartOfDay(zoneId)
+                    .toInstant()
+                    .minus(Duration.ofMillis(1))
+
+                Log.d("toni", "$visibleMonth - $startDate - $endDate")
+
+                getMonthData(startDate, endDate)
+            }
+    }
+
     StatsCard(modifier = modifier) {
         Text(
-            text = currentMonth.month.getDisplayName(
+            text = state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
                 TextStyle.FULL_STANDALONE,
                 Locale.getDefault()
             ),
@@ -235,25 +268,27 @@ private fun CalendarCard(
                 bottom = dimensionResource(id = R.dimen.padding_medium)
             )
         )
-        Row(
-            modifier = Modifier
-                .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
-                .fillMaxWidth()
-        ) {
-            daysOfWeek.forEach { dayOfWeek ->
-                Text(
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    text = dayOfWeek.getDisplayName(
-                        TextStyle.SHORT,
-                        Locale.getDefault()
-                    )
-                )
-            }
-        }
-
         HorizontalCalendar(
             state = state,
+            monthHeader = {
+                Row(
+                    modifier = Modifier
+                        .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
+                        .fillMaxWidth()
+                ) {
+                    daysOfWeek.forEach { dayOfWeek ->
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            text = dayOfWeek.toJavaDayOfWeek()
+                                .getDisplayName(
+                                    TextStyle.SHORT,
+                                    Locale.getDefault()
+                                )
+                        )
+                    }
+                }
+            },
             dayContent = { day ->
                 val sessionsOnDay = sessionsByDate[day.date]
 
@@ -413,6 +448,7 @@ private fun WorkoutIcon(
     )
 }
 
+@OptIn(ExperimentalTime::class)
 val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
 @Composable
@@ -490,7 +526,7 @@ private fun PieChartCard(
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
-                ){
+                ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                     ) {
@@ -577,7 +613,8 @@ private fun StatsScreenForPreview() {
         loading = false,
         workouts = workouts,
         workoutSessionsBetweenDates = workoutsBetweenDates,
-        workoutSessions = workoutsAllTime
+        workoutSessions = workoutsAllTime,
+        getMonthData = { _, _ -> }
     )
 }
 
