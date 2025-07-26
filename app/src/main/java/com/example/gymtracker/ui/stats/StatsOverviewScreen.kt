@@ -1,7 +1,6 @@
 package com.example.gymtracker.ui.stats
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -230,9 +229,11 @@ private fun CalendarCard(
             it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
         }
     }
-    val workoutsById: Map<Int, Workout> = remember(workouts) {
-        workouts.associateBy { it.id }
+    val (gymWorkouts, cardioWorkouts) = remember(workouts) {
+        workouts.partition { it.type == WorkoutType.GYM }
     }
+    val gymWorkoutsById = remember(gymWorkouts) { gymWorkouts.associateBy { it.id } }
+    val cardioWorkoutsById = remember(cardioWorkouts) { cardioWorkouts.associateBy { it.id } }
 
     LaunchedEffect(state) {
         snapshotFlow { state.firstVisibleMonth.yearMonth }
@@ -251,8 +252,6 @@ private fun CalendarCard(
                     .atStartOfDay(zoneId)
                     .toInstant()
                     .minus(Duration.ofMillis(1))
-
-                Log.d("toni", "$visibleMonth - $startDate - $endDate")
 
                 getMonthData(startDate, endDate)
             }
@@ -292,18 +291,24 @@ private fun CalendarCard(
             dayContent = { day ->
                 val sessionsOnDay = sessionsByDate[day.date]
 
-                Day(
-                    day = day
-                ) {
+                Day(day = day) {
                     if (sessionsOnDay?.isNotEmpty() == true) {
                         sessionsOnDay.forEach { session ->
-                            val workoutIndex = workouts.indexOf(workoutsById[session.workout.id])
-                            WorkoutIcon(
-                                painter =
-                                    if (session.workout.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
-                                    else painterResource(id = R.drawable.run),
-                                tint = highlightColors[workoutIndex % highlightColors.size]
-                            )
+                            if (session.workout.type == WorkoutType.GYM) {
+                                val workoutIndex =
+                                    gymWorkouts.indexOf(gymWorkoutsById[session.workout.id])
+                                WorkoutIcon(
+                                    painter = painterResource(id = R.drawable.weight),
+                                    tint = highlightColors[workoutIndex % highlightColors.size]
+                                )
+                            } else {
+                                val workoutIndex =
+                                    cardioWorkouts.indexOf(cardioWorkoutsById[session.workout.id])
+                                WorkoutIcon(
+                                    painter = painterResource(id = R.drawable.run),
+                                    tint = highlightColors[workoutIndex % highlightColors.size]
+                                )
+                            }
                         }
                     }
                 }
@@ -475,7 +480,7 @@ private fun Day(
             contentIcons()
         }
         Text(
-            text = day.date.dayOfMonth.toString(),
+            text = day.date.day.toString(),
             color = if (day.position == DayPosition.MonthDate && day.date <= today)
                 MaterialTheme.colorScheme.onSurface
             else
