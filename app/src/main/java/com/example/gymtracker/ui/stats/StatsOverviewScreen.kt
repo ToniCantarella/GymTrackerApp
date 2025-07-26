@@ -1,6 +1,7 @@
 package com.example.gymtracker.ui.stats
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -30,12 +31,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -66,6 +69,7 @@ import com.kizitonwose.calendar.core.daysOfWeek
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -235,6 +239,11 @@ private fun CalendarCard(
     val gymWorkoutsById = remember(gymWorkouts) { gymWorkouts.associateBy { it.id } }
     val cardioWorkoutsById = remember(cardioWorkouts) { cardioWorkouts.associateBy { it.id } }
 
+    val coroutineScope = rememberCoroutineScope()
+
+    val todayButtonVisible =
+        currentMonth.toKotlinYearMonth() != state.firstVisibleMonth.yearMonth
+
     LaunchedEffect(state) {
         snapshotFlow { state.firstVisibleMonth.yearMonth }
             .distinctUntilChanged()
@@ -258,15 +267,37 @@ private fun CalendarCard(
     }
 
     StatsCard(modifier = modifier) {
-        Text(
-            text = state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
-                TextStyle.FULL_STANDALONE,
-                Locale.getDefault()
-            ),
-            modifier = Modifier.padding(
-                bottom = dimensionResource(id = R.dimen.padding_medium)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
+                    TextStyle.FULL_STANDALONE,
+                    Locale.getDefault()
+                ),
+                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_large))
             )
-        )
+            TextButton(
+                onClick = {
+                    coroutineScope.launch {
+                        state.animateScrollToMonth(
+                            currentMonth.toKotlinYearMonth()
+                        )
+                    }
+                },
+                enabled = todayButtonVisible
+            ) {
+                AnimatedVisibility(
+                    visible = todayButtonVisible
+                ) {
+
+                    Text(
+                        text = stringResource(id = R.string.today)
+                    )
+                }
+            }
+        }
         HorizontalCalendar(
             state = state,
             monthHeader = {
