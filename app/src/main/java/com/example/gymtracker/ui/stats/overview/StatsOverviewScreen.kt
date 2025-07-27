@@ -206,13 +206,13 @@ private fun StatsCard(
 }
 
 val highlightColors = listOf(
-    Color(0xFFFF0000),
-    Color(0xFFFF7E00),
-    Color(0xFF25FF00),
-    Color(0xFF00E1FF),
-    Color(0xFF0080FF),
-    Color(0xFFD900FF),
-    Color(0xFF5900FF)
+    Color(0xFFE63946),
+    Color(0xFFF1A208),
+    Color(0xFF04DEA5),
+    Color(0xFF3A86FF),
+    Color(0xFF8338EC),
+    Color(0xFFB5179E),
+    Color(0xFF16A144)
 )
 
 @OptIn(ExperimentalTime::class)
