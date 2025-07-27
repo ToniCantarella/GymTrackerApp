@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -381,10 +382,12 @@ private fun CalendarCard(
             onDismissRequest = { sessionDialogOpen = false }
         ) {
             ElevatedCard {
-                Column(
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(dimensionResource(id = R.dimen.padding_large))
+                        .fillMaxHeight(.5f)
                 ) {
-                    sessionsForDialog.forEachIndexed { index, session ->
+                    itemsIndexed(sessionsForDialog) { index, session ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
@@ -413,7 +416,9 @@ private fun CalendarCard(
                             }
                         }
                         if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
-                            HorizontalDivider()
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outline
+                            )
                         }
                     }
                 }
@@ -445,7 +450,9 @@ fun CalendarFooter(
             workoutSessions = gymSessions
         )
         if (gymWorkouts.isNotEmpty() && cardioWorkouts.isNotEmpty()) {
-            HorizontalDivider()
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline
+            )
         }
         WorkoutLegendsRow(
             workouts = cardioWorkouts,
