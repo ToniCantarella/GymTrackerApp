@@ -47,7 +47,8 @@ fun Exercise(
     onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
     onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
-    creatingExercise: Boolean = true
+    creatingExercise: Boolean = true,
+    viewOnly: Boolean = false
 ) {
     var editingExercise by remember { mutableStateOf(creatingExercise) }
 
@@ -114,33 +115,35 @@ fun Exercise(
                         )
                     }
                 }
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    if (!creatingExercise) {
-                        IconButton(
-                            onClick = {
-                                editingExercise = !editingExercise
+                if (!viewOnly) {
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        if (!creatingExercise) {
+                            IconButton(
+                                onClick = {
+                                    editingExercise = !editingExercise
+                                }
+                            ) {
+                                Icon(
+                                    painter =
+                                        if (editingExercise) painterResource(id = R.drawable.edit_off)
+                                        else painterResource(id = R.drawable.edit),
+                                    contentDescription = null
+                                )
                             }
-                        ) {
-                            Icon(
-                                painter =
-                                    if (editingExercise) painterResource(id = R.drawable.edit_off)
-                                    else painterResource(id = R.drawable.edit),
-                                contentDescription = null
-                            )
                         }
-                    }
-                    if (editingExercise) {
-                        IconButton(
-                            onClick = onDeletePressed
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(id = R.string.delete),
-                                tint = MaterialTheme.colorScheme.error
-                            )
+                        if (editingExercise) {
+                            IconButton(
+                                onClick = onDeletePressed
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(id = R.string.delete),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
                 }
@@ -161,20 +164,23 @@ fun Exercise(
                                 checked
                             )
                         },
-                        addingSet = creatingExercise
+                        addingSet = creatingExercise,
+                        viewOnly = viewOnly
                     )
                 }
-                TextButton(
-                    onClick = addSet,
-                    enabled = exercise.sets.size < MAX_SETS
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(id = R.string.set)
-                    )
+                if (!viewOnly) {
+                    TextButton(
+                        onClick = addSet,
+                        enabled = exercise.sets.size < MAX_SETS
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.set)
+                        )
+                    }
                 }
             }
         }

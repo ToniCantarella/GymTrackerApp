@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.stats
+package com.example.gymtracker.ui.stats.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

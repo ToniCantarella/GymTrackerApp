@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.stats
+package com.example.gymtracker.ui.stats.overview
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.database.entity.WorkoutType
@@ -61,6 +63,7 @@ import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.MAX_CARDIO
 import com.example.gymtracker.utility.MAX_SPLITS
+import com.example.gymtracker.utility.toDateAndTimeString
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -91,6 +94,7 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
+    onSessionNavigate: (session: WorkoutSession) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -118,7 +122,8 @@ fun StatsOverviewScreen(
         workouts = uiState.workouts,
         workoutSessions = uiState.allWorkoutSessions,
         workoutSessionsBetweenDates = uiState.workoutSessionsBetweenDates,
-        getMonthData = viewModel::getMonthData
+        getMonthData = viewModel::getMonthData,
+        onSessionClick = onSessionNavigate
     )
 }
 
@@ -128,7 +133,8 @@ private fun StatsOverviewScreen(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
     workoutSessionsBetweenDates: List<WorkoutSession>,
-    getMonthData: (startDate: Instant, endDate: Instant) -> Unit
+    getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
+    onSessionClick: (session: WorkoutSession) -> Unit
 ) {
     if (loading) {
         Box(
@@ -156,7 +162,8 @@ private fun StatsOverviewScreen(
                 CalendarCard(
                     workouts = workouts,
                     workoutSessions = workoutSessionsBetweenDates,
-                    getMonthData = getMonthData
+                    getMonthData = getMonthData,
+                    onSessionClick = onSessionClick
                 )
             }
             if (gymWorkouts.isNotEmpty()) {
@@ -213,8 +220,12 @@ private fun CalendarCard(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
+    onSessionClick: (session: WorkoutSession) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var sessionDialogOpen by remember { mutableStateOf(false) }
+    var sessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
+
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(100) }
     val endMonth = remember { currentMonth.plusMonths(100) }
@@ -321,9 +332,22 @@ private fun CalendarCard(
             },
             dayContent = { day ->
                 val sessionsOnDay = sessionsByDate[day.date]
+                val hasSessions = sessionsOnDay?.isNotEmpty() == true
 
-                Day(day = day) {
-                    if (sessionsOnDay?.isNotEmpty() == true) {
+                fun onClick() {
+                    if (sessionsOnDay?.size!! == 1) {
+                        onSessionClick(sessionsOnDay.first())
+                    } else {
+                        sessionDialogOpen = true
+                        sessionsForDialog = sessionsOnDay
+                    }
+                }
+
+                Day(
+                    day = day,
+                    onClick = if (hasSessions) ::onClick else null
+                ) {
+                    if (hasSessions) {
                         sessionsOnDay.forEach { session ->
                             if (session.workout.type == WorkoutType.GYM) {
                                 val workoutIndex =
@@ -350,6 +374,51 @@ private fun CalendarCard(
             workouts = workouts,
             workoutSessions = workoutSessions
         )
+    }
+
+    if (sessionDialogOpen) {
+        Dialog(
+            onDismissRequest = { sessionDialogOpen = false }
+        ) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                ) {
+                    sessionsForDialog.forEachIndexed { index, session ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onSessionClick(session)
+                                }
+                        ) {
+                            Icon(
+                                painter = if (session.workout.type == WorkoutType.GYM)
+                                    painterResource(id = R.drawable.weight)
+                                else
+                                    painterResource(id = R.drawable.run),
+                                contentDescription = null
+                            )
+                            Column(
+                                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                            ) {
+                                Text(
+                                    text = session.workout.name
+                                )
+                                Text(
+                                    text = session.timestamp.toDateAndTimeString()
+                                )
+                            }
+                        }
+                        if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
+                            HorizontalDivider()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -490,6 +559,7 @@ val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 @Composable
 private fun Day(
     day: CalendarDay,
+    onClick: (() -> Unit)? = null,
     contentIcons: @Composable () -> Unit
 ) {
     Box(
@@ -497,6 +567,11 @@ private fun Day(
             .aspectRatio(1f)
             .padding(1.dp)
             .background(MaterialTheme.colorScheme.inverseOnSurface)
+            .clickable(
+                enabled = onClick != null
+            ) {
+                onClick?.invoke()
+            }
             .then(
                 if (day.date == today)
                     Modifier.border(1.dp, MaterialTheme.colorScheme.primary)
@@ -633,6 +708,7 @@ private fun StatsScreenForPreview() {
     val workoutsBetweenDates = List(20) {
         val timestamp = if (it > 4) now.minus(Duration.ofDays(it.toLong())) else now
         WorkoutSession(
+            id = 0,
             workout = workouts.random(),
             timestamp = timestamp
         )
@@ -640,6 +716,7 @@ private fun StatsScreenForPreview() {
 
     val workoutsAllTime = List(10) {
         WorkoutSession(
+            id = 1,
             workout = workouts.random(),
             timestamp = now.minus(Duration.ofDays(it.toLong()))
         )
@@ -650,7 +727,8 @@ private fun StatsScreenForPreview() {
         workouts = workouts,
         workoutSessionsBetweenDates = workoutsBetweenDates,
         workoutSessions = workoutsAllTime,
-        getMonthData = { _, _ -> }
+        getMonthData = { _, _ -> },
+        onSessionClick = {}
     )
 }
 

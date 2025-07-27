@@ -11,6 +11,9 @@ interface GymSessionDao {
     @Insert
     suspend fun insert(session: GymSessionEntity): Long
 
+    @Query("SELECT * FROM gym_sessions WHERE id = :id")
+    suspend fun getById(id: Int): GymSessionEntity
+
     @Query("SELECT * FROM gym_sessions")
     suspend fun getAllSessions(): List<GymSessionEntity?>
 

@@ -28,7 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
 
-data class LatestSplitWithExercises(
+data class SplitWithExercises(
     val id: Int,
     val name: String,
     val timestamp: Instant?,
@@ -42,6 +42,7 @@ data class Workout(
 )
 
 data class WorkoutSession(
+    val id: Int,
     val workout: Workout,
     val timestamp: Instant,
 )
@@ -49,16 +50,19 @@ data class WorkoutSession(
 interface WorkoutRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
     suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem>
-    suspend fun getLatestSplitWithExercises(id: Int): LatestSplitWithExercises?
+    suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises?
+    suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
     suspend fun deleteSplit(splitId: Int)
     suspend fun markSplitSessionDone(
         splitId: Int,
         splitName: String,
         exercises: List<Exercise>
     )
+
     suspend fun addCardio(name: String)
     suspend fun getCardioListWithLatestTimestamp(): List<WorkoutListItem>
     suspend fun getLatestCardio(id: Int): Cardio
+    suspend fun getCardioBySession(sessionId: Int): Cardio
     suspend fun deleteCardio(cardioId: Int)
     suspend fun markCardioSessionDone(id: Int, cardio: Cardio)
     suspend fun getAllWorkouts(): List<Workout>
@@ -67,6 +71,7 @@ interface WorkoutRepository {
         startDate: Instant,
         endDate: Instant
     ): List<WorkoutSession>
+
     suspend fun deleteAllData()
 }
 
@@ -79,7 +84,7 @@ class WorkoutRepositoryImpl(
     private val setSessionDao: SetSessionDao,
     private val cardioDao: CardioDao,
     private val cardioSessionDao: CardioSessionDao
-): WorkoutRepository {
+) : WorkoutRepository {
 
     override suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
         val workoutId = workoutDao.insert(
@@ -126,7 +131,7 @@ class WorkoutRepositoryImpl(
         }.sortedBy { it.latestTimestamp }
     }
 
-    override suspend fun getLatestSplitWithExercises(id: Int): LatestSplitWithExercises? {
+    override suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises? {
         val workout = workoutDao.getById(id)
         val timestamp = gymSessionDao.getLastSession(id)?.timestamp
 
@@ -148,11 +153,43 @@ class WorkoutRepositoryImpl(
             )
         }
 
-        return LatestSplitWithExercises(
+        return SplitWithExercises(
             id = id,
             name = workout.name,
             timestamp = timestamp,
             exercises = exercisesGrouped
+        )
+    }
+
+    override suspend fun getSplitBySession(
+        sessionId: Int
+    ): SplitWithExercises {
+        val gymSession = gymSessionDao.getById(sessionId)
+        val split = workoutDao.getById(gymSession.workoutId)
+        val exercises = exerciseDao.getExercisesByWorkoutId(split.id)
+        val setSession = setSessionDao.getSetsForSession(gymSession.id)
+
+        return SplitWithExercises(
+            id = split.id,
+            name = split.name,
+            timestamp = gymSession.timestamp,
+            exercises = exercises.map { exercise ->
+                val sets = setDao.getSetsForExercise(exercise.id)
+                val setSessionsForExercise = setSession.filter { sets.any { set -> it.setId == set.id }}
+
+                Exercise(
+                    uuid = exercise.uuid,
+                    name = exercise.name,
+                    description = exercise.description,
+                    sets = setSessionsForExercise.map { set ->
+                        WorkoutSet(
+                            uuid = set.uuid,
+                            weight = set.weight,
+                            repetitions = set.repetitions
+                        )
+                    }
+                )
+            }
         )
     }
 
@@ -322,6 +359,25 @@ class WorkoutRepositoryImpl(
         )
     }
 
+    override suspend fun getCardioBySession(
+        sessionId: Int
+    ): Cardio {
+        val session = cardioSessionDao.getById(sessionId)
+        val cardio = cardioDao.getById(session.cardioId)
+        val workout = workoutDao.getById(cardio.workoutId)
+
+        return Cardio(
+            name = workout.name,
+            steps = session.steps,
+            stepsTimestamp = session.timestamp,
+            distance = session.distance,
+            distanceTimestamp = session.timestamp,
+            duration = session.duration,
+            durationTimestamp = session.timestamp,
+            latestTimestamp = session.timestamp
+        )
+    }
+
     override suspend fun deleteCardio(cardioId: Int) = workoutDao.deleteById(cardioId)
 
 
@@ -439,6 +495,7 @@ class WorkoutRepositoryImpl(
             val split = workouts[session.workoutId]
             if (split != null) {
                 WorkoutSession(
+                    id = session.id,
                     workout = Workout(
                         id = split.id,
                         name = split.name,
@@ -462,6 +519,7 @@ class WorkoutRepositoryImpl(
                 val workout = workouts[cardio.workoutId]
                 if (workout != null) {
                     WorkoutSession(
+                        id = session.id,
                         workout = Workout(
                             id = workout.id,
                             name = workout.name,
@@ -498,5 +556,6 @@ class WorkoutRepositoryImpl(
         else
             UnitUtil.kmToMi(distance).roundToDisplay()
 
-    private fun Double.roundToDisplay(decimals: Int = 2): Double  = "%.${decimals}f".format(this).toDouble()
+    private fun Double.roundToDisplay(decimals: Int = 2): Double =
+        "%.${decimals}f".format(this).toDouble()
 }

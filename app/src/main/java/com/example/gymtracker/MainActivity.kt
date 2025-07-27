@@ -51,13 +51,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
-import com.example.gymtracker.ui.stats.StatsOverviewScreen
+import com.example.gymtracker.ui.stats.overview.StatsOverviewScreen
+import com.example.gymtracker.ui.stats.sessions.CardioSessionScreen
+import com.example.gymtracker.ui.stats.sessions.GymSessionScreen
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
 import com.example.gymtracker.ui.workouts.createsplit.CreateSplitScreen
@@ -160,14 +163,31 @@ fun GymTrackerApp(
             navigation<Route.Stats>(startDestination = Route.StatsOverview) {
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
-                        onNavigateBack = { navController.popBackStack() }
+                        onNavigateBack = { navController.popBackStack() },
+                        onSessionNavigate = {
+                            if (it.workout.type == WorkoutType.GYM) {
+                                navController.navigate(Route.GymSession(it.id))
+                            } else {
+                                navController.navigate(Route.CardioSession(it.id))
+                            }
+                        }
+                    )
+                }
+                composable<Route.GymSession> {
+                    GymSessionScreen(
+                        onNavigateBack = navController::popBackStack
+                    )
+                }
+                composable<Route.CardioSession> {
+                    CardioSessionScreen(
+                        onNavigateBack = navController::popBackStack
                     )
                 }
             }
 
             composable<Route.Info> {
                 InfoScreen(
-                    onDeleteFinished = {navController.navigate(Route.Welcome)}
+                    onDeleteFinished = { navController.navigate(Route.Welcome) }
                 )
             }
         }

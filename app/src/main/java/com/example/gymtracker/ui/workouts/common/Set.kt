@@ -37,7 +37,8 @@ fun Set(
     onCheckSet: (checked: Boolean) -> Unit,
     setName: String = "",
     addingSet: Boolean = false,
-    deletionEnabled: Boolean = true
+    deletionEnabled: Boolean = true,
+    viewOnly: Boolean = false
 ) {
     var dropdownMenuOpen by remember { mutableStateOf(false) }
 
@@ -48,7 +49,7 @@ fun Set(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.padding_small))
     ) {
-        if (addingSet) {
+        if (addingSet || viewOnly) {
             Text(
                 text = setName
             )
@@ -81,6 +82,7 @@ fun Set(
         Box {
             IconButton(
                 onClick = { dropdownMenuOpen = !dropdownMenuOpen },
+                enabled = !viewOnly
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,

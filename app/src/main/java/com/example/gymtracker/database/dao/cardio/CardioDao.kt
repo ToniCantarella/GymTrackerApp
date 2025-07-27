@@ -11,6 +11,9 @@ interface CardioDao {
     @Insert
     suspend fun insert(cardio: CardioEntity): Long
 
+    @Query("SELECT * FROM cardios WHERE id = :id")
+    suspend fun getById(id: Int): CardioEntity
+
     @Update
     suspend fun updateCardio(cardio: CardioEntity)
 

@@ -1,6 +1,7 @@
 package com.example.gymtracker.ui.workouts.common
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,9 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.workouts.entity.Exercise
@@ -34,17 +37,18 @@ import java.util.UUID
 @Composable
 fun ExerciseList(
     exercises: List<Exercise>,
-    onAddExercise: () -> Unit,
-    onRemoveExercise: (id: UUID) -> Unit,
-    onExerciseNameChange: (id: UUID, name: String) -> Unit,
-    onDescriptionChange: (id: UUID, description: String) -> Unit,
-    onAddSet: (exerciseId: UUID) -> Unit,
-    onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
-    onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
-    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
     modifier: Modifier = Modifier,
+    onAddExercise: () -> Unit = {},
+    onRemoveExercise: (id: UUID) -> Unit = {},
+    onExerciseNameChange: (id: UUID, name: String) -> Unit = { _, _ -> },
+    onDescriptionChange: (id: UUID, description: String) -> Unit = { _, _ -> },
+    onAddSet: (exerciseId: UUID) -> Unit = { },
+    onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit = { _, _, _ -> },
+    onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit = { _, _, _ -> },
+    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit = { _, _ -> },
+    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> },
     creatingSplit: Boolean = false,
-    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> }
+    viewOnly: Boolean = false
 ) {
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -64,65 +68,78 @@ fun ExerciseList(
         itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
             val placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}"
 
-            Exercise(
-                exercise = exercise,
-                placeholderName = placeholderName,
-                onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
-                onDescriptionChange = { description ->
-                    onDescriptionChange(
-                        exercise.uuid,
-                        description
+            Box {
+                if (viewOnly) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .zIndex(1f)
+                            .pointerInput(Unit) {}
                     )
-                },
-                onDeletePressed = {
-                    deleteDialogOpen = true
-                    itemToDelete = exercise.copy(
-                        name = exercise.name.ifBlank { placeholderName }
-                    )
-                },
-                addSet = { onAddSet(exercise.uuid) },
-                onChangeWeight = { setId, weight ->
-                    onChangeWeight(
-                        exercise.uuid,
-                        setId,
-                        weight
-                    )
-                },
-                onChangeRepetitions = { setId, repetitions ->
-                    onChangeRepetitions(
-                        exercise.uuid,
-                        setId,
-                        repetitions
-                    )
-                },
-                onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
-                onCheckSet = { setId, checked ->
-                    onCheckSet(
-                        exercise.uuid,
-                        setId,
-                        checked
-                    )
-                },
-                creatingExercise = creatingSplit
-            )
+                }
+                Exercise(
+                    exercise = exercise,
+                    placeholderName = placeholderName,
+                    onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
+                    onDescriptionChange = { description ->
+                        onDescriptionChange(
+                            exercise.uuid,
+                            description
+                        )
+                    },
+                    onDeletePressed = {
+                        deleteDialogOpen = true
+                        itemToDelete = exercise.copy(
+                            name = exercise.name.ifBlank { placeholderName }
+                        )
+                    },
+                    addSet = { onAddSet(exercise.uuid) },
+                    onChangeWeight = { setId, weight ->
+                        onChangeWeight(
+                            exercise.uuid,
+                            setId,
+                            weight
+                        )
+                    },
+                    onChangeRepetitions = { setId, repetitions ->
+                        onChangeRepetitions(
+                            exercise.uuid,
+                            setId,
+                            repetitions
+                        )
+                    },
+                    onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+                    onCheckSet = { setId, checked ->
+                        onCheckSet(
+                            exercise.uuid,
+                            setId,
+                            checked
+                        )
+                    },
+                    creatingExercise = creatingSplit,
+                    viewOnly = viewOnly
+                )
+            }
         }
-        item {
-            Button(
-                onClick = {
-                    onAddExercise()
-                    scope.launch {
-                        lazyListState.animateScrollToItem(exercises.size)
-                    }
-                },
-                enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.add)
-                )
-                Text(
-                    text = stringResource(id = R.string.exercise)
-                )
+        if (!viewOnly) {
+            item {
+                Button(
+                    onClick = {
+                        onAddExercise()
+                        scope.launch {
+                            lazyListState.animateScrollToItem(exercises.size)
+                        }
+                    },
+                    enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(id = R.string.add)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.exercise)
+                    )
+                }
             }
         }
     }

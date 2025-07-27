@@ -52,6 +52,7 @@ fun CardioContent(
     previousDistanceTimestamp: Instant? = null,
     distance: Double? = 0.0,
     onDistanceChange: (distance: Double) -> Unit = {},
+    displayDuration: Duration?= null,
     previousDuration: Duration? = null,
     previousDurationTimestamp: Instant? = null,
     onDurationChange: (duration: Duration) -> Unit = {}
@@ -180,7 +181,8 @@ fun CardioContent(
                 )
                 StopWatch(
                     onPause = { onDurationChange(Duration.ofMillis(it)) },
-                    onStop = { onDurationChange(Duration.ofMillis(it)) }
+                    onStop = { onDurationChange(Duration.ofMillis(it)) },
+                    displayDuration = displayDuration
                 )
             }
         }
@@ -192,7 +194,8 @@ fun CardioContent(
 private fun StopWatch(
     onPause: (millis: Long) -> Unit,
     onStop: (millis: Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    displayDuration: Duration? = null
 ) {
     var isRunning by remember { mutableStateOf(false) }
     var elapsedMillis by remember { mutableLongStateOf(0L) }
@@ -207,17 +210,26 @@ private fun StopWatch(
         }
     }
 
-    val hours = (elapsedMillis / 3600000)
-    val minutes = (elapsedMillis / 60000) % 60
-    val seconds = (elapsedMillis / 1000) % 60
-    val milliseconds = (elapsedMillis % 1000) / 10
+    val durationString = if (displayDuration != null) {
+        val totalMillis = displayDuration.toMillis()
+        val dispMinutes = (totalMillis / 1000) / 60
+        val dispSeconds = (totalMillis / 1000) % 60
+        val dispMillis = totalMillis % 1000
+        String.format("%02d:%02d.%03d", dispMinutes, dispSeconds, dispMillis)
+    } else {
+        val hours = (elapsedMillis / 3600000)
+        val minutes = (elapsedMillis / 60000) % 60
+        val seconds = (elapsedMillis / 1000) % 60
+        val millis = (elapsedMillis % 1000)
+        String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis)
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            text = String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds),
+            text = durationString,
             style = MaterialTheme.typography.displayMedium
         )
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
