@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.stats.split
+package com.example.gymtracker.ui.stats.cardio
 
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,13 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.ExerciseWithHistory
-import com.example.gymtracker.database.repository.SplitStats
+import com.example.gymtracker.database.repository.CardioStats
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
+import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.toDateString
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
@@ -46,16 +47,16 @@ import ir.ehsannarmani.compose_charts.models.Line
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SplitStatsScreen(
+fun CardioStatsScreen(
     onNavigateBack: () -> Unit,
-    viewmModel: SplitStatsViewModel = koinViewModel()
+    viewModel: CardioStatsViewModel = koinViewModel()
 ) {
-    val uiState by viewmModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     ProvideTopAppBar(
         title = {
             Text(
-                text = uiState.splitName
+                text = uiState.stats?.name ?: ""
             )
         },
         navigationItem = {
@@ -78,15 +79,15 @@ fun SplitStatsScreen(
             CircularProgressIndicator()
         }
     } else if (uiState.stats != null) {
-        SplitStatsScreen(
+        CardioStatsScreen(
             stats = uiState.stats!!
         )
     }
 }
 
 @Composable
-private fun SplitStatsScreen(
-    stats: SplitStats,
+private fun CardioStatsScreen(
+    stats: CardioStats,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -95,13 +96,94 @@ private fun SplitStatsScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
-        itemsIndexed(stats.exercises) { index, exercise ->
+        item {
+            val stepHistory = stats.cardioHistory.filter { it.steps != null }
+            val stepValues = stepHistory.map { it.steps!!.toDouble() }
+
             LineChartCard(
-                exercise = if (exercise.name.isEmpty())
-                    exercise.copy(
-                        name = "${stringResource(id = R.string.exercise)} ${index + 1}"
-                    )
-                else exercise
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.footprint),
+                            contentDescription = stringResource(id = R.string.steps)
+                        )
+                        Text(
+                            text = stringResource(id = R.string.steps)
+                        )
+                    }
+                },
+                values = stepValues,
+                dateLabels = listOf(
+                    stepHistory.first().timestamp?.toDateString() ?: "",
+                    "-",
+                    stepHistory.last().timestamp?.toDateString() ?: "",
+                )
+            )
+        }
+        item {
+            val distanceHistory = stats.cardioHistory.filter { it.distance != null }
+            val distanceValues = distanceHistory.map { it.distance!! }
+
+            LineChartCard(
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.path),
+                            contentDescription = stringResource(id = R.string.distance)
+                        )
+                        Text(
+                            text = "${stringResource(id = R.string.distance)} (${stringResource(UnitUtil.distanceUnitStringId)})"
+                        )
+                    }
+                },
+                values = distanceValues,
+                dateLabels = listOf(
+                    distanceHistory.first().timestamp?.toDateString() ?: "",
+                    "-",
+                    distanceHistory.last().timestamp?.toDateString() ?: "",
+                )
+            )
+        }
+        item {
+            val durationHistory = stats.cardioHistory.filter { it.duration != null }
+            val rawDurations = durationHistory.map { it.duration!! }
+
+            val maxMillis = rawDurations.maxOfOrNull { it.toMillis() } ?: 0L
+            val (divider, unitLabel) = when {
+                maxMillis >= 3_600_000 -> 3_600_000.0 to "h"
+                maxMillis >= 60_000    -> 60_000.0 to "min"
+                else                   -> 1_000.0 to "s"
+            }
+
+            val durationValues = rawDurations.map { it.toMillis() / divider }
+
+            LineChartCard(
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.timer),
+                            contentDescription = stringResource(id = R.string.time)
+                        )
+                        Text(
+                            text = "${stringResource(id = R.string.time)} (${unitLabel})"
+                        )
+                    }
+                },
+                values = durationValues,
+                dateLabels = listOf(
+                    durationHistory.first().timestamp?.toDateString() ?: "",
+                    "-",
+                    durationHistory.last().timestamp?.toDateString() ?: "",
+                )
             )
         }
     }
@@ -109,7 +191,9 @@ private fun SplitStatsScreen(
 
 @Composable
 private fun LineChartCard(
-    exercise: ExerciseWithHistory,
+    title: @Composable () -> Unit,
+    values: List<Double>,
+    dateLabels: List<String>,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -119,31 +203,19 @@ private fun LineChartCard(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
         ) {
-            Text(
-                text = exercise.name
-            )
+            title()
             LineChart(
                 modifier = Modifier.heightIn(max = 300.dp),
                 data = remember {
                     listOf(
                         Line(
-                            label = "min",
-                            values = exercise.setHistory.map { it.min },
+                            label = "",
+                            values = values,
                             color = SolidColor(Color(0xFF23af92)),
                             firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
                             secondGradientFillColor = Color.Transparent,
                             strokeAnimationSpec = tween(700, easing = EaseInOutCubic),
                             gradientAnimationDelay = 700,
-                            drawStyle = DrawStyle.Stroke(width = 2.dp),
-                        ),
-                        Line(
-                            label = "max",
-                            values = exercise.setHistory.map { it.max },
-                            color = SolidColor(Color(0xFFAF239C)),
-                            firstGradientFillColor = Color(0xFFC02BB1).copy(alpha = .5f),
-                            secondGradientFillColor = Color.Transparent,
-                            strokeAnimationSpec = tween(500, easing = EaseInOutCubic),
-                            gradientAnimationDelay = 500,
                             drawStyle = DrawStyle.Stroke(width = 2.dp),
                         )
                     )
@@ -151,11 +223,7 @@ private fun LineChartCard(
                 labelProperties = LabelProperties(
                     enabled = true,
                     textStyle = MaterialTheme.typography.labelSmall,
-                    labels = listOf(
-                        exercise.setHistory.first().timestamp.toDateString(),
-                        "-",
-                        exercise.setHistory.last().timestamp.toDateString()
-                    ),
+                    labels = dateLabels,
                     builder = { modifier, label, shouldRotate, index ->
                         Text(
                             text = label,
@@ -164,9 +232,7 @@ private fun LineChartCard(
                     },
                 ),
                 labelHelperProperties = LabelHelperProperties(
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    enabled = false
                 ),
                 indicatorProperties = HorizontalIndicatorProperties(
                     textStyle = TextStyle(

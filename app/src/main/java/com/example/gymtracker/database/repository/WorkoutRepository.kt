@@ -26,6 +26,7 @@ import com.example.gymtracker.utility.WeightUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.Instant
 
 data class SplitWithExercises(
@@ -64,6 +65,19 @@ data class SplitStats(
     val exercises: List<ExerciseWithHistory>
 )
 
+data class CardioData(
+    val steps: Int?,
+    val distance: Double?,
+    val duration: Duration?,
+    val timestamp: Instant?
+)
+
+data class CardioStats(
+    val id: Int,
+    val name: String,
+    val cardioHistory: List<CardioData>
+)
+
 interface WorkoutRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
     suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem>
@@ -84,6 +98,7 @@ interface WorkoutRepository {
     suspend fun getCardioBySession(sessionId: Int): Cardio
     suspend fun deleteCardio(cardioId: Int)
     suspend fun markCardioSessionDone(id: Int, cardio: Cardio)
+    suspend fun getCardioStats(id: Int): CardioStats
     suspend fun getAllWorkouts(): List<Workout>
     suspend fun getAllWorkoutSessions(): List<WorkoutSession>
     suspend fun getWorkoutSessionsBetweenDates(
@@ -341,7 +356,8 @@ class WorkoutRepositoryImpl(
                 ExerciseWithHistory(
                     name = exercise.name,
                     setHistory = gymSessions.map { gymSession ->
-                        val setsForSession = setSessionDao.getSetsForSession(gymSession.id).associateBy { it.setId }
+                        val setsForSession =
+                            setSessionDao.getSetsForSession(gymSession.id).associateBy { it.setId }
                         val setSessionForExercise = setsForExercise.mapNotNull { set ->
                             setsForSession[set.id]
                         }
@@ -476,6 +492,25 @@ class WorkoutRepositoryImpl(
                 distance = cardio.distance,
                 duration = cardio.duration
             )
+        )
+    }
+
+    override suspend fun getCardioStats(id: Int): CardioStats {
+        val workout = workoutDao.getById(id)
+        val cardio = cardioDao.getCardioByWorkoutId(workout.id)
+        val sessions = cardioSessionDao.getAllSessionsForCardio(cardio.id)
+
+        return CardioStats(
+            id = id,
+            name = workout.name,
+            cardioHistory = sessions.map {
+                CardioData(
+                    steps = it.steps,
+                    distance = it.distance,
+                    duration = it.duration,
+                    timestamp = it.timestamp
+                )
+            }
         )
     }
 

@@ -42,6 +42,9 @@ open class Route {
     class SplitStats(val id: Int) : Route()
 
     @Serializable
+    class CardioStats(val id: Int) : Route()
+
+    @Serializable
     class GymSession(val id: Int) : Route()
 
     @Serializable

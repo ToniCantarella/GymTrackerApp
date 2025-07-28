@@ -58,6 +58,7 @@ import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
+import com.example.gymtracker.ui.stats.cardio.CardioStatsScreen
 import com.example.gymtracker.ui.stats.overview.StatsOverviewScreen
 import com.example.gymtracker.ui.stats.sessions.CardioSessionScreen
 import com.example.gymtracker.ui.stats.sessions.GymSessionScreen
@@ -152,7 +153,8 @@ fun GymTrackerApp(
                 }
                 composable<Route.CardioItem> {
                     CardioItemScreen(
-                        onNavigateBack = { navController.popBackStack() }
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToStats = { navController.navigate(Route.CardioStats(it)) }
                     )
                 }
                 composable<Route.CreateCardio> {
@@ -187,6 +189,11 @@ fun GymTrackerApp(
                 }
                 composable<Route.SplitStats> {
                     SplitStatsScreen(
+                        onNavigateBack = navController::popBackStack
+                    )
+                }
+                composable<Route.CardioStats> {
+                    CardioStatsScreen(
                         onNavigateBack = navController::popBackStack
                     )
                 }

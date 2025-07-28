@@ -16,6 +16,7 @@ import java.time.Duration
 data class CardioItemUiState(
     val loading: Boolean = true,
     val previousCardio: Cardio? = null,
+    val cardioId: Int = 0,
     val cardio: Cardio = Cardio.emptyCardio()
 )
 
@@ -33,6 +34,7 @@ class CardioItemViewModel(
             val previousCardio = workoutRepository.getLatestCardio(navParams.id)
             _uiState.update {
                 it.copy(
+                    cardioId = navParams.id,
                     previousCardio = previousCardio,
                     cardio = it.cardio.copy(name = previousCardio.name),
                     loading = false

@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.cardio.common.CardioContent
@@ -26,6 +27,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CardioItemScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToStats: (id: Int) -> Unit,
     viewModel: CardioItemViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -49,6 +51,16 @@ fun CardioItemScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back)
+                )
+            }
+        },
+        actions = {
+            IconButton(
+                onClick = { onNavigateToStats(uiState.cardioId) }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.timeline),
+                    contentDescription = stringResource(R.string.stats)
                 )
             }
         }
