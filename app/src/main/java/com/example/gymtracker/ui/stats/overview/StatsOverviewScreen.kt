@@ -211,34 +211,38 @@ private fun WorkoutListing(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.weight),
-                contentDescription = stringResource(id = R.string.gym)
-            )
-            gymWorkouts.forEach {
-                WorkoutCard(
-                    workout = it,
-                    onClick = { onWorkoutNavigate(it) }
+        if (gymWorkouts.isNotEmpty()){
+            Column(
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.weight),
+                    contentDescription = stringResource(id = R.string.gym)
                 )
+                gymWorkouts.forEach {
+                    WorkoutCard(
+                        workout = it,
+                        onClick = { onWorkoutNavigate(it) }
+                    )
+                }
             }
         }
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.run),
-                contentDescription = stringResource(id = R.string.cardio)
-            )
-            cardioWorkouts.forEach {
-                WorkoutCard(
-                    workout = it,
-                    onClick = { onWorkoutNavigate(it) }
+        if(cardioWorkouts.isNotEmpty()){
+            Column(
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.run),
+                    contentDescription = stringResource(id = R.string.cardio)
                 )
+                cardioWorkouts.forEach {
+                    WorkoutCard(
+                        workout = it,
+                        onClick = { onWorkoutNavigate(it) }
+                    )
+                }
             }
         }
     }
