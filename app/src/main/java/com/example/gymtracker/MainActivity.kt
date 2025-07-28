@@ -174,6 +174,13 @@ fun GymTrackerApp(
                             } else {
                                 navController.navigate(Route.CardioSession(it.id))
                             }
+                        },
+                        onWorkoutNavigate = {
+                            if (it.type == WorkoutType.GYM) {
+                                navController.navigate(Route.SplitStats(it.id))
+                            } else {
+                                navController.navigate(Route.CardioStats(it.id))
+                            }
                         }
                     )
                 }

@@ -32,6 +32,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -96,6 +97,7 @@ import kotlin.time.ExperimentalTime
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
     onSessionNavigate: (session: WorkoutSession) -> Unit,
+    onWorkoutNavigate: (workout: Workout) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -124,7 +126,8 @@ fun StatsOverviewScreen(
         workoutSessions = uiState.allWorkoutSessions,
         workoutSessionsBetweenDates = uiState.workoutSessionsBetweenDates,
         getMonthData = viewModel::getMonthData,
-        onSessionClick = onSessionNavigate
+        onSessionClick = onSessionNavigate,
+        onWorkoutNavigate = onWorkoutNavigate
     )
 }
 
@@ -135,7 +138,8 @@ private fun StatsOverviewScreen(
     workoutSessions: List<WorkoutSession>,
     workoutSessionsBetweenDates: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
-    onSessionClick: (session: WorkoutSession) -> Unit
+    onSessionClick: (session: WorkoutSession) -> Unit,
+    onWorkoutNavigate: (workout: Workout) -> Unit
 ) {
     if (loading) {
         Box(
@@ -183,6 +187,88 @@ private fun StatsOverviewScreen(
                     )
                 }
             }
+            if (workouts.isNotEmpty()) {
+                item {
+                    WorkoutListing(
+                        workouts = workouts,
+                        onWorkoutNavigate = onWorkoutNavigate
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkoutListing(
+    workouts: List<Workout>,
+    onWorkoutNavigate: (workout: Workout) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val (gymWorkouts, cardioWorkouts) = workouts.partition { it.type == WorkoutType.GYM }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.weight),
+                contentDescription = stringResource(id = R.string.gym)
+            )
+            gymWorkouts.forEach {
+                WorkoutCard(
+                    workout = it,
+                    onClick = { onWorkoutNavigate(it) }
+                )
+            }
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.run),
+                contentDescription = stringResource(id = R.string.cardio)
+            )
+            cardioWorkouts.forEach {
+                WorkoutCard(
+                    workout = it,
+                    onClick = { onWorkoutNavigate(it) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkoutCard(
+    workout: Workout,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+            modifier = Modifier
+                .padding(dimensionResource(id = R.dimen.padding_medium))
+                .fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.timeline),
+                contentDescription = stringResource(id = R.string.stats)
+            )
+            Text(
+                text = workout.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -735,7 +821,8 @@ private fun StatsScreenForPreview() {
         workoutSessionsBetweenDates = workoutsBetweenDates,
         workoutSessions = workoutsAllTime,
         getMonthData = { _, _ -> },
-        onSessionClick = {}
+        onSessionClick = {},
+        onWorkoutNavigate = {}
     )
 }
 
