@@ -17,6 +17,7 @@ import java.util.UUID
 
 data class SplitUiState(
     val loading: Boolean = false,
+    val splitId: Int = 0,
     val splitName: String = "",
     val latestTimestamp: Instant? = null,
     val exercises: List<Exercise> = emptyList()
@@ -37,6 +38,7 @@ class SplitViewModel(
             val latestSplit = workoutRepository.getLatestSplitWithExercises(navParams.id)
             _uiState.update {
                 it.copy(
+                    splitId = navParams.id,
                     splitName = latestSplit?.name ?: "",
                     latestTimestamp = latestSplit?.timestamp,
                     exercises = latestSplit?.exercises ?: emptyList(),

@@ -61,6 +61,7 @@ import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.stats.overview.StatsOverviewScreen
 import com.example.gymtracker.ui.stats.sessions.CardioSessionScreen
 import com.example.gymtracker.ui.stats.sessions.GymSessionScreen
+import com.example.gymtracker.ui.stats.split.SplitStatsScreen
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
 import com.example.gymtracker.ui.workouts.createsplit.CreateSplitScreen
@@ -131,7 +132,8 @@ fun GymTrackerApp(
                 }
                 composable<Route.Split> {
                     SplitScreen(
-                        onNavigateBack = { navController.popBackStack() }
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToStats = { navController.navigate(Route.SplitStats(it)) }
                     )
                 }
                 composable<Route.CreateSplit> {
@@ -180,6 +182,11 @@ fun GymTrackerApp(
                 }
                 composable<Route.CardioSession> {
                     CardioSessionScreen(
+                        onNavigateBack = navController::popBackStack
+                    )
+                }
+                composable<Route.SplitStats> {
+                    SplitStatsScreen(
                         onNavigateBack = navController::popBackStack
                     )
                 }

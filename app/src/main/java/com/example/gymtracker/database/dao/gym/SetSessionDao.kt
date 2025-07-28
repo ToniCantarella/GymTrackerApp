@@ -12,4 +12,7 @@ interface SetSessionDao {
 
     @Query("SELECT * FROM set_sessions WHERE sessionId = :sessionId")
     suspend fun getSetsForSession(sessionId: Int): List<SetSessionEntity>
+
+    @Query("SELECT * FROM set_sessions WHERE setId = :setId")
+    suspend fun getAllSessionsForSet(setId: Int): List<SetSessionEntity>
 }

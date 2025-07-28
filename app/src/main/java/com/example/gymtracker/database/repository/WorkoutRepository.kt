@@ -47,6 +47,23 @@ data class WorkoutSession(
     val timestamp: Instant,
 )
 
+data class SetData(
+    val min: Double,
+    val max: Double,
+    val timestamp: Instant
+)
+
+data class ExerciseWithHistory(
+    val name: String,
+    val setHistory: List<SetData>
+)
+
+data class SplitStats(
+    val id: Int,
+    val name: String,
+    val exercises: List<ExerciseWithHistory>
+)
+
 interface WorkoutRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
     suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem>
@@ -58,6 +75,8 @@ interface WorkoutRepository {
         splitName: String,
         exercises: List<Exercise>
     )
+
+    suspend fun getSplitStats(id: Int): SplitStats
 
     suspend fun addCardio(name: String)
     suspend fun getCardioListWithLatestTimestamp(): List<WorkoutListItem>
@@ -175,7 +194,8 @@ class WorkoutRepositoryImpl(
             timestamp = gymSession.timestamp,
             exercises = exercises.map { exercise ->
                 val sets = setDao.getSetsForExercise(exercise.id)
-                val setSessionsForExercise = setSession.filter { sets.any { set -> it.setId == set.id }}
+                val setSessionsForExercise =
+                    setSession.filter { sets.any { set -> it.setId == set.id } }
 
                 Exercise(
                     uuid = exercise.uuid,
@@ -305,6 +325,38 @@ class WorkoutRepositoryImpl(
                 }
             }
         }
+    }
+
+    override suspend fun getSplitStats(id: Int): SplitStats {
+        val workout = workoutDao.getById(id)
+        val exercises = exerciseDao.getExercisesByWorkoutId(workout.id)
+        val gymSessions = gymSessionDao.getByWorkoutId(workout.id)
+
+        return SplitStats(
+            id = id,
+            name = workout.name,
+            exercises = exercises.map { exercise ->
+                val setsForExercise = setDao.getSetsForExercise(exercise.id)
+
+                ExerciseWithHistory(
+                    name = exercise.name,
+                    setHistory = gymSessions.map { gymSession ->
+                        val setsForSession = setSessionDao.getSetsForSession(gymSession.id).associateBy { it.setId }
+                        val setSessionForExercise = setsForExercise.mapNotNull { set ->
+                            setsForSession[set.id]
+                        }
+                        val min = setSessionForExercise.minByOrNull { it.weight }?.weight ?: 0.0
+                        val max = setSessionForExercise.maxByOrNull { it.weight }?.weight ?: 0.0
+
+                        SetData(
+                            min = min,
+                            max = max,
+                            timestamp = gymSession.timestamp
+                        )
+                    }
+                )
+            }
+        )
     }
 
     override suspend fun addCardio(name: String) {

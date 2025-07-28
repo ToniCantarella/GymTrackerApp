@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
@@ -38,6 +39,7 @@ import java.util.UUID
 @Composable
 fun SplitScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToStats: (id: Int) -> Unit,
     viewModel: SplitViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -57,6 +59,16 @@ fun SplitScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back)
+                )
+            }
+        },
+        actions = {
+            IconButton(
+                onClick = { onNavigateToStats(uiState.splitId) }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.timeline),
+                    contentDescription = stringResource(R.string.stats)
                 )
             }
         }
