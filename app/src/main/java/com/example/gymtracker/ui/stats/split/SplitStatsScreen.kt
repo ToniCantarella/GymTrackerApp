@@ -151,11 +151,13 @@ private fun LineChartCard(
                 labelProperties = LabelProperties(
                     enabled = true,
                     textStyle = MaterialTheme.typography.labelSmall,
-                    labels = listOf(
-                        exercise.setHistory.first().timestamp.toDateString(),
-                        "-",
-                        exercise.setHistory.last().timestamp.toDateString()
-                    ),
+                    labels = if (exercise.setHistory.isNotEmpty()) {
+                        listOf(
+                            exercise.setHistory.first().timestamp.toDateString(),
+                            "-",
+                            exercise.setHistory.last().timestamp.toDateString()
+                        )
+                    } else emptyList(),
                     builder = { modifier, label, shouldRotate, index ->
                         Text(
                             text = label,

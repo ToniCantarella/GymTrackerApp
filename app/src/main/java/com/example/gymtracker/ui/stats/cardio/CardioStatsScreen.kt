@@ -116,11 +116,13 @@ private fun CardioStatsScreen(
                     }
                 },
                 values = stepValues,
-                dateLabels = listOf(
-                    stepHistory.first().timestamp?.toDateString() ?: "",
-                    "-",
-                    stepHistory.last().timestamp?.toDateString() ?: "",
-                )
+                dateLabels = if (stepHistory.isNotEmpty()) {
+                    listOf(
+                        stepHistory.first().timestamp?.toDateString() ?: "",
+                        "-",
+                        stepHistory.last().timestamp?.toDateString() ?: "",
+                    )
+                } else emptyList()
             )
         }
         item {
@@ -138,16 +140,22 @@ private fun CardioStatsScreen(
                             contentDescription = stringResource(id = R.string.distance)
                         )
                         Text(
-                            text = "${stringResource(id = R.string.distance)} (${stringResource(UnitUtil.distanceUnitStringId)})"
+                            text = "${stringResource(id = R.string.distance)} (${
+                                stringResource(
+                                    UnitUtil.distanceUnitStringId
+                                )
+                            })"
                         )
                     }
                 },
                 values = distanceValues,
-                dateLabels = listOf(
-                    distanceHistory.first().timestamp?.toDateString() ?: "",
-                    "-",
-                    distanceHistory.last().timestamp?.toDateString() ?: "",
-                )
+                dateLabels = if (distanceHistory.isNotEmpty()) {
+                    listOf(
+                        distanceHistory.first().timestamp?.toDateString() ?: "",
+                        "-",
+                        distanceHistory.last().timestamp?.toDateString() ?: "",
+                    )
+                } else emptyList()
             )
         }
         item {
@@ -157,8 +165,8 @@ private fun CardioStatsScreen(
             val maxMillis = rawDurations.maxOfOrNull { it.toMillis() } ?: 0L
             val (divider, unitLabel) = when {
                 maxMillis >= 3_600_000 -> 3_600_000.0 to "h"
-                maxMillis >= 60_000    -> 60_000.0 to "min"
-                else                   -> 1_000.0 to "s"
+                maxMillis >= 60_000 -> 60_000.0 to "min"
+                else -> 1_000.0 to "s"
             }
 
             val durationValues = rawDurations.map { it.toMillis() / divider }
@@ -179,11 +187,13 @@ private fun CardioStatsScreen(
                     }
                 },
                 values = durationValues,
-                dateLabels = listOf(
-                    durationHistory.first().timestamp?.toDateString() ?: "",
-                    "-",
-                    durationHistory.last().timestamp?.toDateString() ?: "",
-                )
+                dateLabels = if (durationHistory.isNotEmpty()) {
+                    listOf(
+                        durationHistory.first().timestamp?.toDateString() ?: "",
+                        "-",
+                        durationHistory.last().timestamp?.toDateString() ?: "",
+                    )
+                } else emptyList()
             )
         }
     }

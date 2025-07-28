@@ -410,9 +410,9 @@ class WorkoutRepositoryImpl(
         val cardio = cardioDao.getCardioByWorkoutId(workout.id)
         val sessions = cardioSessionDao.getAllSessionsForCardio(cardio.id)
 
-        val stepSession = sessions.firstOrNull { it.steps != null }
-        val distanceSession = sessions.firstOrNull { it.distance != null }
-        val durationSession = sessions.firstOrNull { it.duration != null }
+        val stepSession = sessions.firstOrNull { it?.steps != null }
+        val distanceSession = sessions.firstOrNull { it?.distance != null }
+        val durationSession = sessions.firstOrNull { it?.duration != null }
         val lastSession = sessions.firstOrNull()
 
         return Cardio(
@@ -505,10 +505,10 @@ class WorkoutRepositoryImpl(
             name = workout.name,
             cardioHistory = sessions.map {
                 CardioData(
-                    steps = it.steps,
-                    distance = it.distance,
-                    duration = it.duration,
-                    timestamp = it.timestamp
+                    steps = it?.steps,
+                    distance = it?.distance,
+                    duration = it?.duration,
+                    timestamp = it?.timestamp
                 )
             }
         )
