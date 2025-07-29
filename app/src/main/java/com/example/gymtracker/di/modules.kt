@@ -59,7 +59,6 @@ val databaseModule = module {
 
     single<WorkoutRepository> {
         WorkoutRepositoryImpl(
-            db = get(),
             workoutDao = get(),
             gymSessionDao = get(),
             cardioDao = get(),
@@ -84,6 +83,7 @@ val databaseModule = module {
     }
     single<StatRepository> {
         StatRepositoryImpl(
+            db = get(),
             workoutDao = get(),
             exerciseDao = get(),
             setDao = get(),

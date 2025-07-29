@@ -1,5 +1,6 @@
 package com.example.gymtracker.database.repository
 
+import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.dao.WorkoutDao
 import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
@@ -7,6 +8,9 @@ import com.example.gymtracker.database.dao.gym.ExerciseDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 
@@ -43,9 +47,11 @@ data class CardioStats(
 interface StatRepository {
     suspend fun getSplitStats(id: Int): SplitStats
     suspend fun getCardioStats(id: Int): CardioStats
+    suspend fun deleteAllData()
 }
 
 class StatRepositoryImpl(
+    private val db: GymDatabase,
     private val workoutDao: WorkoutDao,
     private val gymSessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
@@ -105,5 +111,11 @@ class StatRepositoryImpl(
                 )
             }
         )
+    }
+
+    override suspend fun deleteAllData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            db.clearAllTables()
+        }
     }
 }
