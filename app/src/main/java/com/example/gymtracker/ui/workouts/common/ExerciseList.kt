@@ -93,7 +93,7 @@ fun ExerciseList(
                             name = exercise.name.ifBlank { placeholderName }
                         )
                     },
-                    deleteEnabled = index >0,
+                    deleteEnabled = exercises.size > 1,
                     addSet = { onAddSet(exercise.uuid) },
                     onChangeWeight = { setId, weight ->
                         onChangeWeight(
