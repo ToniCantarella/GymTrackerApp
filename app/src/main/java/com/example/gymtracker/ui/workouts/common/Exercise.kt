@@ -42,6 +42,7 @@ fun Exercise(
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
     onDeletePressed: () -> Unit,
+    deleteEnabled: Boolean = true,
     addSet: () -> Unit,
     onChangeWeight: (setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
@@ -134,7 +135,7 @@ fun Exercise(
                                 )
                             }
                         }
-                        if (editingExercise) {
+                        if (editingExercise && deleteEnabled) {
                             IconButton(
                                 onClick = onDeletePressed
                             ) {
