@@ -2,8 +2,8 @@ package com.example.gymtracker.ui.cardio.cardiolist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.WorkoutRepository
-import com.example.gymtracker.ui.common.WorkoutListItem
+import com.example.gymtracker.database.repository.CardioRepository
+import com.example.gymtracker.database.repository.WorkoutListItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,14 +17,14 @@ data class CardioListUiState(
 )
 
 class CardioListViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val cardioRepository: CardioRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CardioListUiState())
     val uiState = _uiState.asStateFlow()
 
     fun getCardioList() {
         viewModelScope.launch {
-            val cardioList = workoutRepository.getCardioListWithLatestTimestamp()
+            val cardioList = cardioRepository.getCardioListWithLatestTimestamp()
             _uiState.update {
                 it.copy(
                     cardioList = cardioList,
@@ -67,7 +67,7 @@ class CardioListViewModel(
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-                workoutRepository.deleteCardio(it)
+                cardioRepository.deleteCardio(it)
             }
             stopSelectingItems()
             getCardioList()

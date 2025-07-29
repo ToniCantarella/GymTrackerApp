@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.database.repository.CardioRepository
 import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ data class CardioItemUiState(
 
 class CardioItemViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository
+    private val cardioRepository: CardioRepository
 ) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.CardioItem>()
 
@@ -31,7 +31,7 @@ class CardioItemViewModel(
 
     fun getCardio() {
         viewModelScope.launch {
-            val previousCardio = workoutRepository.getLatestCardio(navParams.id)
+            val previousCardio = cardioRepository.getLatestCardio(navParams.id)
             _uiState.update {
                 it.copy(
                     cardioId = navParams.id,
@@ -78,7 +78,7 @@ class CardioItemViewModel(
     fun onFinishPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
             val cardio = uiState.value.cardio
-            workoutRepository.markCardioSessionDone(
+            cardioRepository.markCardioSessionDone(
                 navParams.id,
                 cardio.copy(
                     steps = if (cardio.steps == 0) null else cardio.steps,

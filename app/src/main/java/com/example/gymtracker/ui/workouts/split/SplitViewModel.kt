@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.database.repository.GymRepository
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.utility.SplitUtil
@@ -25,7 +25,7 @@ data class SplitUiState(
 
 class SplitViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository
+    private val gymRepository: GymRepository
 ) : ViewModel() {
     private val splitUtil = SplitUtil()
     private val navParams = savedStateHandle.toRoute<Route.Split>()
@@ -35,7 +35,7 @@ class SplitViewModel(
 
     init {
         viewModelScope.launch {
-            val latestSplit = workoutRepository.getLatestSplitWithExercises(navParams.id)
+            val latestSplit = gymRepository.getLatestSplitWithExercises(navParams.id)
             _uiState.update {
                 it.copy(
                     splitId = navParams.id,
@@ -135,7 +135,7 @@ class SplitViewModel(
 
     fun onFinishWorkoutPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
-            workoutRepository.markSplitSessionDone(
+            gymRepository.markSplitSessionDone(
                 splitId = navParams.id,
                 splitName = uiState.value.splitName,
                 exercises = uiState.value.exercises

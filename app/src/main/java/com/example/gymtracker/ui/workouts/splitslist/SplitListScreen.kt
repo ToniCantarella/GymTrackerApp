@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
+import com.example.gymtracker.database.repository.WorkoutListItem
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.common.WorkoutListItem

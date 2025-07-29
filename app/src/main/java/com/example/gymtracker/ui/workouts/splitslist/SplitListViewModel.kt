@@ -2,8 +2,8 @@ package com.example.gymtracker.ui.workouts.splitslist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.WorkoutRepository
-import com.example.gymtracker.ui.common.WorkoutListItem
+import com.example.gymtracker.database.repository.GymRepository
+import com.example.gymtracker.database.repository.WorkoutListItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,14 +17,14 @@ data class SplitListUiState(
 )
 
 class SplitListViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val gymRepository: GymRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SplitListUiState())
     val uiState = _uiState.asStateFlow()
 
     fun getSplits() {
         viewModelScope.launch {
-            val splits = workoutRepository.getSplitsWithLatestTimestamp()
+            val splits = gymRepository.getSplitsWithLatestTimestamp()
             _uiState.update {
                 it.copy(
                     splits = splits,
@@ -67,7 +67,7 @@ class SplitListViewModel(
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-                workoutRepository.deleteSplit(it)
+                gymRepository.deleteSplit(it)
             }
             stopSelectingItems()
             getSplits()

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.gymtracker.database.repository.CardioStats
-import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.database.repository.StatRepository
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +19,8 @@ data class CardioStatsUiState(
 
 class CardioStatsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val workoutRepository: WorkoutRepository
-): ViewModel() {
+    private val statRepository: StatRepository
+) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.CardioStats>()
 
     private val _uiState = MutableStateFlow(CardioStatsUiState())
@@ -28,7 +28,7 @@ class CardioStatsViewModel(
 
     init {
         viewModelScope.launch {
-            val stats = workoutRepository.getCardioStats(navParams.id)
+            val stats = statRepository.getCardioStats(navParams.id)
             _uiState.update {
                 it.copy(
                     stats = stats,

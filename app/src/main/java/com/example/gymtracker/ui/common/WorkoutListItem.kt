@@ -17,14 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
+import com.example.gymtracker.database.repository.WorkoutListItem
 import com.example.gymtracker.utility.toDateAndTimeString
-import java.time.Instant
-
-data class WorkoutListItem(
-    val id: Int,
-    val name: String,
-    val latestTimestamp: Instant?
-)
 
 @Composable
 fun WorkoutListItem(

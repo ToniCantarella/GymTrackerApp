@@ -2,7 +2,7 @@ package com.example.gymtracker.ui.workouts.createsplit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.WorkoutRepository
+import com.example.gymtracker.database.repository.GymRepository
 import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.utility.SplitUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ data class CreateSplitUiState(
 )
 
 class CreateSplitViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val gymRepository: GymRepository
 ) : ViewModel() {
     private val splitUtil = SplitUtil()
     private val _uiState = MutableStateFlow(CreateSplitUiState())
@@ -102,7 +102,7 @@ class CreateSplitViewModel(
 
     fun onCreateSplitPressed(onCreateDone: () -> Unit) {
         viewModelScope.launch {
-            workoutRepository.addSplitWithExercises(
+            gymRepository.addSplitWithExercises(
                 splitName = uiState.value.splitName,
                 exercises = uiState.value.exercises
             )

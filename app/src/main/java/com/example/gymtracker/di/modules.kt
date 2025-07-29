@@ -6,6 +6,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
+import com.example.gymtracker.database.repository.CardioRepository
+import com.example.gymtracker.database.repository.CardioRepositoryImpl
+import com.example.gymtracker.database.repository.GymRepository
+import com.example.gymtracker.database.repository.GymRepositoryImpl
+import com.example.gymtracker.database.repository.StatRepository
+import com.example.gymtracker.database.repository.StatRepositoryImpl
 import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.database.repository.WorkoutRepositoryImpl
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
@@ -54,6 +60,30 @@ val databaseModule = module {
     single<WorkoutRepository> {
         WorkoutRepositoryImpl(
             db = get(),
+            workoutDao = get(),
+            gymSessionDao = get(),
+            cardioDao = get(),
+            cardioSessionDao = get()
+        )
+    }
+    single<GymRepository> {
+        GymRepositoryImpl(
+            workoutDao = get(),
+            exerciseDao = get(),
+            setDao = get(),
+            setSessionDao = get(),
+            gymSessionDao = get()
+        )
+    }
+    single<CardioRepository> {
+        CardioRepositoryImpl(
+            workoutDao = get(),
+            cardioDao = get(),
+            cardioSessionDao = get()
+        )
+    }
+    single<StatRepository> {
+        StatRepositoryImpl(
             workoutDao = get(),
             exerciseDao = get(),
             setDao = get(),
