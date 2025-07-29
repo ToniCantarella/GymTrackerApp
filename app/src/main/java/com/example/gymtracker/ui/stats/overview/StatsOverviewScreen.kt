@@ -492,7 +492,7 @@ private fun CalendarCard(
                                     painterResource(id = R.drawable.weight)
                                 else
                                     painterResource(id = R.drawable.run),
-                                contentDescription = null
+                                contentDescription = stringResource(id = R.string.icon)
                             )
                             Column(
                                 modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
@@ -645,7 +645,7 @@ private fun WorkoutIcon(
     Icon(
         painter = painter,
         tint = tint ?: MaterialTheme.colorScheme.onSurface,
-        contentDescription = null,
+        contentDescription = stringResource(id = R.string.icon),
         modifier = Modifier.size(16.dp)
     )
 }
@@ -742,7 +742,7 @@ private fun PieChartCard(
                             painter = if (workouts.first().type == WorkoutType.GYM) painterResource(
                                 id = R.drawable.weight
                             ) else painterResource(id = R.drawable.run),
-                            contentDescription = null
+                            contentDescription = stringResource(id = R.string.icon)
                         )
                         Text(
                             text = stringResource(id = R.string.all_time)

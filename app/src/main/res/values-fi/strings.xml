@@ -47,4 +47,10 @@
     <string name="delete_all_data">Poista kaikki tiedot</string>
     <string name="delete_all_data_confirmation_subtitle">Oletko varma, että tahdot poistaa kaiken? Tätä toimintoa ei voi kumota.</string>
     <string name="today">Tänään</string>
+    <string name="more">Lisää</string>
+    <string name="play">Aloita</string>
+    <string name="pause">Pysäytä</string>
+    <string name="stop">Lopeta</string>
+    <string name="icon">Ikoni</string>
+    <string name="edit">Muokkaa</string>
 </resources>

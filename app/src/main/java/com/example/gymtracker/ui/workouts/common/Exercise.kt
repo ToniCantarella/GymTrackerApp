@@ -130,7 +130,7 @@ fun Exercise(
                                     painter =
                                         if (editingExercise) painterResource(id = R.drawable.edit_off)
                                         else painterResource(id = R.drawable.edit),
-                                    contentDescription = null
+                                    contentDescription = stringResource(id = R.string.edit)
                                 )
                             }
                         }
@@ -175,7 +175,7 @@ fun Exercise(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = null
+                            contentDescription = stringResource(id = R.string.add)
                         )
                         Text(
                             text = stringResource(id = R.string.set)

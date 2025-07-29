@@ -242,7 +242,7 @@ private fun StopWatch(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.timer_pause),
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.pause),
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -255,7 +255,7 @@ private fun StopWatch(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.timer_play),
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.play),
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -270,7 +270,7 @@ private fun StopWatch(
                 Icon(
                     painter = painterResource(id = R.drawable.stop_circle),
                     tint = MaterialTheme.colorScheme.error,
-                    contentDescription = null,
+                    contentDescription = stringResource(id = R.string.stop),
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -323,7 +323,7 @@ private fun LastTimeRow(
             valueText()
             Icon(
                 painter = painterResource(id = R.drawable.history),
-                contentDescription = null
+                contentDescription = stringResource(id = R.string.last_time)
             )
             dateText()
         }

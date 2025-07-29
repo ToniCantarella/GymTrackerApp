@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 
@@ -30,7 +31,7 @@ fun EmptyListCard(
         ) {
             Icon(
                 painter = iconPainter,
-                contentDescription = null,
+                contentDescription = stringResource(id = R.string.icon),
                 modifier = Modifier.size(80.dp)
             )
             subtitle()

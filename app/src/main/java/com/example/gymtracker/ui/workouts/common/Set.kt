@@ -86,7 +86,7 @@ fun Set(
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = null
+                    contentDescription = stringResource(id = R.string.more)
                 )
             }
             DropdownMenu(
