@@ -40,7 +40,7 @@ abstract class GymDatabase : RoomDatabase() {
     abstract fun exerciseDao(): ExerciseDao
     abstract fun setDao(): SetDao
     abstract fun setSessionDao(): SetSessionDao
-    abstract fun splitSessionDao(): GymSessionDao
+    abstract fun gymSessionDao(): GymSessionDao
     abstract fun cardioDao(): CardioDao
     abstract fun cardioSessionDao(): CardioSessionDao
 }
