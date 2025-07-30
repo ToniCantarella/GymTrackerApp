@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,9 @@ fun CardioListScreen(
     viewModel: CardioListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val selectedItemsCount by remember (uiState.cardioList){
+        derivedStateOf { uiState.cardioList.count {it.selected} }
+    }
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -63,7 +67,7 @@ fun CardioListScreen(
                 }
                 IconButton(
                     onClick = { deletionDialogOpen = true },
-                    enabled = uiState.selectedItems.isNotEmpty()
+                    enabled = selectedItemsCount > 0
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -101,7 +105,7 @@ fun CardioListScreen(
                 Text(
                     text = stringResource(
                         id = R.string.delete_are_you_sure,
-                        uiState.selectedItems.size
+                        selectedItemsCount
                     ),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
@@ -139,7 +143,6 @@ fun CardioListScreen(
         loading = uiState.loading,
         cardioList = uiState.cardioList,
         selectingItems = uiState.selectingItems,
-        selectedItems = uiState.selectedItems,
         onSelect = viewModel::onSelectItem,
         onCardioClick = onNavigateToCardioItem,
         onCardioHold = viewModel::startSelectingItems
@@ -151,8 +154,7 @@ private fun CardioListScreen(
     loading: Boolean,
     cardioList: List<WorkoutListItem>,
     selectingItems: Boolean,
-    selectedItems: List<Int>,
-    onSelect: (id: Int) -> Unit,
+    onSelect: (id: Int, selected: Boolean) -> Unit,
     onCardioHold: (id: Int) -> Unit,
     onCardioClick: (id: Int) -> Unit
 ) {
@@ -180,8 +182,8 @@ private fun CardioListScreen(
                     WorkoutListItem(
                         workout = cardio,
                         selectingItems = selectingItems,
-                        selected = selectedItems.contains(cardio.id),
-                        onSelect = onSelect,
+                        selected = cardio.selected,
+                        onSelect = { onSelect(cardio.id, it) },
                         onHold = { onCardioHold(cardio.id) },
                         onClick = { onCardioClick(cardio.id) }
                     )

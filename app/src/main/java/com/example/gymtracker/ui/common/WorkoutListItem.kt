@@ -25,7 +25,7 @@ fun WorkoutListItem(
     workout: WorkoutListItem,
     selectingItems: Boolean,
     selected: Boolean,
-    onSelect: (id: Int) -> Unit,
+    onSelect: (selected: Boolean) -> Unit,
     onHold: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -60,9 +60,7 @@ fun WorkoutListItem(
             if (selectingItems) {
                 Checkbox(
                     checked = selected,
-                    onCheckedChange = {
-                        onSelect(workout.id)
-                    }
+                    onCheckedChange = onSelect
                 )
             }
         }

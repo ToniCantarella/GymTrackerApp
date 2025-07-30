@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,9 @@ fun SplitListScreen(
     viewModel: SplitListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val selectedItemsCount by remember (uiState.splits){
+        derivedStateOf { uiState.splits.count {it.selected} }
+    }
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -67,7 +71,7 @@ fun SplitListScreen(
                 }
                 IconButton(
                     onClick = { deletionDialogOpen = true },
-                    enabled = uiState.selectedItems.isNotEmpty()
+                    enabled = selectedItemsCount > 0
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -105,7 +109,7 @@ fun SplitListScreen(
                 Text(
                     text = stringResource(
                         id = R.string.delete_are_you_sure,
-                        uiState.selectedItems.size
+                        selectedItemsCount
                     ),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
@@ -143,7 +147,6 @@ fun SplitListScreen(
         loading = uiState.loading,
         splits = uiState.splits,
         selectingItems = uiState.selectingItems,
-        selectedItems = uiState.selectedItems,
         onSelect = viewModel::onSelectItem,
         onSplitClick = onNavigateToSplit,
         onSplitHold = viewModel::startSelectingItems
@@ -155,8 +158,7 @@ fun SplitListScreen(
     loading: Boolean,
     splits: List<WorkoutListItem>,
     selectingItems: Boolean,
-    selectedItems: List<Int>,
-    onSelect: (id: Int) -> Unit,
+    onSelect: (id: Int, selected: Boolean) -> Unit,
     onSplitHold: (id: Int) -> Unit,
     onSplitClick: (id: Int) -> Unit
 ) {
@@ -185,8 +187,8 @@ fun SplitListScreen(
                     WorkoutListItem(
                         workout = split,
                         selectingItems = selectingItems,
-                        selected = selectedItems.contains(split.id),
-                        onSelect = onSelect,
+                        selected = split.selected,
+                        onSelect = { onSelect(split.id, it) },
                         onHold = { onSplitHold(split.id) },
                         onClick = { onSplitClick(split.id) }
                     )
@@ -211,8 +213,7 @@ private fun SplitsPreview() {
             ),
             selectingItems = false,
             onSplitClick = {},
-            onSelect = {},
-            selectedItems = emptyList(),
+            onSelect = {_ ,_ -> },
             onSplitHold = {}
         )
     }
@@ -226,8 +227,7 @@ private fun EmptySplitsPreview() {
             loading = false,
             splits = emptyList(),
             selectingItems = false,
-            onSelect = {},
-            selectedItems = emptyList(),
+            onSelect = {_ ,_ -> },
             onSplitClick = {},
             onSplitHold = {}
         )

@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 data class SplitListUiState(
     val loading: Boolean = true,
     val splits: List<WorkoutListItem> = emptyList(),
-    val selectingItems: Boolean = false,
-    val selectedItems: List<Int> = emptyList()
+    val selectingItems: Boolean = false
 )
 
 class SplitListViewModel(
@@ -38,7 +37,13 @@ class SplitListViewModel(
         _uiState.update {
             it.copy(
                 selectingItems = true,
-                selectedItems = if (id != null) listOf(id) else emptyList()
+                splits = it.splits.map { split ->
+                    if (split.id == id) {
+                        split.copy(
+                            selected = true
+                        )
+                    } else split
+                }
             )
         }
     }
@@ -47,27 +52,35 @@ class SplitListViewModel(
         _uiState.update {
             it.copy(
                 selectingItems = false,
-                selectedItems = emptyList()
+                splits = it.splits.map { split ->
+                    split.copy(
+                        selected = false
+                    )
+                }
             )
         }
     }
 
-    fun onSelectItem(id: Int) {
+    fun onSelectItem(id: Int, selected: Boolean) {
         _uiState.update {
             it.copy(
-                selectedItems =
-                    if (it.selectedItems.contains(id)) it.selectedItems.filter { item -> id != item }
-                    else it.selectedItems + listOf(id)
+                splits = it.splits.map { split ->
+                    if (split.id == id) {
+                        split.copy(
+                            selected = selected
+                        )
+                    } else split
+                }
             )
         }
     }
 
     fun onDeleteSplits(onDeletionDone: () -> Unit) {
-        val itemsToDelete = uiState.value.selectedItems
+        val itemsToDelete = uiState.value.splits.filter { it.selected }
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-                gymRepository.deleteSplit(it)
+                gymRepository.deleteSplit(it.id)
             }
             stopSelectingItems()
             getSplits()

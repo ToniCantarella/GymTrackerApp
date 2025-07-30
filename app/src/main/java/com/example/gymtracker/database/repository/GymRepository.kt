@@ -28,7 +28,8 @@ data class SplitWithExercises(
 data class WorkoutListItem(
     val id: Int,
     val name: String,
-    val latestTimestamp: Instant?
+    val latestTimestamp: Instant?,
+    val selected: Boolean = false
 )
 
 interface GymRepository {

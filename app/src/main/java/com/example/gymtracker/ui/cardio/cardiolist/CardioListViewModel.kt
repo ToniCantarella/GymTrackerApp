@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 data class CardioListUiState(
     val loading: Boolean = true,
     val cardioList: List<WorkoutListItem> = emptyList(),
-    val selectingItems: Boolean = false,
-    val selectedItems: List<Int> = emptyList()
+    val selectingItems: Boolean = false
 )
 
 class CardioListViewModel(
@@ -38,7 +37,13 @@ class CardioListViewModel(
         _uiState.update {
             it.copy(
                 selectingItems = true,
-                selectedItems = if (id != null) listOf(id) else emptyList()
+                cardioList = it.cardioList.map { cardio ->
+                    if (cardio.id == id) {
+                        cardio.copy(
+                            selected = true
+                        )
+                    } else cardio
+                }
             )
         }
     }
@@ -47,27 +52,35 @@ class CardioListViewModel(
         _uiState.update {
             it.copy(
                 selectingItems = false,
-                selectedItems = emptyList()
+                cardioList = it.cardioList.map { cardio ->
+                    cardio.copy(
+                        selected = false
+                    )
+                }
             )
         }
     }
 
-    fun onSelectItem(id: Int) {
+    fun onSelectItem(id: Int, selected: Boolean) {
         _uiState.update {
             it.copy(
-                selectedItems =
-                    if (it.selectedItems.contains(id)) it.selectedItems.filter { item -> id != item }
-                    else it.selectedItems + listOf(id)
+                cardioList = it.cardioList.map { cardio ->
+                    if (cardio.id == id) {
+                        cardio.copy(
+                            selected = selected
+                        )
+                    } else cardio
+                }
             )
         }
     }
 
     fun onDeleteCardioList(onDeletionDone: () -> Unit) {
-        val itemsToDelete = uiState.value.selectedItems
+        val itemsToDelete = uiState.value.cardioList.filter { it.selected }
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-                cardioRepository.deleteCardio(it)
+                cardioRepository.deleteCardio(it.id)
             }
             stopSelectingItems()
             getCardioList()
