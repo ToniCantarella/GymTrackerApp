@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
 fun GymTrackerApp(
     viewModel: MainViewModel
 ) {
-    val appUiState by viewModel.uiState.collectAsState()
+    val mainUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
     val navigationAnimationMoveInt = 1500
 
@@ -112,7 +112,7 @@ fun GymTrackerApp(
             popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
             popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
             navController = navController,
-            startDestination = appUiState.initialRoute,
+            startDestination = mainUiState.initialRoute,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<Route.Welcome> {
