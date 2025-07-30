@@ -78,8 +78,7 @@ fun GymSessionScreen(
                 )
             }
             ExerciseList(
-                exercises = split.exercises,
-                viewOnly = true
+                exercises = split.exercises
             )
         }
     }

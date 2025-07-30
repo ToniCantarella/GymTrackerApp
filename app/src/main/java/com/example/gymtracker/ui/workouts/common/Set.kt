@@ -3,8 +3,10 @@ package com.example.gymtracker.ui.workouts.common
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
@@ -31,14 +33,41 @@ import com.example.gymtracker.utility.UnitUtil
 @Composable
 fun Set(
     set: WorkoutSet,
+    setName: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = dimensionResource(id = R.dimen.padding_small))
+    ) {
+        Text(
+            text = setName
+        )
+        Row {
+            Text(
+                text = "${set.weight} ${stringResource(UnitUtil.weightUnitStringId)}",
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_large)))
+            Text(
+                text = "${set.repetitions} ${stringResource(id = R.string.repetitions_count)}"
+            )
+        }
+    }
+}
+
+@Composable
+fun Set(
+    set: WorkoutSet,
     onChangeWeight: (Double) -> Unit,
     onChangeRepetitions: (Int) -> Unit,
     onRemoveSet: () -> Unit,
     onCheckSet: (checked: Boolean) -> Unit,
     setName: String = "",
     addingSet: Boolean = false,
-    deletionEnabled: Boolean = true,
-    viewOnly: Boolean = false
+    deletionEnabled: Boolean = true
 ) {
     var dropdownMenuOpen by remember { mutableStateOf(false) }
 
@@ -49,7 +78,7 @@ fun Set(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.padding_small))
     ) {
-        if (addingSet || viewOnly) {
+        if (addingSet) {
             Text(
                 text = setName
             )
@@ -81,8 +110,7 @@ fun Set(
         }
         Box {
             IconButton(
-                onClick = { dropdownMenuOpen = !dropdownMenuOpen },
-                enabled = !viewOnly
+                onClick = { dropdownMenuOpen = !dropdownMenuOpen }
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,

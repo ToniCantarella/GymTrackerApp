@@ -37,110 +37,98 @@ import java.util.UUID
 @Composable
 fun ExerciseList(
     exercises: List<Exercise>,
+    modifier: Modifier = Modifier
+) {
+    ExerciseLazyColumn(
+        exercises = exercises,
+        modifier = modifier
+    ) { index, exercise, placeholderName ->
+        Box {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .zIndex(1f)
+                    .pointerInput(Unit) {}
+            )
+            Exercise(
+                exercise = exercise,
+                placeholderName = placeholderName
+            )
+        }
+    }
+}
+
+@Composable
+fun ExerciseList(
+    exercises: List<Exercise>,
     modifier: Modifier = Modifier,
-    onAddExercise: () -> Unit = {},
-    onRemoveExercise: (id: UUID) -> Unit = {},
-    onExerciseNameChange: (id: UUID, name: String) -> Unit = { _, _ -> },
-    onDescriptionChange: (id: UUID, description: String) -> Unit = { _, _ -> },
+    onAddExercise: () -> Unit,
+    onRemoveExercise: (id: UUID) -> Unit,
+    onExerciseNameChange: (id: UUID, name: String) -> Unit,
+    onDescriptionChange: (id: UUID, description: String) -> Unit,
     onAddSet: (exerciseId: UUID) -> Unit = { },
-    onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit = { _, _, _ -> },
-    onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit = { _, _, _ -> },
-    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit = { _, _ -> },
+    onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
+    onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
+    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
     onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> },
-    creatingSplit: Boolean = false,
-    viewOnly: Boolean = false
+    creatingSplit: Boolean = false
 ) {
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var deleteDialogOpen by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<Exercise?>(null) }
 
-    LazyColumn(
-        state = lazyListState,
-        contentPadding = PaddingValues(
-            vertical = dimensionResource(id = R.dimen.padding_large),
-            horizontal = dimensionResource(id = R.dimen.padding_large)
-        ),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+    ExerciseLazyColumn(
+        exercises = exercises,
         modifier = modifier
-            .fillMaxSize()
-    ) {
-        itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
-            val placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}"
-
-            Box {
-                if (viewOnly) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .zIndex(1f)
-                            .pointerInput(Unit) {}
-                    )
-                }
-                Exercise(
-                    exercise = exercise,
-                    placeholderName = placeholderName,
-                    onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
-                    onDescriptionChange = { description ->
-                        onDescriptionChange(
-                            exercise.uuid,
-                            description
-                        )
-                    },
-                    onDeletePressed = {
-                        deleteDialogOpen = true
-                        itemToDelete = exercise.copy(
-                            name = exercise.name.ifBlank { placeholderName }
-                        )
-                    },
-                    deleteEnabled = exercises.size > 1,
-                    addSet = { onAddSet(exercise.uuid) },
-                    onChangeWeight = { setId, weight ->
-                        onChangeWeight(
-                            exercise.uuid,
-                            setId,
-                            weight
-                        )
-                    },
-                    onChangeRepetitions = { setId, repetitions ->
-                        onChangeRepetitions(
-                            exercise.uuid,
-                            setId,
-                            repetitions
-                        )
-                    },
-                    onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
-                    onCheckSet = { setId, checked ->
-                        onCheckSet(
-                            exercise.uuid,
-                            setId,
-                            checked
-                        )
-                    },
-                    creatingExercise = creatingSplit,
-                    viewOnly = viewOnly
+    ) { index, exercise, placeholderName ->
+        Exercise(
+            exercise = exercise,
+            placeholderName = placeholderName,
+            onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
+            onDescriptionChange = { description ->
+                onDescriptionChange(
+                    exercise.uuid,
+                    description
                 )
-            }
-        }
-        if (!viewOnly) {
-            item {
-                Button(
-                    onClick = {
-                        onAddExercise()
-                        scope.launch {
-                            lazyListState.animateScrollToItem(exercises.size)
-                        }
-                    },
-                    enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(id = R.string.add)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.exercise)
-                    )
-                }
+            },
+            onDeletePressed = {
+                deleteDialogOpen = true
+                itemToDelete = exercise.copy(name = exercise.name.ifBlank { placeholderName })
+            },
+            deleteEnabled = exercises.size > 1,
+            addSet = { onAddSet(exercise.uuid) },
+            onChangeWeight = { setId, weight -> onChangeWeight(exercise.uuid, setId, weight) },
+            onChangeRepetitions = { setId, repetitions ->
+                onChangeRepetitions(
+                    exercise.uuid,
+                    setId,
+                    repetitions
+                )
+            },
+            onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+            onCheckSet = { setId, checked -> onCheckSet(exercise.uuid, setId, checked) },
+            creatingExercise = creatingSplit
+        )
+
+        if (index == exercises.lastIndex) {
+            Button(
+                onClick = {
+                    onAddExercise()
+                    scope.launch {
+                        lazyListState.animateScrollToItem(exercises.size)
+                    }
+                },
+                enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES,
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add)
+                )
+                Text(
+                    text = stringResource(id = R.string.exercise)
+                )
             }
         }
     }
@@ -186,5 +174,28 @@ fun ExerciseList(
                 deleteDialogOpen = false
             }
         )
+    }
+}
+
+@Composable
+private fun ExerciseLazyColumn(
+    exercises: List<Exercise>,
+    modifier: Modifier = Modifier,
+    content: @Composable (index: Int, exercise: Exercise, placeholderName: String) -> Unit
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(
+            vertical = dimensionResource(id = R.dimen.padding_large),
+            horizontal = dimensionResource(id = R.dimen.padding_large)
+        ),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        itemsIndexed(exercises, key = { _, exercise -> exercise.uuid }) { index, exercise ->
+            val placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}"
+
+            content(index, exercise, placeholderName)
+        }
     }
 }

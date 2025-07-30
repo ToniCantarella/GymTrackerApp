@@ -39,22 +39,173 @@ import java.util.UUID
 fun Exercise(
     exercise: Exercise,
     placeholderName: String,
+    modifier: Modifier = Modifier,
+) {
+    ExerciseCard(
+        exercise = exercise,
+        modifier = modifier,
+        title = {
+            Text(
+                text = exercise.name.ifEmpty { placeholderName }
+            )
+        },
+        description = {
+            if (exercise.description != null) {
+                Text(
+                    text = exercise.description,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
+    ) { index, set ->
+        Set(
+            set = set,
+            setName = "${stringResource(id = R.string.set)} ${index + 1}"
+        )
+    }
+}
+
+@Composable
+fun Exercise(
+    exercise: Exercise,
+    placeholderName: String,
+    modifier: Modifier = Modifier,
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
     onDeletePressed: () -> Unit,
-    deleteEnabled: Boolean = true,
     addSet: () -> Unit,
     onChangeWeight: (setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
     onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
-    creatingExercise: Boolean = true,
-    viewOnly: Boolean = false
+    deleteEnabled: Boolean = false,
+    creatingExercise: Boolean = false
 ) {
     var editingExercise by remember { mutableStateOf(creatingExercise) }
 
+    ExerciseCard(
+        exercise = exercise,
+        modifier = modifier,
+        title = {
+            if (editingExercise) {
+                OutlinedTextField(
+                    value = exercise.name,
+                    onValueChange = {
+                        if (it.length <= EXERCISE_NAME_MAX_SIZE)
+                            onNameChange(it)
+                    },
+                    placeholder = {
+                        Text(
+                            text = placeholderName
+                        )
+                    }
+                )
+            } else {
+                Text(
+                    text = exercise.name.ifEmpty { placeholderName }
+                )
+            }
+        },
+        description = {
+            if (editingExercise) {
+                OutlinedTextField(
+                    value = exercise.description ?: "",
+                    onValueChange = {
+                        if (it.length <= EXERCISE_DESCRIPTION_MAX_SIZE)
+                            onDescriptionChange(it)
+                    },
+                    placeholder = {
+                        Text(
+                            text = "${stringResource(id = R.string.description)} (${
+                                stringResource(
+                                    id = R.string.optional
+                                )
+                            })",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    textStyle = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier
+                )
+            } else if (exercise.description != null) {
+                Text(
+                    text = exercise.description,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        },
+        headerActions = {
+            if (!creatingExercise) {
+                IconButton(
+                    onClick = {
+                        editingExercise = !editingExercise
+                    }
+                ) {
+                    Icon(
+                        painter =
+                            if (editingExercise) painterResource(id = R.drawable.edit_off)
+                            else painterResource(id = R.drawable.edit),
+                        contentDescription = stringResource(id = R.string.edit)
+                    )
+                }
+            }
+            if (editingExercise && deleteEnabled) {
+                IconButton(
+                    onClick = onDeletePressed
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(id = R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        bottomActions = {
+            TextButton(
+                onClick = addSet,
+                enabled = exercise.sets.size < MAX_SETS
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add)
+                )
+                Text(
+                    text = stringResource(id = R.string.set)
+                )
+            }
+        }
+    ) { index, set ->
+        Set(
+            set = set,
+            setName = "${stringResource(id = R.string.set)} ${index + 1}",
+            deletionEnabled = exercise.sets.size > 1,
+            onChangeWeight = { onChangeWeight(set.uuid, it) },
+            onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
+            onRemoveSet = { onRemoveSet(set.uuid) },
+            onCheckSet = { checked ->
+                onCheckSet(
+                    set.uuid,
+                    checked
+                )
+            },
+            addingSet = creatingExercise
+        )
+    }
+}
+
+@Composable
+private fun ExerciseCard(
+    exercise: Exercise,
+    modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
+    description: @Composable () -> Unit = {},
+    headerActions: @Composable () -> Unit = {},
+    bottomActions: @Composable () -> Unit = {},
+    setContent: @Composable (index: Int, set: WorkoutSet) -> Unit
+) {
     ElevatedCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         Column(
@@ -71,118 +222,26 @@ fun Exercise(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
                     modifier = Modifier.weight(2f)
                 ) {
-                    if (editingExercise) {
-                        OutlinedTextField(
-                            value = exercise.name,
-                            onValueChange = {
-                                if (it.length <= EXERCISE_NAME_MAX_SIZE)
-                                    onNameChange(it)
-                            },
-                            placeholder = {
-                                Text(
-                                    text = placeholderName
-                                )
-                            }
-                        )
-                    } else {
-                        Text(
-                            text = exercise.name.ifEmpty { placeholderName }
-                        )
-                    }
-                    if (editingExercise) {
-                        OutlinedTextField(
-                            value = exercise.description ?: "",
-                            onValueChange = {
-                                if (it.length <= EXERCISE_DESCRIPTION_MAX_SIZE)
-                                    onDescriptionChange(it)
-                            },
-                            placeholder = {
-                                Text(
-                                    text = "${stringResource(id = R.string.description)} (${
-                                        stringResource(
-                                            id = R.string.optional
-                                        )
-                                    })",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            },
-                            textStyle = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier
-                        )
-                    } else if (exercise.description != null) {
-                        Text(
-                            text = exercise.description,
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
+                    title()
+                    description()
                 }
-                if (!viewOnly) {
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        if (!creatingExercise) {
-                            IconButton(
-                                onClick = {
-                                    editingExercise = !editingExercise
-                                }
-                            ) {
-                                Icon(
-                                    painter =
-                                        if (editingExercise) painterResource(id = R.drawable.edit_off)
-                                        else painterResource(id = R.drawable.edit),
-                                    contentDescription = stringResource(id = R.string.edit)
-                                )
-                            }
-                        }
-                        if (editingExercise && deleteEnabled) {
-                            IconButton(
-                                onClick = onDeletePressed
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = stringResource(id = R.string.delete),
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-                    }
+
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    headerActions()
                 }
             }
             Column {
                 exercise.sets.forEachIndexed { index, set ->
                     HorizontalDivider()
-                    Set(
-                        set = set,
-                        setName = "${stringResource(id = R.string.set)} ${index + 1}",
-                        deletionEnabled = exercise.sets.size > 1,
-                        onChangeWeight = { onChangeWeight(set.uuid, it) },
-                        onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
-                        onRemoveSet = { onRemoveSet(set.uuid) },
-                        onCheckSet = { checked ->
-                            onCheckSet(
-                                set.uuid,
-                                checked
-                            )
-                        },
-                        addingSet = creatingExercise,
-                        viewOnly = viewOnly
+                    setContent(
+                        index,
+                        set
                     )
                 }
-                if (!viewOnly) {
-                    TextButton(
-                        onClick = addSet,
-                        enabled = exercise.sets.size < MAX_SETS
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(id = R.string.add)
-                        )
-                        Text(
-                            text = stringResource(id = R.string.set)
-                        )
-                    }
-                }
+                bottomActions()
             }
         }
     }
