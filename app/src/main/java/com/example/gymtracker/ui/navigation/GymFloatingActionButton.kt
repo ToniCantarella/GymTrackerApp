@@ -3,14 +3,19 @@ package com.example.gymtracker.ui.navigation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GymFloatingActionButton(
     navBackStackEntry: NavBackStackEntry?
@@ -27,8 +32,11 @@ fun GymFloatingActionButton(
             exit = fadeOut()
         ) {
             FloatingActionButton(
-                onClick = viewModel.onClick,
-                shape = MaterialTheme.shapes.extraLarge
+                onClick = { if (viewModel.enabled) viewModel.onClick() },
+                containerColor = if (viewModel.enabled) MaterialTheme.colorScheme.primary else Color.Gray,
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = Modifier
+                    .imePadding()
             ) {
                 viewModel.content()
             }
@@ -40,6 +48,7 @@ fun GymFloatingActionButton(
 fun ProvideFloatingActionButton(
     onClick: () -> Unit,
     visible: Boolean = true,
+    enabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val viewModelStoreOwner = LocalViewModelStoreOwner.current
@@ -48,8 +57,9 @@ fun ProvideFloatingActionButton(
             viewModelStoreOwner = owner,
             initializer = { GymFloatingActionButtonViewModel() },
         )
-        LaunchedEffect(onClick, visible, content) {
+        LaunchedEffect(onClick, visible, enabled, content) {
             viewModel.showFab = visible
+            viewModel.enabled = enabled
             viewModel.onClick = onClick
             viewModel.content = content
         }

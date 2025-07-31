@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 
 class GymFloatingActionButtonViewModel : ViewModel() {
     var showFab by mutableStateOf(false)
+    var enabled by mutableStateOf(true)
 
     var onClick by mutableStateOf({}, referentialEqualityPolicy())
     var content by mutableStateOf<@Composable () -> Unit>({ }, referentialEqualityPolicy())

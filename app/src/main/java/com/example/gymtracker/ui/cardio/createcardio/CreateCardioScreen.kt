@@ -57,7 +57,7 @@ fun CreateCardioScreen(
         onClick = {
             viewModel.onSavePressed { onNavigateBack() }
         },
-        visible = true
+        enabled = uiState.name.isNotEmpty()
     ) {
         Icon(
             painter = painterResource(id = R.drawable.save),
