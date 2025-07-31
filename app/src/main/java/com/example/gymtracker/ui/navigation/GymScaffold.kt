@@ -1,16 +1,21 @@
 package com.example.gymtracker.ui.navigation
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,55 +31,89 @@ fun GymScaffold(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    val matchesBottomBarRoute = bottomBarRoutes.any { bottomBarRoute ->
+    val matchesBottomBarRoute = navigationBarRoutes.any { bottomBarRoute ->
         currentDestination?.hierarchy?.any { it.hasRoute(bottomBarRoute.route::class) } == true
     }
 
-    Scaffold(
-        topBar = {
-            GymTopAppBar(
-                navBackStackEntry = navBackStackEntry
-            )
-        },
-        bottomBar = {
-            if (matchesBottomBarRoute && currentDestination != null) {
-                BottomAppBar {
-                    bottomBarRoutes.forEach { bottomBarRoute ->
-                        val selected = currentDestination.hierarchy.any {
-                            it.hasRoute(bottomBarRoute.route::class)
-                        }
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(bottomBarRoute.route) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(bottomBarRoute.iconResInt),
-                                    contentDescription = stringResource(id = bottomBarRoute.titleResInt),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = bottomBarRoute.titleResInt)
-                                )
-                            }
-                        )
+    Row(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (matchesBottomBarRoute && currentDestination != null && isLandscape) {
+            NavigationRail {
+                navigationBarRoutes.forEach { navigationBarRoute ->
+                    val selected = currentDestination.hierarchy.any {
+                        it.hasRoute(navigationBarRoute.route::class)
                     }
+                    NavigationRailItem(
+                        selected = selected,
+                        onClick = {
+                            navController.navigate(navigationBarRoute.route) {
+                                launchSingleTop = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                painter = painterResource(navigationBarRoute.iconResInt),
+                                contentDescription = stringResource(id = navigationBarRoute.titleResInt),
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = stringResource(id = navigationBarRoute.titleResInt)
+                            )
+                        }
+                    )
                 }
             }
-        },
-        floatingActionButton = {
-            GymFloatingActionButton(
-                navBackStackEntry = navBackStackEntry
-            )
-        },
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
-        content(innerPadding)
+        }
+        Scaffold(
+            topBar = {
+                GymTopAppBar(
+                    navBackStackEntry = navBackStackEntry
+                )
+            },
+            bottomBar = {
+                if (matchesBottomBarRoute && currentDestination != null && !isLandscape) {
+                    BottomAppBar {
+                        navigationBarRoutes.forEach { navigationBarRoute ->
+                            val selected = currentDestination.hierarchy.any {
+                                it.hasRoute(navigationBarRoute.route::class)
+                            }
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(navigationBarRoute.route) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(navigationBarRoute.iconResInt),
+                                        contentDescription = stringResource(id = navigationBarRoute.titleResInt),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = stringResource(id = navigationBarRoute.titleResInt)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            },
+            floatingActionButton = {
+                GymFloatingActionButton(
+                    navBackStackEntry = navBackStackEntry
+                )
+            },
+            modifier = Modifier.fillMaxSize()
+        ) { innerPadding ->
+            content(innerPadding)
+        }
     }
 }

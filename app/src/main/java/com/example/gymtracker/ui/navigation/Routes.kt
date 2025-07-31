@@ -54,25 +54,25 @@ open class Route {
     object Info : Route()
 }
 
-data class BottomBarRoute(val titleResInt: Int, val route: Route, val iconResInt: Int)
+data class NavigationBarRoute(val titleResInt: Int, val route: Route, val iconResInt: Int)
 
-val bottomBarRoutes = listOf(
-    BottomBarRoute(
+val navigationBarRoutes = listOf(
+    NavigationBarRoute(
         titleResInt = R.string.gym,
         route = Route.Gym,
         iconResInt = R.drawable.weight
     ),
-    BottomBarRoute(
+    NavigationBarRoute(
         titleResInt = R.string.cardio,
         route = Route.Cardio,
         iconResInt = R.drawable.run
     ),
-    BottomBarRoute(
+    NavigationBarRoute(
         titleResInt = R.string.stats,
         route = Route.Stats,
         iconResInt = R.drawable.stats
     ),
-    BottomBarRoute(
+    NavigationBarRoute(
         titleResInt = R.string.info,
         route = Route.Info,
         iconResInt = R.drawable.info

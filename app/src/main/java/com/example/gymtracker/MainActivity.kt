@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -101,16 +104,23 @@ fun GymTrackerApp(
 ) {
     val mainUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     val navigationAnimationMoveInt = 1500
+
+    val enter = if (isLandscape) fadeIn() else slideInHorizontally { navigationAnimationMoveInt }
+    val exit = if (isLandscape) fadeOut() else slideOutHorizontally { -navigationAnimationMoveInt }
+    val popEnter = if (isLandscape) fadeIn() else slideInHorizontally { -navigationAnimationMoveInt }
+    val popExit = if (isLandscape) fadeOut() else slideOutHorizontally { navigationAnimationMoveInt }
 
     GymScaffold(
         navController = navController
     ) { innerPadding ->
         NavHost(
-            enterTransition = { slideInHorizontally(initialOffsetX = { navigationAnimationMoveInt }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { -navigationAnimationMoveInt }) },
-            popEnterTransition = { slideInHorizontally(initialOffsetX = { -navigationAnimationMoveInt }) },
-            popExitTransition = { slideOutHorizontally(targetOffsetX = { navigationAnimationMoveInt }) },
+            enterTransition = { enter },
+            exitTransition = { exit },
+            popEnterTransition = { popEnter },
+            popExitTransition = { popExit },
             navController = navController,
             startDestination = mainUiState.initialRoute,
             modifier = Modifier.padding(innerPadding)
