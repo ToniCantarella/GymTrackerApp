@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.stats.split
+package com.example.gymtracker.ui.stats.gym
 
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween

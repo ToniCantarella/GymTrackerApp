@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.stats.sessions
+package com.example.gymtracker.ui.stats.gym
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

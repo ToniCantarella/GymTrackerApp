@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.stats.split
+package com.example.gymtracker.ui.stats.gym
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

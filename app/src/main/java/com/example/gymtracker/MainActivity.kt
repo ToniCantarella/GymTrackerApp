@@ -61,11 +61,11 @@ import com.example.gymtracker.ui.gym.splitslist.SplitListScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
+import com.example.gymtracker.ui.stats.cardio.CardioSessionScreen
 import com.example.gymtracker.ui.stats.cardio.CardioStatsScreen
+import com.example.gymtracker.ui.stats.gym.GymSessionScreen
+import com.example.gymtracker.ui.stats.gym.SplitStatsScreen
 import com.example.gymtracker.ui.stats.overview.StatsOverviewScreen
-import com.example.gymtracker.ui.stats.sessions.CardioSessionScreen
-import com.example.gymtracker.ui.stats.sessions.GymSessionScreen
-import com.example.gymtracker.ui.stats.split.SplitStatsScreen
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.ui.welcome.WelcomeScreen
 import org.koin.androidx.viewmodel.ext.android.viewModel

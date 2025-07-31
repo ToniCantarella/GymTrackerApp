@@ -21,11 +21,11 @@ import com.example.gymtracker.ui.gym.createsplit.CreateSplitViewModel
 import com.example.gymtracker.ui.gym.split.SplitViewModel
 import com.example.gymtracker.ui.gym.splitslist.SplitListViewModel
 import com.example.gymtracker.ui.info.InfoViewModel
+import com.example.gymtracker.ui.stats.cardio.CardioSessionViewModel
 import com.example.gymtracker.ui.stats.cardio.CardioStatsViewModel
+import com.example.gymtracker.ui.stats.gym.GymSessionViewModel
+import com.example.gymtracker.ui.stats.gym.SplitStatsViewModel
 import com.example.gymtracker.ui.stats.overview.StatsOverviewViewModel
-import com.example.gymtracker.ui.stats.sessions.CardioSessionViewModel
-import com.example.gymtracker.ui.stats.sessions.GymSessionViewModel
-import com.example.gymtracker.ui.stats.split.SplitStatsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
