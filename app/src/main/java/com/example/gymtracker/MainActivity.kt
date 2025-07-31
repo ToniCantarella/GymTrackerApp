@@ -54,7 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
-import com.example.gymtracker.ui.cardio.createcario.CreateCardioScreen
+import com.example.gymtracker.ui.cardio.createcardio.CreateCardioScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route

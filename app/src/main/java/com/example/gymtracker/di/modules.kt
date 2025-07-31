@@ -16,7 +16,7 @@ import com.example.gymtracker.database.repository.WorkoutRepository
 import com.example.gymtracker.database.repository.WorkoutRepositoryImpl
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
-import com.example.gymtracker.ui.cardio.createcario.CreateCardioViewModel
+import com.example.gymtracker.ui.cardio.createcardio.CreateCardioViewModel
 import com.example.gymtracker.ui.info.InfoViewModel
 import com.example.gymtracker.ui.stats.cardio.CardioStatsViewModel
 import com.example.gymtracker.ui.stats.overview.StatsOverviewViewModel
