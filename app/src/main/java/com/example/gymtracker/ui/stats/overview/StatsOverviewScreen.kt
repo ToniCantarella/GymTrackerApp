@@ -373,11 +373,13 @@ private fun CalendarCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
+            val monthString = state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
+                TextStyle.FULL_STANDALONE,
+                Locale.getDefault()
+            )
+            val yearString = state.firstVisibleMonth.yearMonth.year
             Text(
-                text = state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
-                    TextStyle.FULL_STANDALONE,
-                    Locale.getDefault()
-                ),
+                text = "$monthString $yearString",
                 modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_large))
             )
             TextButton(
