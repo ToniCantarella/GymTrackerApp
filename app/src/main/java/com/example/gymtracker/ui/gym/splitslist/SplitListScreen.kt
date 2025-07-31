@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -49,8 +51,8 @@ fun SplitListScreen(
     viewModel: SplitListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val selectedItemsCount by remember (uiState.splits){
-        derivedStateOf { uiState.splits.count {it.selected} }
+    val selectedItemsCount by remember(uiState.splits) {
+        derivedStateOf { uiState.splits.count { it.selected } }
     }
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
@@ -181,7 +183,9 @@ fun SplitListScreen(
             )
         } else {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
                 splits.forEach { split ->
                     WorkoutListItem(
@@ -213,7 +217,7 @@ private fun SplitsPreview() {
             ),
             selectingItems = false,
             onSplitClick = {},
-            onSelect = {_ ,_ -> },
+            onSelect = { _, _ -> },
             onSplitHold = {}
         )
     }
@@ -227,7 +231,7 @@ private fun EmptySplitsPreview() {
             loading = false,
             splits = emptyList(),
             selectingItems = false,
-            onSelect = {_ ,_ -> },
+            onSelect = { _, _ -> },
             onSplitClick = {},
             onSplitHold = {}
         )

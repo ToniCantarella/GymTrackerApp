@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -45,8 +47,8 @@ fun CardioListScreen(
     viewModel: CardioListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val selectedItemsCount by remember (uiState.cardioList){
-        derivedStateOf { uiState.cardioList.count {it.selected} }
+    val selectedItemsCount by remember(uiState.cardioList) {
+        derivedStateOf { uiState.cardioList.count { it.selected } }
     }
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
@@ -176,7 +178,9 @@ private fun CardioListScreen(
             )
         } else {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
                 cardioList.forEach { cardio ->
                     WorkoutListItem(
