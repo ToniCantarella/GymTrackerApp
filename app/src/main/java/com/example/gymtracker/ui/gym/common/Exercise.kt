@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts.common
+package com.example.gymtracker.ui.gym.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,9 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
+import com.example.gymtracker.ui.gym.entity.Exercise
+import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.ui.workouts.entity.Exercise
-import com.example.gymtracker.ui.workouts.entity.WorkoutSet
 import com.example.gymtracker.utility.EXERCISE_DESCRIPTION_MAX_SIZE
 import com.example.gymtracker.utility.EXERCISE_NAME_MAX_SIZE
 import com.example.gymtracker.utility.MAX_SETS

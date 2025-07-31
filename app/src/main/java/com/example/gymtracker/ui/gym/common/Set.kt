@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts.common
+package com.example.gymtracker.ui.gym.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.NumericTextField
-import com.example.gymtracker.ui.workouts.entity.WorkoutSet
+import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import com.example.gymtracker.utility.UnitUtil
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts.common
+package com.example.gymtracker.ui.gym.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.utility.MAX_EXERCISES
 import kotlinx.coroutines.launch
 import java.util.UUID

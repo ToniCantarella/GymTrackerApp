@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts.splitslist
+package com.example.gymtracker.ui.gym.splitslist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

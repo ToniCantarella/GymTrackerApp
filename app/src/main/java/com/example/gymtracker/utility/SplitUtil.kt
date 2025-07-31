@@ -1,7 +1,7 @@
 package com.example.gymtracker.utility
 
-import com.example.gymtracker.ui.workouts.entity.Exercise
-import com.example.gymtracker.ui.workouts.entity.WorkoutSet
+import com.example.gymtracker.ui.gym.entity.Exercise
+import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import java.util.UUID
 
 const val MAX_SPLITS = 7

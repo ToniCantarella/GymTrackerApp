@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts.createsplit
+package com.example.gymtracker.ui.gym.createsplit
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
@@ -11,11 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
+import com.example.gymtracker.ui.gym.common.ExerciseList
+import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
-import com.example.gymtracker.ui.workouts.common.ExerciseList
-import com.example.gymtracker.ui.workouts.entity.Exercise
 import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID

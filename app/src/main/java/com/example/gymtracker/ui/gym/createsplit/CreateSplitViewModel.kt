@@ -1,9 +1,9 @@
-package com.example.gymtracker.ui.workouts.createsplit
+package com.example.gymtracker.ui.gym.createsplit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymtracker.database.repository.GymRepository
-import com.example.gymtracker.ui.workouts.entity.Exercise
+import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.utility.SplitUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

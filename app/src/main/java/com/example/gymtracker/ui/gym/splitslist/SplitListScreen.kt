@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.workouts.splitslist
+package com.example.gymtracker.ui.gym.splitslist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
