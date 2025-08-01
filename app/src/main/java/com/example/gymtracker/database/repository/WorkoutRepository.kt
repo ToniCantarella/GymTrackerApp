@@ -30,6 +30,22 @@ interface WorkoutRepository {
     ): List<WorkoutSession>
 }
 
+/* TODO potential refactor idea
+    return list of workouts, with each having a list of sessions. Easier to handle in the ui
+        Workout
+            id
+            name
+            type
+            sessions [
+                Session
+                    id
+                    timestamp,
+                ...
+            ]
+          ...
+    fetch by type instead of all by once, since you split by type in the ui anyway
+* */
+
 class WorkoutRepositoryImpl(
     private val workoutDao: WorkoutDao,
     private val gymSessionDao: GymSessionDao,

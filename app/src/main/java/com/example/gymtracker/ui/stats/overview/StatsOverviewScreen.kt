@@ -343,7 +343,7 @@ private fun CalendarCard(
             it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
         }
     }
-    val sessionsForMonth = remember(workoutSessions) {
+    val sessionsForMonth = remember(workoutSessions, state) {
         workoutSessions.filter {
             YearMonth.from(it.timestamp.atZone(zoneId))
                 .toKotlinYearMonth() == state.firstVisibleMonth.yearMonth
@@ -355,14 +355,12 @@ private fun CalendarCard(
     val gymWorkoutsById = remember(gymWorkouts) { gymWorkouts.associateBy { it.id } }
     val cardioWorkoutsById = remember(cardioWorkouts) { cardioWorkouts.associateBy { it.id } }
 
-    LaunchedEffect(state, sessionsForMonth) {
-        snapshotFlow { state.firstVisibleMonth.yearMonth }
+    LaunchedEffect(state) {
+        snapshotFlow { state.firstVisibleMonth }
             .distinctUntilChanged()
             .collect { visibleMonth ->
-                val firstVisibleDate =
-                    state.firstVisibleMonth.weekDays.first().first().date.toJavaLocalDate()
-                val lastVisibleDate =
-                    state.firstVisibleMonth.weekDays.last().last().date.toJavaLocalDate()
+                val firstVisibleDate = visibleMonth.weekDays.first().first().date.toJavaLocalDate()
+                val lastVisibleDate = visibleMonth.weekDays.last().last().date.toJavaLocalDate()
 
                 val startDate: Instant = firstVisibleDate
                     .atStartOfDay(zoneId)
