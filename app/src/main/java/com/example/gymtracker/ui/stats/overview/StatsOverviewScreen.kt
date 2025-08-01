@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
@@ -71,6 +72,8 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
+import com.kizitonwose.calendar.core.minusMonths
+import com.kizitonwose.calendar.core.plusMonths
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -79,6 +82,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaDayOfWeek
+import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaYearMonth
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinYearMonth
@@ -211,7 +215,7 @@ private fun WorkoutListing(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier.fillMaxWidth()
     ) {
-        if (gymWorkouts.isNotEmpty()){
+        if (gymWorkouts.isNotEmpty()) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
                 modifier = Modifier.weight(1f)
@@ -228,7 +232,7 @@ private fun WorkoutListing(
                 }
             }
         }
-        if(cardioWorkouts.isNotEmpty()){
+        if (cardioWorkouts.isNotEmpty()) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
                 modifier = Modifier.weight(1f)
@@ -314,25 +318,35 @@ private fun CalendarCard(
     onSessionClick: (session: WorkoutSession) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var sessionDialogOpen by remember { mutableStateOf(false) }
-    var sessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    val zoneId = ZoneId.systemDefault()
 
-    val currentMonth = remember { YearMonth.now() }
+    val currentMonth = remember { YearMonth.now().toKotlinYearMonth() }
     val startMonth = remember { currentMonth.minusMonths(100) }
     val endMonth = remember { currentMonth.plusMonths(100) }
     val daysOfWeek = remember { daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY) }
 
     val state = rememberCalendarState(
-        startMonth = startMonth.toKotlinYearMonth(),
-        endMonth = endMonth.toKotlinYearMonth(),
-        firstVisibleMonth = currentMonth.toKotlinYearMonth(),
+        startMonth = startMonth,
+        endMonth = endMonth,
+        firstVisibleMonth = currentMonth,
         firstDayOfWeek = daysOfWeek.first()
     )
 
+    var sessionDialogOpen by remember { mutableStateOf(false) }
+    val todayButtonVisible =
+        currentMonth != state.firstVisibleMonth.yearMonth
+
+    var sessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
     val sessionsByDate: Map<LocalDate, List<WorkoutSession>> = remember(workoutSessions) {
-        val zoneId = ZoneId.systemDefault()
         workoutSessions.groupBy {
             it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
+        }
+    }
+    val sessionsForMonth = remember(workoutSessions) {
+        workoutSessions.filter {
+            YearMonth.from(it.timestamp.atZone(zoneId))
+                .toKotlinYearMonth() == state.firstVisibleMonth.yearMonth
         }
     }
     val (gymWorkouts, cardioWorkouts) = remember(workouts) {
@@ -341,24 +355,20 @@ private fun CalendarCard(
     val gymWorkoutsById = remember(gymWorkouts) { gymWorkouts.associateBy { it.id } }
     val cardioWorkoutsById = remember(cardioWorkouts) { cardioWorkouts.associateBy { it.id } }
 
-    val coroutineScope = rememberCoroutineScope()
-
-    val todayButtonVisible =
-        currentMonth.toKotlinYearMonth() != state.firstVisibleMonth.yearMonth
-
-    LaunchedEffect(state) {
+    LaunchedEffect(state, sessionsForMonth) {
         snapshotFlow { state.firstVisibleMonth.yearMonth }
             .distinctUntilChanged()
             .collect { visibleMonth ->
-                val zoneId = ZoneId.systemDefault()
+                val firstVisibleDate =
+                    state.firstVisibleMonth.weekDays.first().first().date.toJavaLocalDate()
+                val lastVisibleDate =
+                    state.firstVisibleMonth.weekDays.last().last().date.toJavaLocalDate()
 
-                val startDate: Instant = visibleMonth.toJavaYearMonth()
-                    .atDay(1)
+                val startDate: Instant = firstVisibleDate
                     .atStartOfDay(zoneId)
                     .toInstant()
 
-                val endDate: Instant = visibleMonth.toJavaYearMonth()
-                    .atEndOfMonth()
+                val endDate: Instant = lastVisibleDate
                     .plusDays(1)
                     .atStartOfDay(zoneId)
                     .toInstant()
@@ -373,10 +383,11 @@ private fun CalendarCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            val monthString = state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
-                TextStyle.FULL_STANDALONE,
-                Locale.getDefault()
-            )
+            val monthString =
+                state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
+                    TextStyle.FULL_STANDALONE,
+                    Locale.getDefault()
+                )
             val yearString = state.firstVisibleMonth.yearMonth.year
             Text(
                 text = "$monthString $yearString",
@@ -386,7 +397,7 @@ private fun CalendarCard(
                 onClick = {
                     coroutineScope.launch {
                         state.animateScrollToMonth(
-                            currentMonth.toKotlinYearMonth()
+                            currentMonth
                         )
                     }
                 },
@@ -465,7 +476,7 @@ private fun CalendarCard(
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
         CalendarFooter(
             workouts = workouts,
-            workoutSessions = workoutSessions
+            workoutSessions = sessionsForMonth
         )
     }
 
@@ -666,6 +677,7 @@ private fun Day(
             .aspectRatio(1f)
             .padding(1.dp)
             .background(MaterialTheme.colorScheme.inverseOnSurface)
+            .alpha(if (day.position == DayPosition.MonthDate && day.date <= today) 1f else .4f)
             .clickable(
                 enabled = onClick != null
             ) {
@@ -686,10 +698,7 @@ private fun Day(
         }
         Text(
             text = day.date.day.toString(),
-            color = if (day.position == DayPosition.MonthDate && day.date <= today)
-                MaterialTheme.colorScheme.onSurface
-            else
-                MaterialTheme.colorScheme.onSurface.copy(.5f),
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.align(Alignment.TopEnd)
         )
     }
