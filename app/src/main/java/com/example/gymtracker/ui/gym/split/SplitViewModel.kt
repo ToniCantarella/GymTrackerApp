@@ -20,7 +20,9 @@ data class SplitUiState(
     val splitId: Int = 0,
     val splitName: String = "",
     val latestTimestamp: Instant? = null,
-    val exercises: List<Exercise> = emptyList()
+    val exercises: List<Exercise> = emptyList(),
+    val initialSplitName: String = "",
+    val initialExercises: List<Exercise> = emptyList()
 )
 
 class SplitViewModel(
@@ -36,12 +38,16 @@ class SplitViewModel(
     init {
         viewModelScope.launch {
             val latestSplit = gymRepository.getLatestSplitWithExercises(navParams.id)
+            val splitName = latestSplit?.name ?: ""
+            val exercises = latestSplit?.exercises ?: emptyList()
             _uiState.update {
                 it.copy(
                     splitId = navParams.id,
-                    splitName = latestSplit?.name ?: "",
+                    splitName = splitName,
                     latestTimestamp = latestSplit?.timestamp,
-                    exercises = latestSplit?.exercises ?: emptyList(),
+                    exercises = exercises,
+                    initialSplitName = splitName,
+                    initialExercises = exercises,
                     loading = false
                 )
             }

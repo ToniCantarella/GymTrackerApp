@@ -53,4 +53,5 @@
     <string name="stop">Lopeta</string>
     <string name="icon">Ikoni</string>
     <string name="edit">Muokkaa</string>
+    <string name="unsaved_changes">Sinulla on tallentamattomia muutoksia. Haluatko jatkaa tallentamatta?</string>
 </resources>

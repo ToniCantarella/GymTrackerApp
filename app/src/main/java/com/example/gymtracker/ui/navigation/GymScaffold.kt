@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -33,14 +34,33 @@ fun GymScaffold(
     val currentDestination = navBackStackEntry?.destination
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    val matchesBottomBarRoute = navigationBarRoutes.any { bottomBarRoute ->
-        currentDestination?.hierarchy?.any { it.hasRoute(bottomBarRoute.route::class) } == true
+    val matchesNavigationBarRoute = navigationBarRoutes.any { navigationBarRoute ->
+        currentDestination?.hierarchy?.any { it.hasRoute(navigationBarRoute.route::class) } == true
+    }
+
+    val navigationBarGuard = navBackStackEntry?.let { entry ->
+        viewModel<NavigationBarGuardViewModel>(viewModelStoreOwner = entry)
+    }
+
+    fun onNavigationBarItemClick(navigationBarRoute: NavigationBarRoute) {
+        if (navigationBarGuard?.isGuarded == true) {
+            navigationBarGuard.onGuard.invoke()
+            navigationBarGuard.onProceed = {
+                navController.navigate(navigationBarRoute.route) {
+                    launchSingleTop = true
+                }
+            }
+        } else {
+            navController.navigate(navigationBarRoute.route) {
+                launchSingleTop = true
+            }
+        }
     }
 
     Row(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (matchesBottomBarRoute && currentDestination != null && isLandscape) {
+        if (matchesNavigationBarRoute && currentDestination != null && isLandscape) {
             NavigationRail {
                 navigationBarRoutes.forEach { navigationBarRoute ->
                     val selected = currentDestination.hierarchy.any {
@@ -49,9 +69,7 @@ fun GymScaffold(
                     NavigationRailItem(
                         selected = selected,
                         onClick = {
-                            navController.navigate(navigationBarRoute.route) {
-                                launchSingleTop = true
-                            }
+                            onNavigationBarItemClick(navigationBarRoute)
                         },
                         icon = {
                             Icon(
@@ -76,7 +94,7 @@ fun GymScaffold(
                 )
             },
             bottomBar = {
-                if (matchesBottomBarRoute && currentDestination != null && !isLandscape) {
+                if (matchesNavigationBarRoute && currentDestination != null && !isLandscape) {
                     BottomAppBar {
                         navigationBarRoutes.forEach { navigationBarRoute ->
                             val selected = currentDestination.hierarchy.any {
@@ -85,9 +103,7 @@ fun GymScaffold(
                             NavigationBarItem(
                                 selected = selected,
                                 onClick = {
-                                    navController.navigate(navigationBarRoute.route) {
-                                        launchSingleTop = true
-                                    }
+                                    onNavigationBarItemClick(navigationBarRoute)
                                 },
                                 icon = {
                                     Icon(

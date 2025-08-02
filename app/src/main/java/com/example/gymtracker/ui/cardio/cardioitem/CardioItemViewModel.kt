@@ -17,7 +17,8 @@ data class CardioItemUiState(
     val loading: Boolean = true,
     val previousCardio: Cardio? = null,
     val cardioId: Int = 0,
-    val cardio: Cardio = Cardio.emptyCardio()
+    val cardio: Cardio = Cardio.emptyCardio(),
+    val initialCardio: Cardio = Cardio.emptyCardio()
 )
 
 class CardioItemViewModel(
@@ -29,14 +30,16 @@ class CardioItemViewModel(
     private val _uiState = MutableStateFlow(CardioItemUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun getCardio() {
+    init {
         viewModelScope.launch {
             val previousCardio = cardioRepository.getLatestCardio(navParams.id)
+            val cardio = uiState.value.cardio.copy(name = previousCardio.name)
             _uiState.update {
                 it.copy(
                     cardioId = navParams.id,
                     previousCardio = previousCardio,
-                    cardio = it.cardio.copy(name = previousCardio.name),
+                    cardio = cardio,
+                    initialCardio = cardio,
                     loading = false
                 )
             }
