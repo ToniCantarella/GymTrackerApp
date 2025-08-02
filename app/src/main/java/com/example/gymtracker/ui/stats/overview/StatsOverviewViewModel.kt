@@ -22,9 +22,11 @@ fun firstDayOfMonthInstant(zoneId: ZoneId = ZoneId.systemDefault()): Instant {
 
 data class StatsOverviewUiState(
     val loading: Boolean = true,
-    val workouts: List<Workout> = emptyList(),
-    val allWorkoutSessions: List<WorkoutSession> = emptyList(),
-    val workoutSessionsBetweenDates: List<WorkoutSession> = emptyList(),
+    val gymWorkouts: List<Workout> = emptyList(),
+    val cardioWorkouts: List<Workout> = emptyList(),
+    val gymSessions: List<WorkoutSession> = emptyList(),
+    val cardioSessions: List<WorkoutSession> = emptyList(),
+    val workoutSessionsBetween: List<WorkoutSession> = emptyList(),
     val startDate: Instant = firstDayOfMonthInstant(),
     val endDate: Instant = Instant.now()
 )
@@ -61,31 +63,35 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkouts() {
-        val workouts = workoutRepository.getAllWorkouts()
+        val gymWorkouts = workoutRepository.getGymWorkouts()
+        val cardioWorkouts = workoutRepository.getCardioWorkouts()
         _uiState.update {
             it.copy(
-                workouts = workouts
+                gymWorkouts = gymWorkouts,
+                cardioWorkouts = cardioWorkouts
             )
         }
     }
 
     private suspend fun fetchAllWorkoutSessions() {
-        val sessions = workoutRepository.getAllWorkoutSessions()
+        val gymSessions = workoutRepository.getGymSessions()
+        val cardioSessions = workoutRepository.getCardioSessions()
         _uiState.update {
             it.copy(
-                allWorkoutSessions = sessions
+                gymSessions = gymSessions,
+                cardioSessions = cardioSessions
             )
         }
     }
 
     private suspend fun fetchWorkoutSessionsBetweenDates(startDate: Instant, endDate: Instant) {
-        val sessions = workoutRepository.getWorkoutSessionsBetweenDates(
-            startDate = startDate,
-            endDate = endDate
+        val sessions = workoutRepository.getWorkoutSessionsBetween(
+            start = startDate,
+            end = endDate
         )
         _uiState.update {
             it.copy(
-                workoutSessionsBetweenDates = sessions
+                workoutSessionsBetween = sessions
             )
         }
     }

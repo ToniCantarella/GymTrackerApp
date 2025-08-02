@@ -100,7 +100,7 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
-    onSessionNavigate: (session: WorkoutSession) -> Unit,
+    onSessionNavigate: (id: Int, type: WorkoutType) -> Unit,
     onWorkoutNavigate: (workout: Workout) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
@@ -126,9 +126,11 @@ fun StatsOverviewScreen(
 
     StatsOverviewScreen(
         loading = uiState.loading,
-        workouts = uiState.workouts,
-        workoutSessions = uiState.allWorkoutSessions,
-        workoutSessionsBetweenDates = uiState.workoutSessionsBetweenDates,
+        gymWorkouts = uiState.gymWorkouts,
+        cardioWorkouts = uiState.cardioWorkouts,
+        gymSessions = uiState.gymSessions,
+        cardioSessions = uiState.cardioSessions,
+        workoutSessionsForMonth = uiState.workoutSessionsBetween,
         getMonthData = viewModel::getMonthData,
         onSessionClick = onSessionNavigate,
         onWorkoutNavigate = onWorkoutNavigate
@@ -138,11 +140,13 @@ fun StatsOverviewScreen(
 @Composable
 private fun StatsOverviewScreen(
     loading: Boolean,
-    workouts: List<Workout>,
-    workoutSessions: List<WorkoutSession>,
-    workoutSessionsBetweenDates: List<WorkoutSession>,
+    gymWorkouts: List<Workout>,
+    cardioWorkouts: List<Workout>,
+    gymSessions: List<WorkoutSession>,
+    cardioSessions: List<WorkoutSession>,
+    workoutSessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
-    onSessionClick: (session: WorkoutSession) -> Unit,
+    onSessionClick: (id: Int, type: WorkoutType) -> Unit,
     onWorkoutNavigate: (workout: Workout) -> Unit
 ) {
     if (loading) {
@@ -155,22 +159,15 @@ private fun StatsOverviewScreen(
             CircularProgressIndicator()
         }
     } else {
-        val (gymWorkouts, cardioWorkouts) = remember(workouts) {
-            workouts.partition { it.type == WorkoutType.GYM }
-        }
-
-        val (gymSessions, cardioSessions) = remember(workoutSessions) {
-            workoutSessions.partition { it.workout.type == WorkoutType.GYM }
-        }
-
         LazyColumn(
             contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
         ) {
             item {
                 CalendarCard(
-                    workouts = workouts,
-                    workoutSessions = workoutSessionsBetweenDates,
+                    gymWorkouts = gymWorkouts,
+                    cardioWorkouts = cardioWorkouts,
+                    sessionsForMonth = workoutSessionsForMonth,
                     getMonthData = getMonthData,
                     onSessionClick = onSessionClick
                 )
@@ -191,10 +188,11 @@ private fun StatsOverviewScreen(
                     )
                 }
             }
-            if (workouts.isNotEmpty()) {
+            if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
                 item {
                     WorkoutListing(
-                        workouts = workouts,
+                        gymWorkouts = gymWorkouts,
+                        cardioWorkouts = cardioWorkouts,
                         onWorkoutNavigate = onWorkoutNavigate
                     )
                 }
@@ -205,12 +203,11 @@ private fun StatsOverviewScreen(
 
 @Composable
 private fun WorkoutListing(
-    workouts: List<Workout>,
+    gymWorkouts: List<Workout>,
+    cardioWorkouts: List<Workout>,
     onWorkoutNavigate: (workout: Workout) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val (gymWorkouts, cardioWorkouts) = workouts.partition { it.type == WorkoutType.GYM }
-
     Row(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier.fillMaxWidth()
@@ -312,10 +309,11 @@ val highlightColors = listOf(
 @OptIn(ExperimentalTime::class)
 @Composable
 private fun CalendarCard(
-    workouts: List<Workout>,
-    workoutSessions: List<WorkoutSession>,
+    gymWorkouts: List<Workout>,
+    cardioWorkouts: List<Workout>,
+    sessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
-    onSessionClick: (session: WorkoutSession) -> Unit,
+    onSessionClick: (id: Int, type: WorkoutType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -337,23 +335,19 @@ private fun CalendarCard(
     val todayButtonVisible =
         currentMonth != state.firstVisibleMonth.yearMonth
 
+    val allWorkouts = gymWorkouts + cardioWorkouts
     var sessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
-    val sessionsByDate: Map<LocalDate, List<WorkoutSession>> = remember(workoutSessions) {
-        workoutSessions.groupBy {
+    val sessionsByDate: Map<LocalDate, List<WorkoutSession>> = remember(sessionsForMonth) {
+        sessionsForMonth.groupBy {
             it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
         }
     }
-    val sessionsForMonth = remember(workoutSessions, state) {
-        workoutSessions.filter {
+    val sessionsForMonth = remember(sessionsForMonth, state) {
+        sessionsForMonth.filter {
             YearMonth.from(it.timestamp.atZone(zoneId))
                 .toKotlinYearMonth() == state.firstVisibleMonth.yearMonth
         }
     }
-    val (gymWorkouts, cardioWorkouts) = remember(workouts) {
-        workouts.partition { it.type == WorkoutType.GYM }
-    }
-    val gymWorkoutsById = remember(gymWorkouts) { gymWorkouts.associateBy { it.id } }
-    val cardioWorkoutsById = remember(cardioWorkouts) { cardioWorkouts.associateBy { it.id } }
 
     LaunchedEffect(state) {
         snapshotFlow { state.firstVisibleMonth }
@@ -438,7 +432,9 @@ private fun CalendarCard(
 
                 fun onClick() {
                     if (sessionsOnDay?.size!! == 1) {
-                        onSessionClick(sessionsOnDay.first())
+                        val session = sessionsOnDay.first()
+                        val workout = allWorkouts.find { it.id == session.workoutId }
+                        onSessionClick(session.id, workout!!.type)
                     } else {
                         sessionDialogOpen = true
                         sessionsForDialog = sessionsOnDay
@@ -451,16 +447,18 @@ private fun CalendarCard(
                 ) {
                     if (hasSessions) {
                         sessionsOnDay.forEach { session ->
-                            if (session.workout.type == WorkoutType.GYM) {
+                            val workout = allWorkouts.find { it.id == session.workoutId }
+
+                            if (workout?.type == WorkoutType.GYM) {
                                 val workoutIndex =
-                                    gymWorkouts.indexOf(gymWorkoutsById[session.workout.id])
+                                    gymWorkouts.indexOf(workout)
                                 WorkoutIcon(
                                     painter = painterResource(id = R.drawable.weight),
                                     tint = highlightColors[workoutIndex % highlightColors.size]
                                 )
                             } else {
                                 val workoutIndex =
-                                    cardioWorkouts.indexOf(cardioWorkoutsById[session.workout.id])
+                                    cardioWorkouts.indexOf(workout)
                                 WorkoutIcon(
                                     painter = painterResource(id = R.drawable.run),
                                     tint = highlightColors[workoutIndex % highlightColors.size]
@@ -473,7 +471,8 @@ private fun CalendarCard(
         )
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
         CalendarFooter(
-            workouts = workouts,
+            gymWorkouts = gymWorkouts,
+            cardioWorkouts = cardioWorkouts,
             workoutSessions = sessionsForMonth
         )
     }
@@ -489,17 +488,19 @@ private fun CalendarCard(
                         .fillMaxHeight(.5f)
                 ) {
                     itemsIndexed(sessionsForDialog) { index, session ->
+                        val workout = allWorkouts.find { it.id == session.workoutId }
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    onSessionClick(session)
+                                    onSessionClick(session.id, workout!!.type)
                                 }
                         ) {
                             Icon(
-                                painter = if (session.workout.type == WorkoutType.GYM)
+                                painter = if (workout!!.type == WorkoutType.GYM)
                                     painterResource(id = R.drawable.weight)
                                 else
                                     painterResource(id = R.drawable.run),
@@ -509,7 +510,7 @@ private fun CalendarCard(
                                 modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
                             ) {
                                 Text(
-                                    text = session.workout.name
+                                    text = workout.name
                                 )
                                 Text(
                                     text = session.timestamp.toDateAndTimeString()
@@ -530,25 +531,21 @@ private fun CalendarCard(
 
 @Composable
 fun CalendarFooter(
-    workouts: List<Workout>,
+    gymWorkouts: List<Workout>,
+    cardioWorkouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
     modifier: Modifier = Modifier
 ) {
-    val (gymWorkouts, cardioWorkouts) = remember(workouts) {
-        workouts.partition { it.type == WorkoutType.GYM }
+    val sessionsByWorkoutId = remember(workoutSessions) {
+        workoutSessions.groupBy { it.workoutId }
     }
-
-    val (gymSessions, cardioSessions) = remember(workoutSessions) {
-        workoutSessions.partition { it.workout.type == WorkoutType.GYM }
-    }
-
     Column(
         modifier = modifier
             .fillMaxWidth()
     ) {
         WorkoutLegendsRow(
             workouts = gymWorkouts,
-            workoutSessions = gymSessions
+            sessionsByWorkoutId = sessionsByWorkoutId
         )
         if (gymWorkouts.isNotEmpty() && cardioWorkouts.isNotEmpty()) {
             HorizontalDivider(
@@ -557,7 +554,7 @@ fun CalendarFooter(
         }
         WorkoutLegendsRow(
             workouts = cardioWorkouts,
-            workoutSessions = cardioSessions
+            sessionsByWorkoutId = sessionsByWorkoutId
         )
         Text(
             text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
@@ -568,19 +565,15 @@ fun CalendarFooter(
 @Composable
 fun WorkoutLegendsRow(
     workouts: List<Workout>,
-    workoutSessions: List<WorkoutSession>,
+    sessionsByWorkoutId: Map<Int, List<WorkoutSession>>,
     modifier: Modifier = Modifier
 ) {
-    val sessionsById = remember(workoutSessions) {
-        workoutSessions.groupBy { it.workout.id }
-    }
-
     FlowRow(
         maxItemsInEachRow = 3,
         modifier = modifier.fillMaxWidth()
     ) {
         workouts.forEachIndexed { index, workout ->
-            val sessionsAmount = sessionsById[workout.id]?.size ?: 0
+            val sessionsAmount = sessionsByWorkoutId[workout.id]?.size ?: 0
 
             WorkoutLegend(
                 workout = workout,
@@ -595,18 +588,14 @@ fun WorkoutLegendsRow(
 @Composable
 fun WorkoutLegendsColumn(
     workouts: List<Workout>,
-    workoutSessions: List<WorkoutSession>,
+    sessionsByWorkoutId: Map<Int, List<WorkoutSession>>,
     modifier: Modifier = Modifier
 ) {
-    val sessionsById = remember(workoutSessions) {
-        workoutSessions.groupBy { it.workout.id }
-    }
-
     Column(
         modifier = modifier
     ) {
         workouts.forEachIndexed { index, workout ->
-            val sessionsAmount = sessionsById[workout.id]?.size ?: 0
+            val sessionsAmount = sessionsByWorkoutId[workout.id]?.size ?: 0
 
             WorkoutLegend(
                 workout = workout,
@@ -708,22 +697,19 @@ private fun PieChartCard(
     workoutSessions: List<WorkoutSession>,
     modifier: Modifier = Modifier
 ) {
-    val sessionsByName = remember(workoutSessions) {
-        workoutSessions.groupBy { it.workout.name }
+    val sessionsByWorkoutId = remember(workoutSessions) {
+        workoutSessions.groupBy { it.workoutId }
     }
-    val workoutsById: Map<Int, Workout> = remember(workouts) {
-        workouts.associateBy { it.id }
-    }
-    var data by remember(sessionsByName) {
+
+    var data by remember {
         mutableStateOf(
-            sessionsByName.map { session ->
-                val workoutIndex =
-                    workouts.indexOf(workoutsById[session.value.first().workout.id])
-                val color =
-                    if (workoutIndex < 0) Color.Transparent else highlightColors[workoutIndex % highlightColors.size]
+            workouts.map { workout ->
+                val workoutIndex = workouts.indexOf(workout)
+                val amountOfSessions = sessionsByWorkoutId[workout.id]?.size?.toDouble() ?: 0.0
+                val color = highlightColors[workoutIndex % highlightColors.size]
                 Pie(
-                    label = session.key,
-                    data = session.value.size.toDouble(),
+                    label = workout.name,
+                    data = amountOfSessions,
                     color = color,
                     selectedColor = color.copy(alpha = .5f)
                 )
@@ -759,7 +745,7 @@ private fun PieChartCard(
                     }
                     WorkoutLegendsColumn(
                         workouts = workouts,
-                        workoutSessions = workoutSessions
+                        sessionsByWorkoutId = sessionsByWorkoutId
                     )
                 }
                 Text(
@@ -796,45 +782,69 @@ private fun PieChartCard(
 
 @Composable
 private fun StatsScreenForPreview() {
-    val workouts = List(MAX_SPLITS + MAX_CARDIO) {
+    val gymWorkouts = List(MAX_SPLITS) {
         val name =
             if (it == 0)
                 "This is a very long name that can overflow"
             else
-                "workout ${it + 1}"
+                "Gym ${it + 1}"
         Workout(
             id = it,
             name = name,
-            type = if (it < MAX_SPLITS) WorkoutType.GYM else WorkoutType.CARDIO
+            type = WorkoutType.GYM
         )
     }
+    val cardioWorkouts = List(MAX_CARDIO) {
+        val name =
+            if (it == 0)
+                "This is a very long name that can overflow"
+            else
+                "Cardio ${it + 1}"
+        Workout(
+            id = it + MAX_SPLITS,
+            name = name,
+            type = WorkoutType.CARDIO
+        )
+    }
+    val allWorkouts = gymWorkouts + cardioWorkouts
 
     val now = Instant.now()
 
-    val workoutsBetweenDates = List(20) {
+    val workoutSessionsBetween = List(20) {
         val timestamp = if (it > 4) now.minus(Duration.ofDays(it.toLong())) else now
         WorkoutSession(
             id = 0,
-            workout = workouts.random(),
+            workoutId = allWorkouts.random().id,
             timestamp = timestamp
         )
     }
 
-    val workoutsAllTime = List(10) {
+    val gymSessions = List(20) {
+        val timestamp = if (it > 4) now.minus(Duration.ofDays(it.toLong())) else now
         WorkoutSession(
-            id = 1,
-            workout = workouts.random(),
-            timestamp = now.minus(Duration.ofDays(it.toLong()))
+            id = 0,
+            workoutId = gymWorkouts.random().id,
+            timestamp = timestamp
         )
-    } + workoutsBetweenDates
+    }
+    val cardioSessions = List(20) {
+        val timestamp = if (it > 4) now.minus(Duration.ofDays(it.toLong())) else now
+        WorkoutSession(
+            id = 0,
+            workoutId = cardioWorkouts.random().id,
+            timestamp = timestamp
+        )
+    }
 
     StatsOverviewScreen(
         loading = false,
-        workouts = workouts,
-        workoutSessionsBetweenDates = workoutsBetweenDates,
-        workoutSessions = workoutsAllTime,
+        gymWorkouts = gymWorkouts,
+        cardioWorkouts = cardioWorkouts,
+        gymSessions = gymSessions,
+        cardioSessions = cardioSessions,
+        workoutSessionsForMonth = workoutSessionsBetween,
         getMonthData = { _, _ -> },
-        onSessionClick = {},
+        onSessionClick = { _, _ -> },
         onWorkoutNavigate = {}
     )
 }

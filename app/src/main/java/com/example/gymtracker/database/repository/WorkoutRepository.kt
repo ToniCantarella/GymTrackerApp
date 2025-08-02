@@ -5,8 +5,6 @@ import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.entity.WorkoutType
-import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
-import com.example.gymtracker.database.entity.gym.GymSessionEntity
 import java.time.Instant
 
 data class Workout(
@@ -17,34 +15,18 @@ data class Workout(
 
 data class WorkoutSession(
     val id: Int,
-    val workout: Workout,
+    val workoutId: Int,
     val timestamp: Instant,
 )
 
-interface WorkoutRepository {
-    suspend fun getAllWorkouts(): List<Workout>
-    suspend fun getAllWorkoutSessions(): List<WorkoutSession>
-    suspend fun getWorkoutSessionsBetweenDates(
-        startDate: Instant,
-        endDate: Instant
-    ): List<WorkoutSession>
-}
 
-/* TODO potential refactor idea
-    return list of workouts, with each having a list of sessions. Easier to handle in the ui
-        Workout
-            id
-            name
-            type
-            sessions [
-                Session
-                    id
-                    timestamp,
-                ...
-            ]
-          ...
-    fetch by type instead of all by once, since you split by type in the ui anyway
-* */
+interface WorkoutRepository {
+    suspend fun getGymWorkouts(): List<Workout>
+    suspend fun getCardioWorkouts(): List<Workout>
+    suspend fun getGymSessions(): List<WorkoutSession>
+    suspend fun getCardioSessions(): List<WorkoutSession>
+    suspend fun getWorkoutSessionsBetween(start: Instant, end: Instant): List<WorkoutSession>
+}
 
 class WorkoutRepositoryImpl(
     private val workoutDao: WorkoutDao,
@@ -52,102 +34,97 @@ class WorkoutRepositoryImpl(
     private val cardioDao: CardioDao,
     private val cardioSessionDao: CardioSessionDao
 ) : WorkoutRepository {
-
-    override suspend fun getAllWorkouts(): List<Workout> {
-        val workouts = workoutDao.getAllWorkouts()
-
-        return workouts.map {
+    override suspend fun getGymWorkouts(): List<Workout> {
+        val workouts = workoutDao.getAllGymWorkouts()
+        return workouts.map { workout ->
             Workout(
-                id = it.id,
-                name = it.name,
-                type = it.type
+                id = workout.id,
+                name = workout.name,
+                type = workout.type
             )
         }
     }
 
-    override suspend fun getAllWorkoutSessions(): List<WorkoutSession> {
-        val splitSessions = getAllGymWorkoutSessions()
-        val cardioSessions = getAllCardioWorkoutSessions()
-        return splitSessions + cardioSessions
+    override suspend fun getCardioWorkouts(): List<Workout> {
+        val workouts = workoutDao.getAllCardioWorkouts()
+        return workouts.map { workout ->
+            Workout(
+                id = workout.id,
+                name = workout.name,
+                type = workout.type
+            )
+        }
     }
 
-    override suspend fun getWorkoutSessionsBetweenDates(
-        startDate: Instant,
-        endDate: Instant
-    ): List<WorkoutSession> {
-        val gymSessions = getGymSessionsBetweenDates(startDate, endDate)
-        val cardioSessions = getCardioSessionsBetweenDates(startDate, endDate)
-        return gymSessions + cardioSessions
-    }
-
-    private suspend fun getAllGymWorkoutSessions(): List<WorkoutSession> {
-        val sessions = gymSessionDao.getAllSessions().filterNotNull()
-        return gymSessionsToWorkoutSessions(sessions)
-    }
-
-    private suspend fun getAllCardioWorkoutSessions(): List<WorkoutSession> {
-        val sessions = cardioSessionDao.getAllSessions().filterNotNull()
-        return cardioSessionsToWorkoutSessions(sessions)
-    }
-
-    private suspend fun getGymSessionsBetweenDates(
-        startDate: Instant,
-        endDate: Instant
-    ): List<WorkoutSession> {
-        val sessions = gymSessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
-        return gymSessionsToWorkoutSessions(sessions)
-    }
-
-    private suspend fun getCardioSessionsBetweenDates(
-        startDate: Instant,
-        endDate: Instant
-    ): List<WorkoutSession> {
-        val sessions = cardioSessionDao.getSessionsForTimespan(startDate, endDate).filterNotNull()
-        return cardioSessionsToWorkoutSessions(sessions)
-    }
-
-    private suspend fun gymSessionsToWorkoutSessions(sessions: List<GymSessionEntity>): List<WorkoutSession> {
-        if (sessions.isEmpty()) return emptyList()
-
-        val workouts = workoutDao.getAllGymWorkouts().associateBy { it.id }
-
+    override suspend fun getGymSessions(): List<WorkoutSession> {
+        val sessions = gymSessionDao.getAllSessions()
         return sessions.mapNotNull { session ->
-            val split = workouts[session.workoutId]
-            if (split != null) {
+            if (session != null) {
                 WorkoutSession(
                     id = session.id,
-                    workout = Workout(
-                        id = split.id,
-                        name = split.name,
-                        type = split.type
-                    ),
-                    timestamp = session.timestamp,
+                    workoutId = session.workoutId,
+                    timestamp = session.timestamp
                 )
             } else null
         }
     }
 
-    private suspend fun cardioSessionsToWorkoutSessions(sessions: List<CardioSessionEntity>): List<WorkoutSession> {
-        if (sessions.isEmpty()) return emptyList()
-
-        val workouts = workoutDao.getAllCardioWorkouts().associateBy { it.id }
+    override suspend fun getCardioSessions(): List<WorkoutSession> {
+        val sessions = cardioSessionDao.getAllSessions()
         val cardioList = cardioDao.getAllCardio().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
-            val cardio = cardioList[session.cardioId]
-            if (cardio != null) {
-                val workout = workouts[cardio.workoutId]
-                if (workout != null) {
-                    WorkoutSession(
-                        id = session.id,
-                        workout = Workout(
-                            id = workout.id,
-                            name = workout.name,
-                            type = workout.type
-                        ),
-                        timestamp = session.timestamp,
-                    )
-                } else null
+            val cardio = cardioList[session?.cardioId]
+            if (cardio != null && session != null) {
+                WorkoutSession(
+                    id = session.id,
+                    workoutId = cardio.workoutId,
+                    timestamp = session.timestamp
+                )
+            } else null
+        }
+    }
+
+    override suspend fun getWorkoutSessionsBetween(
+        start: Instant,
+        end: Instant
+    ): List<WorkoutSession> {
+        val gymSessions = getGymSessionsBetween(start, end)
+        val cardioSessions = getCardioSessionsBetween(start, end)
+        return gymSessions + cardioSessions
+    }
+
+    private suspend fun getGymSessionsBetween(
+        start: Instant,
+        end: Instant
+    ): List<WorkoutSession> {
+        val sessions = gymSessionDao.getSessionsForTimespan(start, end)
+        return sessions.mapNotNull { session ->
+            if (session != null) {
+                WorkoutSession(
+                    id = session.id,
+                    workoutId = session.workoutId,
+                    timestamp = session.timestamp
+                )
+            } else null
+        }
+    }
+
+    private suspend fun getCardioSessionsBetween(
+        start: Instant,
+        end: Instant
+    ): List<WorkoutSession> {
+        val sessions = cardioSessionDao.getSessionsForTimespan(start, end)
+        val cardioList = cardioDao.getAllCardio().associateBy { it.id }
+
+        return sessions.mapNotNull { session ->
+            val cardio = cardioList[session?.cardioId]
+            if (cardio != null && session != null) {
+                WorkoutSession(
+                    id = session.id,
+                    workoutId = cardio.workoutId,
+                    timestamp = session.timestamp
+                )
             } else null
         }
     }

@@ -178,11 +178,11 @@ fun GymTrackerApp(
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
                         onNavigateBack = { navController.popBackStack() },
-                        onSessionNavigate = {
-                            if (it.workout.type == WorkoutType.GYM) {
-                                navController.navigate(Route.GymSession(it.id))
+                        onSessionNavigate = { id, type ->
+                            if (type == WorkoutType.GYM) {
+                                navController.navigate(Route.GymSession(id))
                             } else {
-                                navController.navigate(Route.CardioSession(it.id))
+                                navController.navigate(Route.CardioSession(id))
                             }
                         },
                         onWorkoutNavigate = {
