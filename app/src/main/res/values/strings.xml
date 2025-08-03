@@ -62,4 +62,6 @@
     <string name="edit">Edit</string>
     <string name="unsaved_changes">You have unsaved changes. Do you want to continue without saving?</string>
     <string name="ok" translatable="false">Ok</string>
+    <string name="confirm_done_workout">Do you want to finish this workout?</string>
+    <string name="do_not_ask_again">Don\'t ask again</string>
 </resources>

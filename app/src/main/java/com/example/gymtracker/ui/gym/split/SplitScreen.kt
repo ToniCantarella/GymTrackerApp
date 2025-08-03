@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,17 +55,32 @@ fun SplitScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    var backNavigationDialog by remember { mutableStateOf(false) }
-    var dialogNavigationAction: () -> Unit by remember { mutableStateOf({}) }
+    var navigationDialogOpen by remember { mutableStateOf(false) }
+    var navigationDialogOnNavigate: () -> Unit by remember { mutableStateOf({}) }
+
     val hasUnsavedChanges =
         uiState.initialSplitName != uiState.splitName || uiState.initialExercises != uiState.exercises
 
     fun navigationCheck(onNavigate: () -> Unit) {
         if (hasUnsavedChanges) {
-            backNavigationDialog = true
-            dialogNavigationAction = onNavigate
+            navigationDialogOpen = true
+            navigationDialogOnNavigate = onNavigate
         } else {
             onNavigate()
+        }
+
+    }
+
+    var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
+
+    fun onFinishWorkout() = viewModel.onFinishWorkoutPressed { onNavigateBack() }
+
+    fun finishWorkoutCheck() {
+        val hasSetsChecked = uiState.exercises.any { it.sets.any { set -> set.checked } }
+        if (hasSetsChecked && uiState.showConfirmOnFinishWorkout) {
+            finishWorkoutDialogOpen = true
+        } else {
+            onFinishWorkout()
         }
     }
 
@@ -74,7 +90,7 @@ fun SplitScreen(
 
     ProvideNavigationBarGuard(
         isGuarded = hasUnsavedChanges,
-        onGuard = { backNavigationDialog = true }
+        onGuard = { navigationDialogOpen = true }
     )
     val proceedOnGuardCleared = rememberProceedOnGuardCleared()
 
@@ -109,7 +125,7 @@ fun SplitScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = { viewModel.onFinishWorkoutPressed { onNavigateBack() } }
+        onClick = ::finishWorkoutCheck
     ) {
         Icon(
             imageVector = Icons.Default.Done,
@@ -132,7 +148,7 @@ fun SplitScreen(
         onCheckSet = viewModel::onCheckSet
     )
 
-    if (backNavigationDialog) {
+    if (navigationDialogOpen) {
         ConfirmDialog(
             subtitle = {
                 Text(
@@ -142,7 +158,7 @@ fun SplitScreen(
             },
             cancelButton = {
                 OutlinedButton(
-                    onClick = { backNavigationDialog = false }
+                    onClick = { navigationDialogOpen = false }
                 ) {
                     Text(
                         text = stringResource(id = R.string.cancel)
@@ -152,8 +168,8 @@ fun SplitScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        backNavigationDialog = false
-                        dialogNavigationAction.invoke()
+                        navigationDialogOpen = false
+                        navigationDialogOnNavigate.invoke()
                         proceedOnGuardCleared()
                     }
                 ) {
@@ -162,7 +178,51 @@ fun SplitScreen(
                     )
                 }
             },
-            onDismissRequest = { backNavigationDialog = false }
+            onDismissRequest = { navigationDialogOpen = false }
+        )
+    }
+
+    if (finishWorkoutDialogOpen) {
+        ConfirmDialog(
+            subtitle = {
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.confirm_done_workout),
+                        textAlign = TextAlign.Center
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            uiState.doNotAskAgain,
+                            onCheckedChange = viewModel::onShowFinishDialogChecked
+                        )
+                        Text(
+                            text = stringResource(id = R.string.do_not_ask_again)
+                        )
+                    }
+                }
+            },
+            cancelButton = {
+                OutlinedButton(
+                    onClick = { finishWorkoutDialogOpen = false }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        finishWorkoutDialogOpen = false
+                        onFinishWorkout()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.ok)
+                    )
+                }
+            },
+            onDismissRequest = { finishWorkoutDialogOpen = false }
         )
     }
 }

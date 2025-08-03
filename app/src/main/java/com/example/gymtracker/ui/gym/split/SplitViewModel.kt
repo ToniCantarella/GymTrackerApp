@@ -1,5 +1,9 @@
 package com.example.gymtracker.ui.gym.split
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,10 +14,14 @@ import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.utility.SplitUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.UUID
+
+private val SHOW_FINISH_WORKOUT_DIALOG = booleanPreferencesKey("show_finish_workout_dialog")
 
 data class SplitUiState(
     val loading: Boolean = false,
@@ -22,12 +30,15 @@ data class SplitUiState(
     val latestTimestamp: Instant? = null,
     val exercises: List<Exercise> = emptyList(),
     val initialSplitName: String = "",
-    val initialExercises: List<Exercise> = emptyList()
+    val initialExercises: List<Exercise> = emptyList(),
+    val showConfirmOnFinishWorkout: Boolean = true,
+    val doNotAskAgain: Boolean = false
 )
 
 class SplitViewModel(
     savedStateHandle: SavedStateHandle,
-    private val gymRepository: GymRepository
+    private val gymRepository: GymRepository,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
     private val splitUtil = SplitUtil()
     private val navParams = savedStateHandle.toRoute<Route.Split>()
@@ -40,6 +51,11 @@ class SplitViewModel(
             val latestSplit = gymRepository.getLatestSplitWithExercises(navParams.id)
             val splitName = latestSplit?.name ?: ""
             val exercises = latestSplit?.exercises ?: emptyList()
+
+            val showFinishWorkoutDialog = dataStore.data
+                .map { it[SHOW_FINISH_WORKOUT_DIALOG] ?: true }
+                .first()
+
             _uiState.update {
                 it.copy(
                     splitId = navParams.id,
@@ -48,6 +64,7 @@ class SplitViewModel(
                     exercises = exercises,
                     initialSplitName = splitName,
                     initialExercises = exercises,
+                    showConfirmOnFinishWorkout = showFinishWorkoutDialog,
                     loading = false
                 )
             }
@@ -139,6 +156,14 @@ class SplitViewModel(
         }
     }
 
+    fun onShowFinishDialogChecked(checked: Boolean) {
+        _uiState.update {
+            it.copy(
+                doNotAskAgain = checked
+            )
+        }
+    }
+
     fun onFinishWorkoutPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
             gymRepository.markSplitSessionDone(
@@ -146,6 +171,13 @@ class SplitViewModel(
                 splitName = uiState.value.splitName,
                 exercises = uiState.value.exercises
             )
+
+            if (uiState.value.showConfirmOnFinishWorkout && uiState.value.doNotAskAgain) {
+                dataStore.edit { preferences ->
+                    preferences[SHOW_FINISH_WORKOUT_DIALOG] = false
+                }
+            }
+
             onFinish()
         }
     }
