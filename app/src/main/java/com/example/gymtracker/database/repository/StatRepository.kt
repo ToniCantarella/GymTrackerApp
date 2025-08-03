@@ -72,20 +72,31 @@ class StatRepositoryImpl(
             exercises = exercises.map { exercise ->
                 val setsForExercise = setDao.getSetsForExercise(exercise.id)
 
+                var lastKnownMin = 0.0
+                var lastKnownMax = 0.0
+
                 ExerciseWithHistory(
                     name = exercise.name,
                     setHistory = gymSessions.map { gymSession ->
-                        val setsForSession =
-                            setSessionDao.getSetsForSession(gymSession.id).associateBy { it.setId }
+                        val setsForSession = setSessionDao
+                            .getSetsForSession(gymSession.id)
+                            .associateBy { it.setId }
                         val setSessionForExercise = setsForExercise.mapNotNull { set ->
                             setsForSession[set.id]
                         }
-                        val min = setSessionForExercise.minByOrNull { it.weight }?.weight ?: 0.0
-                        val max = setSessionForExercise.maxByOrNull { it.weight }?.weight ?: 0.0
+
+                        val min = setSessionForExercise.minByOrNull { it.weight }?.weight
+                        val max = setSessionForExercise.maxByOrNull { it.weight }?.weight
+
+                        val finalMin = min ?: lastKnownMin
+                        val finalMax = max ?: lastKnownMax
+
+                        if (min != null) lastKnownMin = min
+                        if (max != null) lastKnownMax = max
 
                         SetData(
-                            min = min,
-                            max = max,
+                            min = finalMin,
+                            max = finalMax,
                             timestamp = gymSession.timestamp
                         )
                     }

@@ -48,9 +48,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SplitStatsScreen(
     onNavigateBack: () -> Unit,
-    viewmModel: SplitStatsViewModel = koinViewModel()
+    viewModel: SplitStatsViewModel = koinViewModel()
 ) {
-    val uiState by viewmModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     ProvideTopAppBar(
         title = {
