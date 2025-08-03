@@ -63,7 +63,14 @@ private fun GenericNumericTextField(
     valueValidator: (value: String) -> Boolean,
     modifier: Modifier = Modifier
 ) {
-    var valueString by remember { mutableStateOf(value.toString()) }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    fun Number.toCleanString(): String =
+        BigDecimal.valueOf(this.toDouble()).stripTrailingZeros().toPlainString()
+
+    var valueString by rememberSaveable { mutableStateOf(value?.toCleanString() ?: "") }
+
     OutlinedTextField(
         value = valueString,
         onValueChange = {
