@@ -11,10 +11,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+
+
 data class CreateSplitUiState(
     val splitName: String = "",
-    val exercises: List<Exercise> = listOf(Exercise.emptyExercise())
-)
+    val exercises: List<Exercise> = defaultExercises,
+    val initialExercises: List<Exercise> = defaultExercises
+){
+    companion object {
+        val defaultExercises = listOf(Exercise.emptyExercise())
+    }
+}
 
 class CreateSplitViewModel(
     private val gymRepository: GymRepository
