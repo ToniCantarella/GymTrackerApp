@@ -149,14 +149,15 @@ fun Exercise(
                     )
                 }
             }
-            if (editingExercise && deleteEnabled) {
+            if (editingExercise) {
                 IconButton(
-                    onClick = onDeletePressed
+                    onClick = onDeletePressed,
+                    enabled = deleteEnabled
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = stringResource(id = R.string.delete),
-                        tint = MaterialTheme.colorScheme.error
+                        tint = if (deleteEnabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .5f)
                     )
                 }
             }
