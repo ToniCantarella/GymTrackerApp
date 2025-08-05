@@ -19,7 +19,7 @@ interface CardioRepository {
     suspend fun getLatestCardio(id: Int): Cardio
     suspend fun getCardioBySession(sessionId: Int): Cardio
     suspend fun deleteCardio(cardioId: Int)
-    suspend fun markCardioSessionDone(id: Int, cardio: Cardio)
+    suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant? = null)
 }
 
 class CardioRepositoryImpl(
@@ -102,7 +102,7 @@ class CardioRepositoryImpl(
     override suspend fun deleteCardio(cardioId: Int) = workoutDao.deleteById(cardioId)
 
 
-    override suspend fun markCardioSessionDone(id: Int, cardio: Cardio) {
+    override suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant?) {
         val workout = workoutDao.getById(id)
         val newName = cardio.name.trim()
 
@@ -140,7 +140,7 @@ class CardioRepositoryImpl(
         cardioSessionDao.insert(
             CardioSessionEntity(
                 cardioId = currentCardio.id,
-                timestamp = Instant.now(),
+                timestamp = timestamp ?: Instant.now(),
                 steps = cardio.steps,
                 distance = cardio.distance,
                 duration = cardio.duration

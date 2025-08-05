@@ -3,11 +3,13 @@ package com.example.gymtracker.ui.stats.overview
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,8 +26,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -35,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +52,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
@@ -81,10 +88,12 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaYearMonth
 import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toKotlinYearMonth
 import kotlinx.datetime.todayIn
 import org.koin.androidx.compose.koinViewModel
@@ -96,12 +105,14 @@ import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
 
 @Composable
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
     onSessionNavigate: (id: Int, type: WorkoutType) -> Unit,
-    onWorkoutNavigate: (workout: Workout) -> Unit,
+    onAddSessionNavigate: (workout: Workout, timestamp: Instant) -> Unit,
+    onWorkoutStatsNavigate: (workout: Workout) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -132,8 +143,9 @@ fun StatsOverviewScreen(
         cardioSessions = uiState.cardioSessions,
         workoutSessionsForMonth = uiState.workoutSessionsBetween,
         getMonthData = viewModel::getMonthData,
-        onSessionClick = onSessionNavigate,
-        onWorkoutNavigate = onWorkoutNavigate
+        onSessionNavigate = onSessionNavigate,
+        onAddSessionNavigate = onAddSessionNavigate,
+        onWorkoutStatsNavigate = onWorkoutStatsNavigate
     )
 }
 
@@ -146,8 +158,9 @@ private fun StatsOverviewScreen(
     cardioSessions: List<WorkoutSession>,
     workoutSessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
-    onSessionClick: (id: Int, type: WorkoutType) -> Unit,
-    onWorkoutNavigate: (workout: Workout) -> Unit
+    onSessionNavigate: (id: Int, type: WorkoutType) -> Unit,
+    onAddSessionNavigate: (workout: Workout, timestamp: Instant) -> Unit,
+    onWorkoutStatsNavigate: (workout: Workout) -> Unit
 ) {
     if (loading) {
         Box(
@@ -169,7 +182,8 @@ private fun StatsOverviewScreen(
                     cardioWorkouts = cardioWorkouts,
                     sessionsForMonth = workoutSessionsForMonth,
                     getMonthData = getMonthData,
-                    onSessionClick = onSessionClick
+                    onSessionClick = onSessionNavigate,
+                    onAddSessionClick = onAddSessionNavigate
                 )
             }
             if (gymWorkouts.isNotEmpty()) {
@@ -193,7 +207,7 @@ private fun StatsOverviewScreen(
                     WorkoutListing(
                         gymWorkouts = gymWorkouts,
                         cardioWorkouts = cardioWorkouts,
-                        onWorkoutNavigate = onWorkoutNavigate
+                        onWorkoutNavigate = onWorkoutStatsNavigate
                     )
                 }
             }
@@ -314,10 +328,15 @@ private fun CalendarCard(
     sessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
     onSessionClick: (id: Int, type: WorkoutType) -> Unit,
+    onAddSessionClick: (workout: Workout, timestamp: Instant) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val zoneId = ZoneId.systemDefault()
+
+    var addForDayButtonsVisible by remember { mutableStateOf(false) }
+    var addSessionDialogOpen by remember { mutableStateOf(false) }
+    var timestamp by remember { mutableStateOf<Instant?>(null) }
 
     val currentMonth = remember { YearMonth.now().toKotlinYearMonth() }
     val startMonth = remember { currentMonth.minusMonths(100) }
@@ -330,6 +349,13 @@ private fun CalendarCard(
         firstVisibleMonth = currentMonth,
         firstDayOfWeek = daysOfWeek.first()
     )
+
+    val monthString =
+        state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
+            TextStyle.FULL_STANDALONE,
+            Locale.getDefault()
+        )
+    val yearString = state.firstVisibleMonth.yearMonth.year
 
     var sessionDialogOpen by remember { mutableStateOf(false) }
     val todayButtonVisible =
@@ -371,19 +397,33 @@ private fun CalendarCard(
     }
 
     StatsCard(modifier = modifier) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Box(
             modifier = Modifier.fillMaxWidth()
         ) {
-            val monthString =
-                state.firstVisibleMonth.yearMonth.toJavaYearMonth().month.getDisplayName(
-                    TextStyle.FULL_STANDALONE,
-                    Locale.getDefault()
+            val rotation by animateFloatAsState(
+                targetValue = if (addForDayButtonsVisible) 45f else 0f,
+                label = "Icon Rotation"
+            )
+
+            TextButton(
+                onClick = { addForDayButtonsVisible = !addForDayButtonsVisible },
+                shape = CircleShape,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .rotate(rotation)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = if (addForDayButtonsVisible) stringResource(id = R.string.close) else stringResource(
+                        id = R.string.add
+                    )
                 )
-            val yearString = state.firstVisibleMonth.yearMonth.year
+            }
             Text(
                 text = "$monthString $yearString",
-                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_large))
+                modifier = Modifier.align(Alignment.Center)
             )
             TextButton(
                 onClick = {
@@ -393,12 +433,12 @@ private fun CalendarCard(
                         )
                     }
                 },
-                enabled = todayButtonVisible
+                enabled = todayButtonVisible,
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 AnimatedVisibility(
                     visible = todayButtonVisible
                 ) {
-
                     Text(
                         text = stringResource(id = R.string.today)
                     )
@@ -445,24 +485,56 @@ private fun CalendarCard(
                     day = day,
                     onClick = if (hasSessions) ::onClick else null
                 ) {
-                    if (hasSessions) {
-                        sessionsOnDay.forEach { session ->
-                            val workout = allWorkouts.find { it.id == session.workoutId }
+                    Box(
+                        modifier = Modifier.matchParentSize()
+                    ) {
+                        if (addForDayButtonsVisible && day.position == DayPosition.MonthDate && day.date <= today) {
+                            Box(
+                                modifier = Modifier
+                                    .clickable(
+                                        indication = ripple(color = MaterialTheme.colorScheme.primary),
+                                        interactionSource = remember { MutableInteractionSource() }
+                                    ) {
+                                        timestamp =
+                                            day.date.atStartOfDayIn(zoneId.toKotlinTimeZone())
+                                                .toJavaInstant()
+                                        addSessionDialogOpen = true
+                                    }
+                                    .matchParentSize()
 
-                            if (workout?.type == WorkoutType.GYM) {
-                                val workoutIndex =
-                                    gymWorkouts.indexOf(workout)
-                                WorkoutIcon(
-                                    painter = painterResource(id = R.drawable.weight),
-                                    tint = highlightColors[workoutIndex % highlightColors.size]
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = stringResource(id = R.string.add),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.align(Alignment.Center)
                                 )
-                            } else {
-                                val workoutIndex =
-                                    cardioWorkouts.indexOf(workout)
-                                WorkoutIcon(
-                                    painter = painterResource(id = R.drawable.run),
-                                    tint = highlightColors[workoutIndex % highlightColors.size]
-                                )
+                            }
+                        }
+                        if (hasSessions) {
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier.align(Alignment.BottomStart)
+                            ) {
+                                sessionsOnDay.forEach { session ->
+                                    val workout = allWorkouts.find { it.id == session.workoutId }
+
+                                    if (workout?.type == WorkoutType.GYM) {
+                                        val workoutIndex =
+                                            gymWorkouts.indexOf(workout)
+                                        WorkoutIcon(
+                                            painter = painterResource(id = R.drawable.weight),
+                                            tint = highlightColors[workoutIndex % highlightColors.size]
+                                        )
+                                    } else {
+                                        val workoutIndex =
+                                            cardioWorkouts.indexOf(workout)
+                                        WorkoutIcon(
+                                            painter = painterResource(id = R.drawable.run),
+                                            tint = highlightColors[workoutIndex % highlightColors.size]
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -514,6 +586,52 @@ private fun CalendarCard(
                                 )
                                 Text(
                                     text = session.timestamp.toDateAndTimeString()
+                                )
+                            }
+                        }
+                        if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (addSessionDialogOpen) {
+        Dialog(
+            onDismissRequest = { addSessionDialogOpen = false }
+        ) {
+            ElevatedCard {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(dimensionResource(id = R.dimen.padding_large))
+                        .fillMaxHeight(.5f)
+                ) {
+                    itemsIndexed(allWorkouts) { index, workout ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    timestamp?.let { onAddSessionClick(workout, it) }
+                                }
+                        ) {
+                            Icon(
+                                painter = if (workout.type == WorkoutType.GYM)
+                                    painterResource(id = R.drawable.weight)
+                                else
+                                    painterResource(id = R.drawable.run),
+                                contentDescription = stringResource(id = R.string.icon)
+                            )
+                            Column(
+                                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                            ) {
+                                Text(
+                                    text = workout.name
                                 )
                             }
                         }
@@ -657,7 +775,7 @@ val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 private fun Day(
     day: CalendarDay,
     onClick: (() -> Unit)? = null,
-    contentIcons: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -677,12 +795,7 @@ private fun Day(
             ),
         contentAlignment = Alignment.Center
     ) {
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.align(Alignment.BottomStart)
-        ) {
-            contentIcons()
-        }
+        content()
         Text(
             text = day.date.day.toString(),
             color = MaterialTheme.colorScheme.onSurface,
@@ -844,8 +957,9 @@ private fun StatsScreenForPreview() {
         cardioSessions = cardioSessions,
         workoutSessionsForMonth = workoutSessionsBetween,
         getMonthData = { _, _ -> },
-        onSessionClick = { _, _ -> },
-        onWorkoutNavigate = {}
+        onSessionNavigate = { _, _ -> },
+        onWorkoutStatsNavigate = {},
+        onAddSessionNavigate = { _, _ -> }
     )
 }
 

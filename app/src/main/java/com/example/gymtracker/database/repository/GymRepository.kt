@@ -41,7 +41,8 @@ interface GymRepository {
     suspend fun markSplitSessionDone(
         splitId: Int,
         splitName: String,
-        exercises: List<Exercise>
+        exercises: List<Exercise>,
+        timestamp: Instant? = null
     )
 }
 
@@ -166,7 +167,8 @@ class GymRepositoryImpl(
     override suspend fun markSplitSessionDone(
         splitId: Int,
         splitName: String,
-        exercises: List<Exercise>
+        exercises: List<Exercise>,
+        timestamp: Instant?
     ) {
         if (exercises.isEmpty()) return
 
@@ -187,7 +189,7 @@ class GymRepositoryImpl(
             gymSessionDao.insert(
                 GymSessionEntity(
                     workoutId = splitId,
-                    timestamp = Instant.now()
+                    timestamp = timestamp ?: Instant.now()
                 )
             ).toInt()
         } else null

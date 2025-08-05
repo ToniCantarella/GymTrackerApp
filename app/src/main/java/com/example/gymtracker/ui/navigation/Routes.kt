@@ -15,7 +15,7 @@ open class Route {
     object SplitList : Route()
 
     @Serializable
-    class Split(val id: Int) : Route()
+    class Split(val id: Int, val timestampString: String? = null) : Route()
 
     @Serializable
     object CreateSplit : Route()
@@ -27,7 +27,7 @@ open class Route {
     object CardioList : Route()
 
     @Serializable
-    class CardioItem(val id: Int) : Route()
+    class CardioItem(val id: Int, val timestampString: String? = null) : Route()
 
     @Serializable
     object CreateCardio : Route()

@@ -43,6 +43,7 @@ import com.example.gymtracker.ui.navigation.rememberProceedOnGuardCleared
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
 import com.example.gymtracker.utility.toDateAndTimeString
+import com.example.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.util.UUID
@@ -136,6 +137,7 @@ fun SplitScreen(
     SplitScreen(
         loading = uiState.loading,
         latestTimestamp = uiState.latestTimestamp,
+        addingTimestamp = uiState.selectedTimestamp,
         exercises = uiState.exercises,
         addExercise = viewModel::addExercise,
         onRemoveExercise = viewModel::onRemoveExercise,
@@ -231,6 +233,7 @@ fun SplitScreen(
 fun SplitScreen(
     loading: Boolean,
     latestTimestamp: Instant?,
+    addingTimestamp: Instant?,
     exercises: List<Exercise>,
     addExercise: () -> Unit,
     onRemoveExercise: (exerciseId: UUID) -> Unit,
@@ -256,9 +259,16 @@ fun SplitScreen(
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
             ) {
-                Text(
-                    text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString() ?: "-"}"
-                )
+                if(addingTimestamp != null) {
+                    Text(
+                        text = "${stringResource(id = R.string.adding_for_date)}: ${addingTimestamp.toDateString()}"
+                    )
+                }    else
+                {
+                    Text(
+                        text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString() ?: "-"}"
+                    )
+                }
             }
             ExerciseList(
                 exercises = exercises,
@@ -282,6 +292,7 @@ private fun ScreenForPreview(
     SplitScreen(
         loading = false,
         latestTimestamp = Instant.now(),
+        addingTimestamp = null,
         exercises = listOf(
             Exercise(
                 name = "Bench press",

@@ -185,7 +185,14 @@ fun GymTrackerApp(
                                 navController.navigate(Route.CardioSession(id))
                             }
                         },
-                        onWorkoutNavigate = {
+                        onAddSessionNavigate = { workout, timestamp ->
+                            if (workout.type == WorkoutType.GYM) {
+                                navController.navigate(Route.Split(workout.id, timestamp.toString()))
+                            } else {
+                                navController.navigate(Route.CardioItem(workout.id, timestamp.toString()))
+                            }
+                        },
+                        onWorkoutStatsNavigate = {
                             if (it.type == WorkoutType.GYM) {
                                 navController.navigate(Route.SplitStats(it.id))
                             } else {

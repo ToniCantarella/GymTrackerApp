@@ -56,4 +56,5 @@
     <string name="unsaved_changes">Sinulla on tallentamattomia muutoksia. Haluatko jatkaa tallentamatta?</string>
     <string name="confirm_done_workout">Tahdotko päättää tämän treenin?</string>
     <string name="do_not_ask_again">Älä kysy uudestaan</string>
+    <string name="adding_for_date">Lisätään</string>
 </resources>

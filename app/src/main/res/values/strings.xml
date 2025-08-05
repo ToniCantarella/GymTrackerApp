@@ -64,4 +64,5 @@
     <string name="ok" translatable="false">Ok</string>
     <string name="confirm_done_workout">Do you want to finish this workout?</string>
     <string name="do_not_ask_again">Don\'t ask again</string>
+    <string name="adding_for_date">Adding for</string>
 </resources>

@@ -32,7 +32,8 @@ data class SplitUiState(
     val initialSplitName: String = "",
     val initialExercises: List<Exercise> = emptyList(),
     val showConfirmOnFinishWorkout: Boolean = true,
-    val doNotAskAgain: Boolean = false
+    val doNotAskAgain: Boolean = false,
+    val selectedTimestamp: Instant? = null
 )
 
 class SplitViewModel(
@@ -51,6 +52,7 @@ class SplitViewModel(
             val latestSplit = gymRepository.getLatestSplitWithExercises(navParams.id)
             val splitName = latestSplit?.name ?: ""
             val exercises = latestSplit?.exercises ?: emptyList()
+            val selectedTimestamp = navParams.timestampString?.let{ Instant.parse(it) }
 
             val showFinishWorkoutDialog = dataStore.data
                 .map { it[SHOW_FINISH_WORKOUT_DIALOG] ?: true }
@@ -61,6 +63,7 @@ class SplitViewModel(
                     splitId = navParams.id,
                     splitName = splitName,
                     latestTimestamp = latestSplit?.timestamp,
+                    selectedTimestamp = selectedTimestamp,
                     exercises = exercises,
                     initialSplitName = splitName,
                     initialExercises = exercises,
@@ -169,7 +172,8 @@ class SplitViewModel(
             gymRepository.markSplitSessionDone(
                 splitId = navParams.id,
                 splitName = uiState.value.splitName,
-                exercises = uiState.value.exercises
+                exercises = uiState.value.exercises,
+                timestamp = uiState.value.selectedTimestamp
             )
 
             if (uiState.value.showConfirmOnFinishWorkout && uiState.value.doNotAskAgain) {
