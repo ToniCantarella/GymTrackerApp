@@ -405,21 +405,23 @@ private fun CalendarCard(
                 label = "Icon Rotation"
             )
 
-            TextButton(
-                onClick = { addForDayButtonsVisible = !addForDayButtonsVisible },
-                shape = CircleShape,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .rotate(rotation)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = if (addForDayButtonsVisible) stringResource(id = R.string.close) else stringResource(
-                        id = R.string.add
+            if (allWorkouts.isNotEmpty()) {
+                TextButton(
+                    onClick = { addForDayButtonsVisible = !addForDayButtonsVisible },
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .rotate(rotation)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = if (addForDayButtonsVisible) stringResource(id = R.string.close) else stringResource(
+                            id = R.string.add
+                        )
                     )
-                )
+                }
             }
             Text(
                 text = "$monthString $yearString",
