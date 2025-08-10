@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -43,10 +45,15 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -99,6 +106,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun keyboardAsState(): State<Boolean> {
+    val ime = WindowInsets.ime
+    val isOpen = ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isOpen)
+}
+
+@Composable
 fun GymTrackerApp(
     viewModel: MainViewModel
 ) {
@@ -106,12 +120,23 @@ fun GymTrackerApp(
     val navController = rememberNavController()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+    val focusManager = LocalFocusManager.current
+    val isKeyboardOpen by keyboardAsState()
+
     val navigationAnimationMoveInt = 1500
 
     val enter = if (isLandscape) fadeIn() else slideInHorizontally { navigationAnimationMoveInt }
     val exit = if (isLandscape) fadeOut() else slideOutHorizontally { -navigationAnimationMoveInt }
-    val popEnter = if (isLandscape) fadeIn() else slideInHorizontally { -navigationAnimationMoveInt }
-    val popExit = if (isLandscape) fadeOut() else slideOutHorizontally { navigationAnimationMoveInt }
+    val popEnter =
+        if (isLandscape) fadeIn() else slideInHorizontally { -navigationAnimationMoveInt }
+    val popExit =
+        if (isLandscape) fadeOut() else slideOutHorizontally { navigationAnimationMoveInt }
+
+    LaunchedEffect(isKeyboardOpen) {
+        if (!isKeyboardOpen) {
+            focusManager.clearFocus()
+        }
+    }
 
     GymScaffold(
         navController = navController
@@ -187,9 +212,19 @@ fun GymTrackerApp(
                         },
                         onAddSessionNavigate = { workout, timestamp ->
                             if (workout.type == WorkoutType.GYM) {
-                                navController.navigate(Route.Split(workout.id, timestamp.toString()))
+                                navController.navigate(
+                                    Route.Split(
+                                        workout.id,
+                                        timestamp.toString()
+                                    )
+                                )
                             } else {
-                                navController.navigate(Route.CardioItem(workout.id, timestamp.toString()))
+                                navController.navigate(
+                                    Route.CardioItem(
+                                        workout.id,
+                                        timestamp.toString()
+                                    )
+                                )
                             }
                         },
                         onWorkoutStatsNavigate = {

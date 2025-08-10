@@ -66,6 +66,7 @@ private fun GenericNumericTextField(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+
     fun Number.toCleanString(): String =
         BigDecimal.valueOf(this.toDouble()).stripTrailingZeros().toPlainString()
 
