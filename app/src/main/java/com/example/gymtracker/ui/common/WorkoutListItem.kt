@@ -1,10 +1,17 @@
 package com.example.gymtracker.ui.common
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
@@ -16,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.database.repository.WorkoutListItem
 import com.example.gymtracker.utility.toDateAndTimeString
@@ -57,11 +65,17 @@ fun WorkoutListItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            if (selectingItems) {
-                Checkbox(
-                    checked = selected,
-                    onCheckedChange = onSelect
-                )
+            AnimatedVisibility(
+                visible = selectingItems,
+                enter = slideInHorizontally(initialOffsetX = { it / 2 }) + fadeIn(),
+                exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut()
+            ) {
+                Box(modifier.height(40.dp)) {
+                    Checkbox(
+                        checked = selected,
+                        onCheckedChange = onSelect
+                    )
+                }
             }
         }
     }
