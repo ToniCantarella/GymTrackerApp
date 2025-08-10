@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -34,7 +32,7 @@ import com.example.gymtracker.R
 import com.example.gymtracker.database.repository.WorkoutListItem
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
-import com.example.gymtracker.ui.common.WorkoutListItem
+import com.example.gymtracker.ui.common.WorkoutList
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.utility.MAX_CARDIO
@@ -177,22 +175,13 @@ private fun CardioListScreen(
                 }
             )
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                cardioList.forEach { cardio ->
-                    WorkoutListItem(
-                        workout = cardio,
-                        selectingItems = selectingItems,
-                        selected = cardio.selected,
-                        onSelect = { onSelect(cardio.id, it) },
-                        onHold = { onCardioHold(cardio.id) },
-                        onClick = { onCardioClick(cardio.id) }
-                    )
-                }
-            }
+            WorkoutList(
+                workouts = cardioList,
+                selectingItems = selectingItems,
+                onSelect = onSelect,
+                onHold = onCardioHold,
+                onClick = onCardioClick
+            )
         }
     }
 }

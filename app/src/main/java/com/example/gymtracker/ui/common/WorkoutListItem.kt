@@ -34,16 +34,17 @@ fun WorkoutListItem(
     selectingItems: Boolean,
     selected: Boolean,
     onSelect: (selected: Boolean) -> Unit,
-    onHold: () -> Unit,
-    onClick: () -> Unit,
+    onHold: (id: Int) -> Unit,
+    onClick: (id: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { if (!selectingItems) onClick() },
-                onLongClick = onHold
+                onClick = { if (!selectingItems) onClick(workout.id) },
+                enabled = !selectingItems,
+                onLongClick = { onHold(workout.id) }
             )
     ) {
         Row(
