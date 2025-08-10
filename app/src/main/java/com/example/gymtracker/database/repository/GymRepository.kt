@@ -96,7 +96,7 @@ class GymRepositoryImpl(
                 name = it.name,
                 latestTimestamp = timestamp
             )
-        }.sortedBy { it.latestTimestamp }
+        }
     }
 
     override suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises? {
