@@ -1,11 +1,13 @@
 package com.example.gymtracker.ui.gym.common
 
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -31,6 +33,7 @@ import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.utility.MAX_EXERCISES
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -80,6 +83,7 @@ fun ExerciseList(
 
     ExerciseLazyColumn(
         exercises = exercises,
+        state = lazyListState,
         modifier = modifier
     ) { index, exercise, placeholderName ->
         Exercise(
@@ -116,7 +120,13 @@ fun ExerciseList(
                 onClick = {
                     onAddExercise()
                     scope.launch {
-                        lazyListState.animateScrollToItem(exercises.size)
+                        val targetIndex = exercises.size - 1
+                        val targetOffset = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
+                        repeat(10) {
+                            lazyListState.scrollBy(targetOffset / 10f)
+                            delay(20)
+                        }
+                        lazyListState.animateScrollToItem(targetIndex)
                     }
                 },
                 enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES,
@@ -181,9 +191,11 @@ fun ExerciseList(
 private fun ExerciseLazyColumn(
     exercises: List<Exercise>,
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     content: @Composable (index: Int, exercise: Exercise, placeholderName: String) -> Unit
 ) {
     LazyColumn(
+        state = state,
         contentPadding = PaddingValues(
             vertical = dimensionResource(id = R.dimen.padding_large),
             horizontal = dimensionResource(id = R.dimen.padding_large)
