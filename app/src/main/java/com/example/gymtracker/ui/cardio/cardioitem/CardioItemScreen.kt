@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -98,13 +97,10 @@ fun CardioItemScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = {
-            viewModel.onFinishPressed { onNavigateBack() }
-        },
-        visible = true
+        onClick = { viewModel.onFinishPressed { onNavigateBack() } }
     ) {
         Icon(
-            imageVector = Icons.Default.Done,
+            painter = painterResource(id = R.drawable.goal),
             contentDescription = stringResource(id = R.string.done)
         )
     }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -129,7 +128,7 @@ fun SplitScreen(
         onClick = ::finishWorkoutCheck
     ) {
         Icon(
-            imageVector = Icons.Default.Done,
+            painter = painterResource(id = R.drawable.goal),
             contentDescription = stringResource(id = R.string.done)
         )
     }
