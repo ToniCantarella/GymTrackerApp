@@ -1,6 +1,7 @@
 package com.example.gymtracker.ui.gym.common
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -86,6 +90,7 @@ fun Exercise(
     deleteEnabled: Boolean = false,
     creatingExercise: Boolean = false
 ) {
+    var dropdownMenuOpen by remember { mutableStateOf(false) }
     var editingExercise by remember { mutableStateOf(creatingExercise) }
 
     val focusManager = LocalFocusManager.current
@@ -160,30 +165,81 @@ fun Exercise(
             }
         },
         headerActions = {
-            if (!creatingExercise) {
+            if(creatingExercise) {
                 IconButton(
-                    onClick = {
-                        editingExercise = !editingExercise
-                    }
-                ) {
-                    Icon(
-                        painter =
-                            if (editingExercise) painterResource(id = R.drawable.edit_off)
-                            else painterResource(id = R.drawable.edit),
-                        contentDescription = stringResource(id = R.string.edit)
-                    )
-                }
-            }
-            if (editingExercise) {
-                IconButton(
-                    onClick = onDeletePressed,
-                    enabled = deleteEnabled
+                    enabled = deleteEnabled,
+                    onClick = onDeletePressed
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = stringResource(id = R.string.delete),
-                        tint = if (deleteEnabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .5f)
+                        tint = if (deleteEnabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = .5f
+                        )
                     )
+                }
+            } else if (editingExercise) {
+                IconButton(
+                    onClick = { editingExercise = false }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.edit_off),
+                        contentDescription = stringResource(id = R.string.stop)
+                    )
+                }
+            } else {
+                Box {
+                    IconButton(
+                        onClick = { dropdownMenuOpen = !dropdownMenuOpen }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(id = R.string.more)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = dropdownMenuOpen,
+                        onDismissRequest = { dropdownMenuOpen = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                editingExercise = true
+                                dropdownMenuOpen = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = stringResource(id = R.string.edit)
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(id = R.string.edit)
+                                )
+                            }
+                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                onDeletePressed()
+                                dropdownMenuOpen = false
+                            },
+                            enabled = deleteEnabled,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(id = R.string.delete),
+                                    tint = if (deleteEnabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                        alpha = .5f
+                                    )
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(id = R.string.delete)
+                                )
+                            }
+                        )
+                    }
                 }
             }
         },
