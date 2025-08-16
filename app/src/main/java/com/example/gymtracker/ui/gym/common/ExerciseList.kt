@@ -68,12 +68,10 @@ fun ExerciseListCreate(
     onRemoveExercise: (id: UUID) -> Unit,
     onExerciseNameChange: (id: UUID, name: String) -> Unit,
     onDescriptionChange: (id: UUID, description: String) -> Unit,
-    onAddSet: (exerciseId: UUID) -> Unit = { },
+    onAddSet: (exerciseId: UUID) -> Unit,
     onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
-    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
-    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> },
-    creatingSplit: Boolean = false
+    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -118,7 +116,8 @@ fun ExerciseListCreate(
                     onAddExercise()
                     scope.launch {
                         val targetIndex = exercises.size - 1
-                        val targetOffset = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
+                        val targetOffset =
+                            lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
                         repeat(10) {
                             lazyListState.scrollBy(targetOffset / 10f)
                             delay(20)
@@ -126,7 +125,7 @@ fun ExerciseListCreate(
                         lazyListState.animateScrollToItem(targetIndex)
                     }
                 },
-                enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES,
+                enabled = exercises.size < MAX_EXERCISES,
                 modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large))
             ) {
                 Icon(
@@ -192,12 +191,11 @@ fun ExerciseListEdit(
     onRemoveExercise: (id: UUID) -> Unit,
     onExerciseNameChange: (id: UUID, name: String) -> Unit,
     onDescriptionChange: (id: UUID, description: String) -> Unit,
-    onAddSet: (exerciseId: UUID) -> Unit = { },
+    onAddSet: (exerciseId: UUID) -> Unit,
     onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
-    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> },
-    creatingSplit: Boolean = false
+    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> }
 ) {
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -243,7 +241,8 @@ fun ExerciseListEdit(
                     onAddExercise()
                     scope.launch {
                         val targetIndex = exercises.size - 1
-                        val targetOffset = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
+                        val targetOffset =
+                            lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
                         repeat(10) {
                             lazyListState.scrollBy(targetOffset / 10f)
                             delay(20)
@@ -251,7 +250,7 @@ fun ExerciseListEdit(
                         lazyListState.animateScrollToItem(targetIndex)
                     }
                 },
-                enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES,
+                enabled = exercises.size < MAX_EXERCISES,
                 modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large))
             ) {
                 Icon(
