@@ -55,11 +55,14 @@ fun SplitScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
+
     var navigationDialogOpen by remember { mutableStateOf(false) }
     var navigationDialogOnNavigate: () -> Unit by remember { mutableStateOf({}) }
 
     val hasUnsavedChanges =
         uiState.initialSplitName != uiState.splitName || uiState.initialExercises != uiState.exercises
+    val hasPerformedSets = uiState.exercises.any { it.sets.any { set -> set.checked } }
 
     fun navigationCheck(onNavigate: () -> Unit) {
         if (hasUnsavedChanges) {
@@ -71,13 +74,10 @@ fun SplitScreen(
 
     }
 
-    var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
-
     fun onFinishWorkout() = viewModel.onFinishWorkoutPressed { onNavigateBack() }
 
     fun finishWorkoutCheck() {
-        val hasSetsChecked = uiState.exercises.any { it.sets.any { set -> set.checked } }
-        if (hasSetsChecked && uiState.showConfirmOnFinishWorkout) {
+        if (hasPerformedSets && uiState.showConfirmOnFinishWorkout) {
             finishWorkoutDialogOpen = true
         } else {
             onFinishWorkout()
@@ -125,10 +125,13 @@ fun SplitScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = ::finishWorkoutCheck
+        onClick = { finishWorkoutCheck() },
+        enabled = hasUnsavedChanges || hasPerformedSets
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.goal),
+            painter =
+                if (hasPerformedSets) painterResource(id = R.drawable.goal)
+                else painterResource(id = R.drawable.save),
             contentDescription = stringResource(id = R.string.done)
         )
     }
