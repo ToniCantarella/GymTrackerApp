@@ -119,7 +119,6 @@ private fun CardioStatsScreen(
                 dateLabels = if (stepHistory.isNotEmpty()) {
                     listOf(
                         stepHistory.first().timestamp?.toDateString() ?: "",
-                        "-",
                         stepHistory.last().timestamp?.toDateString() ?: "",
                     )
                 } else emptyList()
@@ -152,7 +151,6 @@ private fun CardioStatsScreen(
                 dateLabels = if (distanceHistory.isNotEmpty()) {
                     listOf(
                         distanceHistory.first().timestamp?.toDateString() ?: "",
-                        "-",
                         distanceHistory.last().timestamp?.toDateString() ?: "",
                     )
                 } else emptyList()
@@ -190,7 +188,6 @@ private fun CardioStatsScreen(
                 dateLabels = if (durationHistory.isNotEmpty()) {
                     listOf(
                         durationHistory.first().timestamp?.toDateString() ?: "",
-                        "-",
                         durationHistory.last().timestamp?.toDateString() ?: "",
                     )
                 } else emptyList()

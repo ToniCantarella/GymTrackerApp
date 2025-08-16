@@ -2,15 +2,19 @@ package com.example.gymtracker.ui.stats.gym
 
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
@@ -112,6 +117,11 @@ private fun LineChartCard(
     exercise: ExerciseWithHistory,
     modifier: Modifier = Modifier
 ) {
+    val minLabel = "min"
+    val maxLabel = "max"
+    val minColor = Color(0xFF23af92)
+    val maxColor = Color(0xFFAF239C)
+
     ElevatedCard(
         modifier = modifier
     ) {
@@ -127,20 +137,20 @@ private fun LineChartCard(
                 data = remember {
                     listOf(
                         Line(
-                            label = "min",
+                            label = minLabel,
                             values = exercise.setHistory.map { it.min }.ifEmpty { listOf(0.0) },
-                            color = SolidColor(Color(0xFF23af92)),
-                            firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
+                            color = SolidColor(minColor),
+                            firstGradientFillColor = minColor.copy(alpha = .5f),
                             secondGradientFillColor = Color.Transparent,
                             strokeAnimationSpec = tween(700, easing = EaseInOutCubic),
                             gradientAnimationDelay = 700,
                             drawStyle = DrawStyle.Stroke(width = 2.dp),
                         ),
                         Line(
-                            label = "max",
+                            label = maxLabel,
                             values = exercise.setHistory.map { it.max }.ifEmpty { listOf(0.0) },
-                            color = SolidColor(Color(0xFFAF239C)),
-                            firstGradientFillColor = Color(0xFFC02BB1).copy(alpha = .5f),
+                            color = SolidColor(maxColor),
+                            firstGradientFillColor = maxColor.copy(alpha = .5f),
                             secondGradientFillColor = Color.Transparent,
                             strokeAnimationSpec = tween(500, easing = EaseInOutCubic),
                             gradientAnimationDelay = 500,
@@ -154,7 +164,6 @@ private fun LineChartCard(
                     labels = if (exercise.setHistory.isNotEmpty()) {
                         listOf(
                             exercise.setHistory.first().timestamp.toDateString(),
-                            "-",
                             exercise.setHistory.last().timestamp.toDateString()
                         )
                     } else emptyList(),
@@ -166,9 +175,7 @@ private fun LineChartCard(
                     },
                 ),
                 labelHelperProperties = LabelHelperProperties(
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    enabled = false
                 ),
                 indicatorProperties = HorizontalIndicatorProperties(
                     textStyle = TextStyle(
@@ -177,6 +184,40 @@ private fun LineChartCard(
                 ),
                 animationMode = AnimationMode.Together(delayBuilder = { it * 500L })
             )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(minColor)
+                    )
+                    Text(
+                        text = minLabel,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(maxColor)
+                    )
+                    Text(
+                        text = maxLabel,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
         }
     }
 }
