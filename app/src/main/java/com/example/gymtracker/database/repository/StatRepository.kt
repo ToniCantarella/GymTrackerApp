@@ -15,8 +15,10 @@ import java.time.Duration
 import java.time.Instant
 
 data class SetData(
-    val min: Double,
-    val max: Double,
+    val minWeight: Double,
+    val maxWeight: Double,
+    val minRepetitions: Int,
+    val maxRepetitions: Int,
     val timestamp: Instant
 )
 
@@ -72,8 +74,8 @@ class StatRepositoryImpl(
             exercises = exercises.map { exercise ->
                 val setsForExercise = setDao.getSetsForExercise(exercise.id)
 
-                var lastKnownMin = 0.0
-                var lastKnownMax = 0.0
+                var lastKnownMinWeight = 0.0
+                var lastKnownMaxWeight = 0.0
 
                 ExerciseWithHistory(
                     name = exercise.name,
@@ -85,18 +87,22 @@ class StatRepositoryImpl(
                             setsForSession[set.id]
                         }
 
-                        val min = setSessionForExercise.minByOrNull { it.weight }?.weight
-                        val max = setSessionForExercise.maxByOrNull { it.weight }?.weight
+                        val minWeight = setSessionForExercise.minByOrNull { it.weight }?.weight
+                        val maxWeight = setSessionForExercise.maxByOrNull { it.weight }?.weight
+                        val minRepetitions = setSessionForExercise.minByOrNull { it.repetitions }?.repetitions ?: 0
+                        val maxRepetitions = setSessionForExercise.maxByOrNull { it.repetitions }?.repetitions ?: 0
 
-                        val finalMin = min ?: lastKnownMin
-                        val finalMax = max ?: lastKnownMax
+                        val finalMinWeight = minWeight ?: lastKnownMinWeight
+                        val finalMaxWeight = maxWeight ?: lastKnownMaxWeight
 
-                        if (min != null) lastKnownMin = min
-                        if (max != null) lastKnownMax = max
+                        if (minWeight != null) lastKnownMinWeight = minWeight
+                        if (maxWeight != null) lastKnownMaxWeight = maxWeight
 
                         SetData(
-                            min = finalMin,
-                            max = finalMax,
+                            minWeight = finalMinWeight,
+                            maxWeight = finalMaxWeight,
+                            minRepetitions = minRepetitions,
+                            maxRepetitions = maxRepetitions,
                             timestamp = gymSession.timestamp
                         )
                     }
