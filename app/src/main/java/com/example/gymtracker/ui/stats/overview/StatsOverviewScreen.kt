@@ -6,6 +6,8 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -334,7 +336,7 @@ private fun CalendarCard(
     val coroutineScope = rememberCoroutineScope()
     val zoneId = ZoneId.systemDefault()
 
-    var addForDayButtonsVisible by remember { mutableStateOf(false) }
+    var addingSessions by remember { mutableStateOf(false) }
     var addSessionDialogOpen by remember { mutableStateOf(false) }
     var timestamp by remember { mutableStateOf<Instant?>(null) }
 
@@ -401,13 +403,13 @@ private fun CalendarCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             val rotation by animateFloatAsState(
-                targetValue = if (addForDayButtonsVisible) 45f else 0f,
+                targetValue = if (addingSessions) 45f else 0f,
                 label = "Icon Rotation"
             )
 
             if (allWorkouts.isNotEmpty()) {
                 TextButton(
-                    onClick = { addForDayButtonsVisible = !addForDayButtonsVisible },
+                    onClick = { addingSessions = !addingSessions },
                     shape = CircleShape,
                     modifier = Modifier
                         .align(Alignment.CenterStart)
@@ -417,7 +419,7 @@ private fun CalendarCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = if (addForDayButtonsVisible) stringResource(id = R.string.close) else stringResource(
+                        contentDescription = if (addingSessions) stringResource(id = R.string.close) else stringResource(
                             id = R.string.add
                         )
                     )
@@ -490,16 +492,16 @@ private fun CalendarCard(
                     Box(
                         modifier = Modifier.matchParentSize()
                     ) {
-                        if (addForDayButtonsVisible && day.position == DayPosition.MonthDate && day.date <= today) {
+                        if (addingSessions && day.position == DayPosition.MonthDate && day.date <= today) {
                             Box(
                                 modifier = Modifier
                                     .clickable(
                                         indication = ripple(color = MaterialTheme.colorScheme.primary),
                                         interactionSource = remember { MutableInteractionSource() }
                                     ) {
-                                        timestamp =
-                                            day.date.atStartOfDayIn(zoneId.toKotlinTimeZone())
-                                                .toJavaInstant()
+                                        timestamp = day.date
+                                            .atStartOfDayIn(zoneId.toKotlinTimeZone())
+                                            .toJavaInstant()
                                         addSessionDialogOpen = true
                                     }
                                     .matchParentSize()
@@ -520,21 +522,32 @@ private fun CalendarCard(
                             ) {
                                 sessionsOnDay.forEach { session ->
                                     val workout = allWorkouts.find { it.id == session.workoutId }
+                                    var visible by remember { mutableStateOf(false) }
 
-                                    if (workout?.type == WorkoutType.GYM) {
-                                        val workoutIndex =
-                                            gymWorkouts.indexOf(workout)
-                                        WorkoutIcon(
-                                            painter = painterResource(id = R.drawable.weight),
-                                            tint = highlightColors[workoutIndex % highlightColors.size]
-                                        )
-                                    } else {
-                                        val workoutIndex =
-                                            cardioWorkouts.indexOf(workout)
-                                        WorkoutIcon(
-                                            painter = painterResource(id = R.drawable.run),
-                                            tint = highlightColors[workoutIndex % highlightColors.size]
-                                        )
+                                    LaunchedEffect(Unit) {
+                                        visible = true
+                                    }
+
+                                    AnimatedVisibility(
+                                        visible = visible,
+                                        enter = fadeIn(),
+                                        exit = fadeOut()
+                                    ) {
+                                        if (workout?.type == WorkoutType.GYM) {
+                                            val workoutIndex =
+                                                gymWorkouts.indexOf(workout)
+                                            WorkoutIcon(
+                                                painter = painterResource(id = R.drawable.weight),
+                                                tint = highlightColors[workoutIndex % highlightColors.size]
+                                            )
+                                        } else {
+                                            val workoutIndex =
+                                                cardioWorkouts.indexOf(workout)
+                                            WorkoutIcon(
+                                                painter = painterResource(id = R.drawable.run),
+                                                tint = highlightColors[workoutIndex % highlightColors.size]
+                                            )
+                                        }
                                     }
                                 }
                             }
