@@ -153,7 +153,6 @@ private fun CreateSplitScreen(
     Column {
         ExerciseListCreate(
             exercises = exercises,
-            creatingSplit = true,
             onAddExercise = addExercise,
             onRemoveExercise = onRemoveExercise,
             onExerciseNameChange = onExerciseNameChange,

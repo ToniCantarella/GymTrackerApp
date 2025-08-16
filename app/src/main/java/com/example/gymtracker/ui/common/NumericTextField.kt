@@ -6,17 +6,21 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
@@ -66,18 +70,43 @@ private fun GenericNumericTextField(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-
     fun Number.toCleanString(): String =
         BigDecimal.valueOf(this.toDouble()).stripTrailingZeros().toPlainString()
 
-    var valueString by rememberSaveable { mutableStateOf(value?.toCleanString() ?: "") }
+    var textFieldValue by remember {
+        val initialText = value?.toCleanString() ?: "0"
+        mutableStateOf(
+            TextFieldValue(
+                text = initialText,
+                selection = TextRange(initialText.length)
+            )
+        )
+    }
+
+    var isFocused by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isFocused) {
+        if (isFocused) {
+            val currentText = textFieldValue.text
+            val currentTextLength = currentText.length
+            val newText = if (currentText == "0" || currentText == "0.0") "" else currentText
+            textFieldValue = textFieldValue.copy(
+                text = newText,
+                selection = TextRange(currentTextLength)
+            )
+        } else {
+            if (textFieldValue.text == "" || textFieldValue.text == ".") {
+                textFieldValue = textFieldValue.copy(text = "0")
+            }
+        }
+    }
 
     OutlinedTextField(
-        value = valueString,
+        value = textFieldValue,
         onValueChange = {
-            val filtered = it.filter { input -> input.isDigit() || input == '.' }
+            val filtered = it.text.filter { input -> input.isDigit() || input == '.' }
             if (valueValidator(filtered)) {
-                valueString = filtered
+                textFieldValue = it.copy(text = filtered)
                 onValueChange(filtered)
             }
         },
@@ -99,5 +128,8 @@ private fun GenericNumericTextField(
         maxLines = 1,
         textStyle = TextStyle(textAlign = TextAlign.End),
         modifier = modifier
+            .onFocusChanged { focusState ->
+                isFocused = focusState.isFocused
+            }
     )
 }
