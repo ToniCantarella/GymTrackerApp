@@ -1,7 +1,7 @@
 package com.example.gymtracker.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val primary = Color(0xFFFEAC53)
+val primary = Color(0xFFFF8036)
 
 val primaryLight = primary
 val onPrimaryLight = Color(0xFFFFFFFF)

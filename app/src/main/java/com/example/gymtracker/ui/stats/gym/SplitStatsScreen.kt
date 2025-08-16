@@ -138,7 +138,7 @@ private fun LineChartCard(
                     listOf(
                         Line(
                             label = minLabel,
-                            values = exercise.setHistory.map { it.min }.ifEmpty { listOf(0.0) },
+                            values = exercise.setHistory.map { it.minWeight }.ifEmpty { listOf(0.0) },
                             color = SolidColor(minColor),
                             firstGradientFillColor = minColor.copy(alpha = .5f),
                             secondGradientFillColor = Color.Transparent,
@@ -148,7 +148,7 @@ private fun LineChartCard(
                         ),
                         Line(
                             label = maxLabel,
-                            values = exercise.setHistory.map { it.max }.ifEmpty { listOf(0.0) },
+                            values = exercise.setHistory.map { it.maxWeight }.ifEmpty { listOf(0.0) },
                             color = SolidColor(maxColor),
                             firstGradientFillColor = maxColor.copy(alpha = .5f),
                             secondGradientFillColor = Color.Transparent,

@@ -3,12 +3,14 @@ package com.example.gymtracker.ui.welcome
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,12 +49,12 @@ fun WelcomeScreen(
             contentDescription = null,
             modifier = Modifier
                 .graphicsLayer {
-                    translationX = 300F
-                    translationY = -100f
+                    translationX = 200F
+                    translationY = -50f
                 }
-                .blur(5.dp)
+                .blur(10.dp)
                 .align(Alignment.TopEnd)
-                .size(400.dp),
+                .size(300.dp),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
         )
         Column(
@@ -63,17 +65,19 @@ fun WelcomeScreen(
                 .padding(dimensionResource(id = R.dimen.padding_large))
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(id = R.string.welcome),
                     style = MaterialTheme.typography.titleLarge
                 )
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
                 Text(
                     text = stringResource(id = R.string.welcome_text),
                     textAlign = TextAlign.Center
                 )
+
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                 Button(
                     onClick = onUnderstoodClick
                 ) {
@@ -90,18 +94,22 @@ fun WelcomeScreen(
 @Composable
 private fun WelcomeScreenPreview() {
     GymTrackerTheme {
-        WelcomeScreen(
-            onUnderstoodClick = {}
-        )
+        Surface {
+            WelcomeScreen(
+                onUnderstoodClick = {}
+            )
+        }
     }
 }
 
 @Preview(showBackground = true, locale = "fi")
 @Composable
 private fun WelcomeScreenPreviewFi() {
-    GymTrackerTheme {
-        WelcomeScreen(
-            onUnderstoodClick = {}
-        )
+    GymTrackerTheme(darkTheme = true) {
+        Surface{
+            WelcomeScreen(
+                onUnderstoodClick = {}
+            )
+        }
     }
 }
