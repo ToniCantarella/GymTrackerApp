@@ -220,7 +220,7 @@ private fun LineChartCard(
                     listOf(
                         Line(
                             label = "",
-                            values = values,
+                            values = values.ifEmpty { listOf(0.0) },
                             color = SolidColor(Color(0xFF23af92)),
                             firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
                             secondGradientFillColor = Color.Transparent,
