@@ -1,9 +1,11 @@
 package com.example.gymtracker.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFFFF6200)
+val primary = Color(0xFFFEAC53)
+
+val primaryLight = primary
 val onPrimaryLight = Color(0xFFFFFFFF)
-val primaryContainerLight = Color(0xFFFF6200)
+val primaryContainerLight = primary
 val onPrimaryContainerLight = Color(0xFFFFFFFF)
 val secondaryLight = Color(0xFFA47F3D)
 val onSecondaryLight = Color(0xFF2A331E)
@@ -37,9 +39,9 @@ val surfaceContainerLight = Color(0xFFEEEFE3)
 val surfaceContainerHighLight = Color(0xFFE8E9DE)
 val surfaceContainerHighestLight = Color(0xFFE2E3D8)
 
-val primaryDark = Color(0xFFFF6200)
+val primaryDark = primary
 val onPrimaryDark = Color(0xFFFFFFFF)
-val primaryContainerDark = Color(0xFFFF6200)
+val primaryContainerDark = primary
 val onPrimaryContainerDark = Color(0xFFFFFFFF)
 val secondaryDark = Color(0xFFA47F3D)
 val onSecondaryDark = Color(0xFF2A331E)
