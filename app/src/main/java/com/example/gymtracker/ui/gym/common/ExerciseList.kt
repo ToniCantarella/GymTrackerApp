@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
-fun ExerciseList(
+fun ExerciseListView(
     exercises: List<Exercise>,
     modifier: Modifier = Modifier
 ) {
@@ -53,16 +53,15 @@ fun ExerciseList(
                     .zIndex(1f)
                     .pointerInput(Unit) {}
             )
-            Exercise(
-                exercise = exercise,
-                placeholderName = placeholderName
+            ViewExercise(
+                exercise = exercise
             )
         }
     }
 }
 
 @Composable
-fun ExerciseList(
+fun ExerciseListCreate(
     exercises: List<Exercise>,
     modifier: Modifier = Modifier,
     onAddExercise: () -> Unit,
@@ -86,7 +85,131 @@ fun ExerciseList(
         state = lazyListState,
         modifier = modifier
     ) { index, exercise, placeholderName ->
-        Exercise(
+        CreateExercise(
+            exercise = exercise,
+            placeholderName = placeholderName,
+            onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
+            onDescriptionChange = { description ->
+                onDescriptionChange(
+                    exercise.uuid,
+                    description
+                )
+            },
+            onDeletePressed = {
+                deleteDialogOpen = true
+                itemToDelete = exercise.copy(name = exercise.name.ifBlank { placeholderName })
+            },
+            deleteEnabled = exercises.size > 1,
+            addSet = { onAddSet(exercise.uuid) },
+            onChangeWeight = { setId, weight -> onChangeWeight(exercise.uuid, setId, weight) },
+            onChangeRepetitions = { setId, repetitions ->
+                onChangeRepetitions(
+                    exercise.uuid,
+                    setId,
+                    repetitions
+                )
+            },
+            onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+        )
+
+        if (index == exercises.lastIndex) {
+            Button(
+                onClick = {
+                    onAddExercise()
+                    scope.launch {
+                        val targetIndex = exercises.size - 1
+                        val targetOffset = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
+                        repeat(10) {
+                            lazyListState.scrollBy(targetOffset / 10f)
+                            delay(20)
+                        }
+                        lazyListState.animateScrollToItem(targetIndex)
+                    }
+                },
+                enabled = exercises.last().name.isNotEmpty() && exercises.size < MAX_EXERCISES,
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add)
+                )
+                Text(
+                    text = stringResource(id = R.string.exercise)
+                )
+            }
+        }
+    }
+
+    if (deleteDialogOpen && itemToDelete != null) {
+        ConfirmDialog(
+            subtitle = {
+                Text(
+                    text = stringResource(
+                        id = R.string.exercise_deletion_subtitle,
+                        itemToDelete!!.name
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onRemoveExercise(itemToDelete!!.uuid)
+                        deleteDialogOpen = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.delete)
+                    )
+                }
+            },
+            cancelButton = {
+                OutlinedButton(
+                    onClick = {
+                        itemToDelete = null
+                        deleteDialogOpen = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel)
+                    )
+                }
+            },
+            onDismissRequest = {
+                deleteDialogOpen = false
+            }
+        )
+    }
+}
+
+@Composable
+fun ExerciseListEdit(
+    exercises: List<Exercise>,
+    modifier: Modifier = Modifier,
+    onAddExercise: () -> Unit,
+    onRemoveExercise: (id: UUID) -> Unit,
+    onExerciseNameChange: (id: UUID, name: String) -> Unit,
+    onDescriptionChange: (id: UUID, description: String) -> Unit,
+    onAddSet: (exerciseId: UUID) -> Unit = { },
+    onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
+    onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
+    onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
+    onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit = { _, _, _ -> },
+    creatingSplit: Boolean = false
+) {
+    val lazyListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    var deleteDialogOpen by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<Exercise?>(null) }
+
+    ExerciseLazyColumn(
+        exercises = exercises,
+        state = lazyListState,
+        modifier = modifier
+    ) { index, exercise, placeholderName ->
+        EditExercise(
             exercise = exercise,
             placeholderName = placeholderName,
             onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
@@ -112,7 +235,6 @@ fun ExerciseList(
             },
             onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
             onCheckSet = { setId, checked -> onCheckSet(exercise.uuid, setId, checked) },
-            creatingExercise = creatingSplit
         )
 
         if (index == exercises.lastIndex) {

@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.gym.common.ExerciseList
+import com.example.gymtracker.ui.gym.common.ExerciseListEdit
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
@@ -258,18 +258,17 @@ fun SplitScreen(
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
             ) {
-                if(addingTimestamp != null) {
+                if (addingTimestamp != null) {
                     Text(
                         text = "${stringResource(id = R.string.adding_for_date)}: ${addingTimestamp.toDateString()}"
                     )
-                }    else
-                {
+                } else {
                     Text(
                         text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString() ?: "-"}"
                     )
                 }
             }
-            ExerciseList(
+            ExerciseListEdit(
                 exercises = exercises,
                 onAddExercise = addExercise,
                 onRemoveExercise = onRemoveExercise,

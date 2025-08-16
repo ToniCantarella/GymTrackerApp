@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.gym.common.ExerciseList
+import com.example.gymtracker.ui.gym.common.ExerciseListCreate
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideNavigationBarGuard
@@ -151,7 +151,7 @@ private fun CreateSplitScreen(
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit
 ) {
     Column {
-        ExerciseList(
+        ExerciseListCreate(
             exercises = exercises,
             creatingSplit = true,
             onAddExercise = addExercise,

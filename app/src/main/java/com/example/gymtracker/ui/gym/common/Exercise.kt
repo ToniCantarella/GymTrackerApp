@@ -1,11 +1,14 @@
 package com.example.gymtracker.ui.gym.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -23,17 +26,23 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.gym.entity.Exercise
@@ -45,286 +54,411 @@ import com.example.gymtracker.utility.MAX_SETS
 import java.util.UUID
 
 @Composable
-fun Exercise(
+fun ViewExercise(
     exercise: Exercise,
-    placeholderName: String,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     ExerciseCard(
-        exercise = exercise,
-        modifier = modifier,
-        title = {
-            Text(
-                text = exercise.name.ifEmpty { placeholderName }
+        header = {
+            ExerciseHeader(
+                headerTitle = {
+                    ExerciseTitle(
+                        name = {
+                            Text(
+                                text = exercise.name
+                            )
+                        },
+                        description = {
+                            if (exercise.description != null) {
+                                Text(
+                                    text = exercise.description,
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+                        }
+                    )
+                }
             )
         },
-        description = {
-            if (exercise.description != null) {
-                Text(
-                    text = exercise.description,
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
+        modifier = modifier
+    ) {
+        exercise.sets.forEachIndexed { index, set ->
+            HorizontalDivider()
+            Set(
+                set = set,
+                setName = "${stringResource(id = R.string.set)} ${index + 1}"
+            )
         }
-    ) { index, set ->
-        Set(
-            set = set,
-            setName = "${stringResource(id = R.string.set)} ${index + 1}"
-        )
     }
 }
 
 @Composable
-fun Exercise(
+fun CreateExercise(
     exercise: Exercise,
-    placeholderName: String,
-    modifier: Modifier = Modifier,
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
+    deleteEnabled: Boolean,
     onDeletePressed: () -> Unit,
+    placeholderName: String,
     addSet: () -> Unit,
     onChangeWeight: (setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
     onRemoveSet: (setId: UUID) -> Unit,
-    onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
-    deleteEnabled: Boolean = false,
-    creatingExercise: Boolean = false
+    modifier: Modifier = Modifier
 ) {
-    var dropdownMenuOpen by remember { mutableStateOf(false) }
-    var editingExercise by remember { mutableStateOf(creatingExercise) }
-
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     ExerciseCard(
-        exercise = exercise,
-        modifier = modifier,
-        title = {
-            if (editingExercise) {
-                OutlinedTextField(
-                    value = exercise.name,
-                    onValueChange = {
-                        if (it.length <= EXERCISE_NAME_MAX_SIZE)
-                            onNameChange(it)
-                    },
-                    placeholder = {
-                        Text(
-                            text = placeholderName
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
-                        }
-                    )
-                )
-            } else {
-                Text(
-                    text = exercise.name.ifEmpty { placeholderName }
-                )
-            }
-        },
-        description = {
-            if (editingExercise) {
-                OutlinedTextField(
-                    value = exercise.description ?: "",
-                    onValueChange = {
-                        if (it.length <= EXERCISE_DESCRIPTION_MAX_SIZE)
-                            onDescriptionChange(it)
-                    },
-                    placeholder = {
-                        Text(
-                            text = "${stringResource(id = R.string.description)} (${
-                                stringResource(
-                                    id = R.string.optional
+        header = {
+            ExerciseHeader(
+                headerTitle = {
+                    ExerciseTitle(
+                        name = {
+                            OutlinedTextField(
+                                value = exercise.name,
+                                onValueChange = {
+                                    if (it.length <= EXERCISE_NAME_MAX_SIZE)
+                                        onNameChange(it)
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = placeholderName
+                                    )
+                                },
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboardController?.hide()
+                                        focusManager.clearFocus()
+                                    }
                                 )
-                            })",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    textStyle = MaterialTheme.typography.labelMedium,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
+                            )
+                        },
+                        description = {
+                            OutlinedTextField(
+                                value = exercise.description ?: "",
+                                onValueChange = {
+                                    if (it.length <= EXERCISE_DESCRIPTION_MAX_SIZE)
+                                        onDescriptionChange(it)
+                                },
+                                placeholder = {
+                                    Text(
+                                        text ="${stringResource(id = R.string.description)} (${stringResource(id = R.string.optional)})",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                },
+                                textStyle = MaterialTheme.typography.labelMedium,
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboardController?.hide()
+                                        focusManager.clearFocus()
+                                    }
+                                )
+                            )
                         }
                     )
-                )
-            } else if (exercise.description != null) {
-                Text(
-                    text = exercise.description,
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-        },
-        headerActions = {
-            if(creatingExercise) {
-                IconButton(
-                    enabled = deleteEnabled,
-                    onClick = onDeletePressed
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(id = R.string.delete),
-                        tint = if (deleteEnabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                            alpha = .5f
-                        )
-                    )
-                }
-            } else if (editingExercise) {
-                IconButton(
-                    onClick = { editingExercise = false }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.edit_off),
-                        contentDescription = stringResource(id = R.string.stop)
-                    )
-                }
-            } else {
-                Box {
+                },
+                headerActions = {
                     IconButton(
-                        onClick = { dropdownMenuOpen = !dropdownMenuOpen }
+                        onClick = onDeletePressed,
+                        enabled = deleteEnabled
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(id = R.string.more)
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = dropdownMenuOpen,
-                        onDismissRequest = { dropdownMenuOpen = false }
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                editingExercise = true
-                                dropdownMenuOpen = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.edit),
-                                    contentDescription = stringResource(id = R.string.edit)
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(id = R.string.edit)
-                                )
-                            }
-                        )
-                        DropdownMenuItem(
-                            onClick = {
-                                onDeletePressed()
-                                dropdownMenuOpen = false
-                            },
-                            enabled = deleteEnabled,
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = stringResource(id = R.string.delete),
-                                    tint = if (deleteEnabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                        alpha = .5f
-                                    )
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(id = R.string.delete)
-                                )
-                            }
+                            imageVector = Icons.Default.Delete,
+                            tint =
+                                if (deleteEnabled) MaterialTheme.colorScheme.error
+                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .5f),
+                            contentDescription = stringResource(id = R.string.delete)
                         )
                     }
                 }
-            }
+            )
         },
-        bottomActions = {
-            TextButton(
+        actions = {
+            AddSetButton(
                 onClick = addSet,
                 enabled = exercise.sets.size < MAX_SETS
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.add)
-                )
-                Text(
-                    text = stringResource(id = R.string.set)
-                )
-            }
+            )
+        },
+        modifier = modifier
+    ) {
+        exercise.sets.forEachIndexed { index, set ->
+            HorizontalDivider()
+            Set(
+                set = set,
+                setName = "${stringResource(id = R.string.set)} ${index + 1}",
+                deletionEnabled = exercise.sets.size > 1,
+                onChangeWeight = { onChangeWeight(set.uuid, it) },
+                onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
+                onRemoveSet = { onRemoveSet(set.uuid) },
+                onCheckSet = {},
+                addingSet = true
+            )
         }
-    ) { index, set ->
-        Set(
-            set = set,
-            setName = "${stringResource(id = R.string.set)} ${index + 1}",
-            deletionEnabled = exercise.sets.size > 1,
-            onChangeWeight = { onChangeWeight(set.uuid, it) },
-            onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
-            onRemoveSet = { onRemoveSet(set.uuid) },
-            onCheckSet = { checked ->
-                onCheckSet(
-                    set.uuid,
-                    checked
-                )
-            },
-            addingSet = creatingExercise
+    }
+}
+
+@Composable
+fun EditExercise(
+    exercise: Exercise,
+    onNameChange: (name: String) -> Unit,
+    onDescriptionChange: (description: String) -> Unit,
+    deleteEnabled: Boolean,
+    onDeletePressed: () -> Unit,
+    placeholderName: String,
+    addSet: () -> Unit,
+    onCheckSet: (setId: UUID, checked: Boolean) -> Unit,
+    onChangeWeight: (setId: UUID, weight: Double) -> Unit,
+    onChangeRepetitions: (setId: UUID, repetitions: Int) -> Unit,
+    onRemoveSet: (setId: UUID) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    var dropdownMenuOpen by remember { mutableStateOf(false) }
+    var editingTitle by remember { mutableStateOf(false) }
+
+    var nameTextFieldValue by remember(editingTitle, exercise.name) {
+        mutableStateOf(
+            TextFieldValue(
+                text = exercise.name,
+                selection = if (editingTitle) TextRange(exercise.name.length) else TextRange.Zero // Initial selection
+            )
+        )
+    }
+
+    LaunchedEffect(editingTitle) {
+        if (editingTitle) focusRequester.requestFocus()
+    }
+
+    ExerciseCard(
+        header = {
+            ExerciseHeader(
+                headerTitle = {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_small)))
+                            .clickable(
+                                enabled = !editingTitle,
+                                onClick = { editingTitle = true }
+                            )
+                    ) {
+                        ExerciseTitle(
+                            name = {
+                                if (editingTitle) {
+                                    OutlinedTextField(
+                                        value = nameTextFieldValue,
+                                        onValueChange = {
+                                            nameTextFieldValue = it
+                                            if (it.text.length <= EXERCISE_NAME_MAX_SIZE)
+                                                onNameChange(it.text)
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                text = placeholderName
+                                            )
+                                        },
+                                        keyboardOptions = KeyboardOptions.Default.copy(
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                                focusManager.clearFocus()
+                                            }
+                                        ),
+                                        modifier = Modifier.focusRequester(focusRequester)
+                                    )
+                                } else {
+                                    Text(
+                                        text = exercise.name.ifEmpty { placeholderName }
+                                    )
+                                }
+                            },
+                            description = {
+                                if (editingTitle) {
+                                    OutlinedTextField(
+                                        value = exercise.description ?: "",
+                                        onValueChange = {
+                                            if (it.length <= EXERCISE_DESCRIPTION_MAX_SIZE)
+                                                onDescriptionChange(it)
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                text ="${stringResource(id = R.string.description)} (${stringResource(id = R.string.optional)})",
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                        },
+                                        keyboardOptions = KeyboardOptions.Default.copy(
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                                focusManager.clearFocus()
+                                            }
+                                        )
+                                    )
+                                } else if (exercise.description != null) {
+                                    Text(
+                                        text = exercise.description,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                            }
+                        )
+                    }
+                },
+                headerActions = {
+                    if (editingTitle) {
+                        IconButton(
+                            onClick = { editingTitle = false }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.edit_off),
+                                contentDescription = stringResource(id = R.string.stop)
+                            )
+                        }
+                    } else {
+                        Box {
+                            IconButton(
+                                onClick = { dropdownMenuOpen = !dropdownMenuOpen }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = stringResource(id = R.string.more)
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = dropdownMenuOpen,
+                                onDismissRequest = { dropdownMenuOpen = false }
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onDeletePressed()
+                                        dropdownMenuOpen = false
+                                    },
+                                    enabled = deleteEnabled,
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = stringResource(id = R.string.delete)
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = R.string.delete)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        },
+        actions = {
+            AddSetButton(
+                onClick = addSet,
+                enabled = exercise.sets.size < MAX_SETS
+            )
+        },
+        modifier = modifier
+    ) {
+        exercise.sets.forEachIndexed { index, set ->
+            HorizontalDivider()
+            Set(
+                set = set,
+                setName = "${stringResource(id = R.string.set)} ${index + 1}",
+                deletionEnabled = exercise.sets.size > 1,
+                onChangeWeight = { onChangeWeight(set.uuid, it) },
+                onChangeRepetitions = { onChangeRepetitions(set.uuid, it) },
+                onRemoveSet = { onRemoveSet(set.uuid) },
+                onCheckSet = { onCheckSet(set.uuid, it) },
+                addingSet = false
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExerciseTitle(
+    name: @Composable () -> Unit,
+    description: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+        modifier = modifier
+    ) {
+        name()
+        description()
+    }
+}
+
+@Composable
+private fun ExerciseHeader(
+    headerTitle: @Composable RowScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    headerActions: @Composable RowScope.() -> Unit = {}
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        headerTitle()
+        headerActions()
+    }
+}
+
+@Composable
+private fun AddSetButton(
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = stringResource(id = R.string.add)
+        )
+        Text(
+            text = stringResource(id = R.string.set)
         )
     }
 }
 
 @Composable
 private fun ExerciseCard(
-    exercise: Exercise,
     modifier: Modifier = Modifier,
-    title: @Composable () -> Unit,
-    description: @Composable () -> Unit = {},
-    headerActions: @Composable () -> Unit = {},
-    bottomActions: @Composable () -> Unit = {},
-    setContent: @Composable (index: Int, set: WorkoutSet) -> Unit
+    header: @Composable () -> Unit,
+    actions: @Composable () -> Unit = {},
+    content: @Composable () -> Unit
 ) {
     ElevatedCard(
         modifier = modifier
-            .fillMaxWidth()
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.padding_large))
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-                    modifier = Modifier.weight(2f)
-                ) {
-                    title()
-                    description()
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    headerActions()
-                }
-            }
-            Column {
-                exercise.sets.forEachIndexed { index, set ->
-                    HorizontalDivider()
-                    setContent(
-                        index,
-                        set
-                    )
-                }
-                bottomActions()
-            }
+            header()
+            content()
+            actions()
         }
     }
 }
@@ -352,58 +486,51 @@ val testExercise = Exercise(
     )
 )
 
-@Composable
-fun ExerciseForPreview(
-    exercise: Exercise = testExercise,
-    addingExercise: Boolean = false
-) {
-    Exercise(
-        exercise = exercise,
-        placeholderName = "${stringResource(id = R.string.exercise)} 1",
-        onNameChange = {},
-        onDescriptionChange = {},
-        onDeletePressed = {},
-        addSet = {},
-        onChangeWeight = { _, _ -> },
-        onChangeRepetitions = { _, _ -> },
-        onRemoveSet = {},
-        onCheckSet = { _, _ -> },
-        creatingExercise = addingExercise
-    )
-}
-
 @Preview
 @Composable
-private fun ExercisePreview() {
+private fun ViewExercisePreview() {
     GymTrackerTheme {
-        ExerciseForPreview()
-    }
-}
-
-@Preview
-@Composable
-private fun ExercisePreviewNoDescription() {
-    GymTrackerTheme {
-        ExerciseForPreview(
-            exercise = testExercise.copy(description = null)
+        ViewExercise(
+            exercise = testExercise
         )
     }
 }
 
 @Preview
 @Composable
-private fun AddingExercisePreview() {
+private fun CreateExercisePreview() {
     GymTrackerTheme {
-        ExerciseForPreview(
-            exercise = Exercise(
-                uuid = UUID.randomUUID(),
-                name = "",
-                description = null,
-                sets = listOf(
-                    WorkoutSet.emptySet()
-                )
-            ),
-            addingExercise = true
+        CreateExercise(
+            exercise = testExercise,
+            onNameChange = {},
+            onDescriptionChange = {},
+            placeholderName = "${stringResource(id = R.string.exercise)} 1",
+            deleteEnabled = false,
+            onDeletePressed = {},
+            addSet = {},
+            onChangeWeight = { _, _ -> },
+            onChangeRepetitions = { _, _ -> },
+            onRemoveSet = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EditExercisePreview() {
+    GymTrackerTheme {
+        EditExercise(
+            exercise = testExercise,
+            onNameChange = {},
+            onDescriptionChange = {},
+            placeholderName = "${stringResource(id = R.string.exercise)} 1",
+            deleteEnabled = false,
+            onDeletePressed = {},
+            addSet = {},
+            onCheckSet = { _, _ -> },
+            onChangeWeight = { _, _ -> },
+            onChangeRepetitions = { _, _ -> },
+            onRemoveSet = {}
         )
     }
 }
