@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ fun EmptyListCard(
             Icon(
                 painter = iconPainter,
                 contentDescription = stringResource(id = R.string.icon),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(80.dp)
             )
             subtitle()

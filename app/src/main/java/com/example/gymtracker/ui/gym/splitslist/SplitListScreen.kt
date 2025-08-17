@@ -14,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,6 +60,11 @@ fun SplitListScreen(
     }
 
     ProvideTopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.gym_workouts)
+            )
+        },
         actions = {
             if (uiState.selectingItems) {
                 IconButton(
@@ -195,34 +201,38 @@ fun SplitListScreen(
 @Composable
 private fun SplitsPreview() {
     GymTrackerTheme {
-        SplitListScreen(
-            loading = false,
-            splits = listOf(
-                WorkoutListItem(
-                    id = 0,
-                    name = "Workout 1",
-                    latestTimestamp = Instant.now()
-                )
-            ),
-            selectingItems = false,
-            onSplitClick = {},
-            onSelect = { _, _ -> },
-            onSplitHold = {}
-        )
+        Surface {
+            SplitListScreen(
+                loading = false,
+                splits = listOf(
+                    WorkoutListItem(
+                        id = 0,
+                        name = "Workout 1",
+                        latestTimestamp = Instant.now()
+                    )
+                ),
+                selectingItems = false,
+                onSplitClick = {},
+                onSelect = { _, _ -> },
+                onSplitHold = {}
+            )
+        }
     }
 }
 
 @Preview(showBackground = true, locale = "fi")
 @Composable
 private fun EmptySplitsPreview() {
-    GymTrackerTheme {
-        SplitListScreen(
-            loading = false,
-            splits = emptyList(),
-            selectingItems = false,
-            onSelect = { _, _ -> },
-            onSplitClick = {},
-            onSplitHold = {}
-        )
+    GymTrackerTheme(darkTheme = true) {
+        Surface {
+            SplitListScreen(
+                loading = false,
+                splits = emptyList(),
+                selectingItems = false,
+                onSelect = { _, _ -> },
+                onSplitClick = {},
+                onSplitHold = {}
+            )
+        }
     }
 }
