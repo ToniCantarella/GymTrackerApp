@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -146,7 +145,11 @@ fun CreateExercise(
                                 },
                                 placeholder = {
                                     Text(
-                                        text ="${stringResource(id = R.string.description)} (${stringResource(id = R.string.optional)})",
+                                        text = "${stringResource(id = R.string.description)} (${
+                                            stringResource(
+                                                id = R.string.optional
+                                            )
+                                        })",
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                 },
@@ -245,7 +248,7 @@ fun EditExercise(
                 headerTitle = {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_small)))
                             .clickable(
                                 enabled = !editingTitle,
@@ -294,7 +297,11 @@ fun EditExercise(
                                         },
                                         placeholder = {
                                             Text(
-                                                text ="${stringResource(id = R.string.description)} (${stringResource(id = R.string.optional)})",
+                                                text = "${stringResource(id = R.string.description)} (${
+                                                    stringResource(
+                                                        id = R.string.optional
+                                                    )
+                                                })",
                                                 style = MaterialTheme.typography.labelMedium
                                             )
                                         },
@@ -407,15 +414,19 @@ private fun ExerciseTitle(
 
 @Composable
 private fun ExerciseHeader(
-    headerTitle: @Composable RowScope.() -> Unit,
+    headerTitle: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    headerActions: @Composable RowScope.() -> Unit = {}
+    headerActions: @Composable () -> Unit = {}
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
-        headerTitle()
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            headerTitle()
+        }
         headerActions()
     }
 }
