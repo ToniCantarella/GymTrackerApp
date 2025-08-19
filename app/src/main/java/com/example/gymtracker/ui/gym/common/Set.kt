@@ -80,7 +80,8 @@ fun Set(
     ) {
         if (addingSet) {
             Text(
-                text = setName
+                text = setName,
+                modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_large))
             )
         } else {
             Checkbox(
