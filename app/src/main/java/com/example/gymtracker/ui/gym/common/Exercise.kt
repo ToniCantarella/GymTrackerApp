@@ -351,6 +351,23 @@ fun EditExercise(
                             ) {
                                 DropdownMenuItem(
                                     onClick = {
+                                        editingTitle = true
+                                        dropdownMenuOpen = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.edit),
+                                            contentDescription = stringResource(id = R.string.edit)
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = R.string.edit)
+                                        )
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
                                         onDeletePressed()
                                         dropdownMenuOpen = false
                                     },
