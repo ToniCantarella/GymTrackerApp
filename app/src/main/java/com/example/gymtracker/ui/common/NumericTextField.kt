@@ -52,7 +52,7 @@ fun NumericTextField(
         value = value,
         onValueChange = { onValueChange(it.toDoubleOrNull() ?: 0.0) },
         valueValidator = {
-            val parts = it.split(".")
+            val parts = it.split(",")
             parts.size <= 2 && parts[0].length <= valueMaxLength && (parts.getOrNull(1)?.length
                 ?: 0) <= 2
         },
@@ -95,7 +95,7 @@ private fun GenericNumericTextField(
                 selection = TextRange(currentTextLength)
             )
         } else {
-            if (textFieldValue.text == "" || textFieldValue.text == ".") {
+            if (textFieldValue.text == "" || textFieldValue.text == ",") {
                 textFieldValue = textFieldValue.copy(text = "0")
             }
         }
@@ -104,10 +104,13 @@ private fun GenericNumericTextField(
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = {
-            val filtered = it.text.filter { input -> input.isDigit() || input == '.' }
-            if (valueValidator(filtered)) {
-                textFieldValue = it.copy(text = filtered)
-                onValueChange(filtered)
+            val allowedCharacters =
+                it.text.filter { input -> input.isDigit() || input == '.' || input == ',' }
+            val newValue = allowedCharacters.replace(".", ",")
+
+            if (valueValidator(newValue)) {
+                textFieldValue = it.copy(text = newValue)
+                onValueChange(newValue)
             }
         },
         singleLine = true,
