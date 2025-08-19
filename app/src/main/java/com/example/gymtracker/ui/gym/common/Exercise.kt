@@ -206,6 +206,7 @@ fun CreateExercise(
                 addingSet = true
             )
         }
+        HorizontalDivider()
     }
 }
 
