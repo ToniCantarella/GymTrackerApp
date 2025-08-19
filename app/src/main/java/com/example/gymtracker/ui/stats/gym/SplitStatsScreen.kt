@@ -92,7 +92,7 @@ private fun SplitStatsScreen(
                 dataValues = exercise.setHistory.map { it.maxWeight },
                 popupContentBuilder = { dataIndex, valueIndex, value ->
                     "${exercise.setHistory[valueIndex].maxWeight} ${weightUnitString}\n ${exercise.setHistory[valueIndex].timestamp.toDateString()}"
-                },
+                }
             )
         }
     }

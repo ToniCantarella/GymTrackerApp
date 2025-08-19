@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.gymtracker.database.repository.GymRepository
+import com.example.gymtracker.database.repository.SplitStats
+import com.example.gymtracker.database.repository.StatRepository
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.utility.SplitUtil
@@ -33,12 +35,14 @@ data class SplitUiState(
     val initialExercises: List<Exercise> = emptyList(),
     val showConfirmOnFinishWorkout: Boolean = true,
     val doNotAskAgain: Boolean = false,
-    val selectedTimestamp: Instant? = null
+    val selectedTimestamp: Instant? = null,
+    val stats: SplitStats? = null
 )
 
 class SplitViewModel(
     savedStateHandle: SavedStateHandle,
     private val gymRepository: GymRepository,
+    private val statsRepository: StatRepository,
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
     private val splitUtil = SplitUtil()
@@ -69,6 +73,14 @@ class SplitViewModel(
                     initialExercises = exercises,
                     showConfirmOnFinishWorkout = showFinishWorkoutDialog,
                     loading = false
+                )
+            }
+
+            val splitStats = statsRepository.getSplitStats(navParams.id)
+
+            _uiState.update {
+                it.copy(
+                    stats = splitStats
                 )
             }
         }

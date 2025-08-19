@@ -7,15 +7,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,21 +45,25 @@ import com.example.gymtracker.ui.navigation.ProvideNavigationBarGuard
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
 import com.example.gymtracker.ui.navigation.rememberProceedOnGuardCleared
+import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
+import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.toDateAndTimeString
 import com.example.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SplitScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToStats: (id: Int) -> Unit,
     viewModel: SplitViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    var statsBottomSheetOpen by remember { mutableStateOf(false) }
 
     var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
 
@@ -71,7 +81,6 @@ fun SplitScreen(
         } else {
             onNavigate()
         }
-
     }
 
     fun onFinishWorkout() = viewModel.onFinishWorkoutPressed { onNavigateBack() }
@@ -114,7 +123,8 @@ fun SplitScreen(
         },
         actions = {
             IconButton(
-                onClick = { navigationCheck { onNavigateToStats(uiState.splitId) } }
+                onClick = { statsBottomSheetOpen = true },
+                enabled = uiState.stats != null && uiState.stats!!.exercises.isNotEmpty()
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.timeline),
@@ -151,6 +161,40 @@ fun SplitScreen(
         onRemoveSet = viewModel::onRemoveSet,
         onCheckSet = viewModel::onCheckSet
     )
+
+    if (statsBottomSheetOpen && uiState.stats != null) {
+        ModalBottomSheet(
+            onDismissRequest = { statsBottomSheetOpen = false },
+            sheetState = rememberModalBottomSheetState(),
+        ) {
+            val weightUnitString = stringResource(id = UnitUtil.weightUnitStringId)
+
+            Column {
+                LazyColumn {
+                    itemsIndexed(uiState.stats!!.exercises) { index, exercise ->
+                        BasicLineChart(
+                            title = {
+                                Text(
+                                    text = exercise.name.ifEmpty { "${stringResource(id = R.string.exercise)} ${index + 1}" }
+                                )
+                            },
+                            bottomLabels = if (exercise.setHistory.isNotEmpty()) {
+                                listOf(
+                                    exercise.setHistory.first().timestamp.toDateString(),
+                                    exercise.setHistory.last().timestamp.toDateString()
+                                )
+                            } else emptyList(),
+                            dataValues = exercise.setHistory.map { it.maxWeight },
+                            popupContentBuilder = { dataIndex, valueIndex, value ->
+                                "${exercise.setHistory[valueIndex].maxWeight} ${weightUnitString}\n ${exercise.setHistory[valueIndex].timestamp.toDateString()}"
+                            }
+                        )
+                        HorizontalDivider()
+                    }
+                }
+            }
+        }
+    }
 
     if (navigationDialogOpen) {
         ConfirmDialog(

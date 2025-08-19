@@ -170,8 +170,7 @@ fun GymTrackerApp(
 
             composable<Route.Split> {
                 SplitScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    onNavigateToStats = { navController.navigate(Route.SplitStats(it)) }
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 
