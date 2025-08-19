@@ -166,17 +166,19 @@ fun GymTrackerApp(
                         onNavigateToCreateSplit = { navController.navigate(Route.CreateSplit) }
                     )
                 }
-                composable<Route.Split> {
-                    SplitScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        onNavigateToStats = { navController.navigate(Route.SplitStats(it)) }
-                    )
-                }
-                composable<Route.CreateSplit> {
-                    CreateSplitScreen(
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
+            }
+
+            composable<Route.Split> {
+                SplitScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToStats = { navController.navigate(Route.SplitStats(it)) }
+                )
+            }
+
+            composable<Route.CreateSplit> {
+                CreateSplitScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
 
             navigation<Route.Cardio>(startDestination = Route.CardioList) {
@@ -186,17 +188,18 @@ fun GymTrackerApp(
                         onNavigateToCreateCardio = { navController.navigate(Route.CreateCardio) }
                     )
                 }
-                composable<Route.CardioItem> {
-                    CardioItemScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        onNavigateToStats = { navController.navigate(Route.CardioStats(it)) }
-                    )
-                }
-                composable<Route.CreateCardio> {
-                    CreateCardioScreen(
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
+            }
+
+            composable<Route.CardioItem> {
+                CardioItemScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToStats = { navController.navigate(Route.CardioStats(it)) }
+                )
+            }
+            composable<Route.CreateCardio> {
+                CreateCardioScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
 
             navigation<Route.Stats>(startDestination = Route.StatsOverview) {
