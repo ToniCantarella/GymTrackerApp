@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -411,6 +413,7 @@ fun EditExercise(
                 addingSet = false
             )
         }
+        HorizontalDivider()
     }
 }
 
@@ -437,14 +440,23 @@ private fun ExerciseHeader(
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         Box(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = dimensionResource(id = R.dimen.padding_large))
+                .padding(top = dimensionResource(id = R.dimen.padding_large))
         ) {
             headerTitle()
         }
-        headerActions()
+        Box(
+            modifier = Modifier
+                .padding(top = dimensionResource(id = R.dimen.padding_medium))
+        ) {
+            headerActions()
+        }
     }
 }
 
@@ -480,11 +492,10 @@ private fun ExerciseCard(
         modifier = modifier
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-            modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.padding_large))
+            modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         ) {
             header()
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
             content()
             actions()
         }
