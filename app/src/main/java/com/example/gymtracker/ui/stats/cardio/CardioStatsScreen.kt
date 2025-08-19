@@ -1,49 +1,31 @@
 package com.example.gymtracker.ui.stats.cardio
 
-import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.database.repository.CardioStats
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
+import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.toDateString
-import ir.ehsannarmani.compose_charts.LineChart
-import ir.ehsannarmani.compose_charts.models.AnimationMode
-import ir.ehsannarmani.compose_charts.models.DrawStyle
-import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
-import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
-import ir.ehsannarmani.compose_charts.models.LabelProperties
-import ir.ehsannarmani.compose_charts.models.Line
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -91,8 +73,6 @@ private fun CardioStatsScreen(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier
             .fillMaxSize()
     ) {
@@ -100,7 +80,8 @@ private fun CardioStatsScreen(
             val stepHistory = stats.cardioHistory.filter { it.steps != null }
             val stepValues = stepHistory.map { it.steps!!.toDouble() }
 
-            LineChartCard(
+            HorizontalDivider()
+            BasicLineChart(
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
@@ -115,20 +96,24 @@ private fun CardioStatsScreen(
                         )
                     }
                 },
-                values = stepValues,
-                dateLabels = if (stepHistory.isNotEmpty()) {
+                bottomLabels = if (stepHistory.isNotEmpty()) {
                     listOf(
                         stepHistory.first().timestamp?.toDateString() ?: "",
                         stepHistory.last().timestamp?.toDateString() ?: "",
                     )
-                } else emptyList()
+                } else emptyList(),
+                dataValues = stepValues,
+                popupContentBuilder = { dataIndex, valueIndex, value ->
+                    "${stepHistory[valueIndex].steps}\n ${stepHistory[valueIndex].timestamp?.toDateString()}"
+                },
             )
         }
         item {
             val distanceHistory = stats.cardioHistory.filter { it.distance != null }
             val distanceValues = distanceHistory.map { it.distance!! }
 
-            LineChartCard(
+            HorizontalDivider()
+            BasicLineChart(
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
@@ -147,13 +132,16 @@ private fun CardioStatsScreen(
                         )
                     }
                 },
-                values = distanceValues,
-                dateLabels = if (distanceHistory.isNotEmpty()) {
+                bottomLabels = if (distanceHistory.isNotEmpty()) {
                     listOf(
                         distanceHistory.first().timestamp?.toDateString() ?: "",
                         distanceHistory.last().timestamp?.toDateString() ?: "",
                     )
-                } else emptyList()
+                } else emptyList(),
+                dataValues = distanceValues,
+                popupContentBuilder = { dataIndex, valueIndex, value ->
+                    "${distanceHistory[valueIndex].distance}\n ${distanceHistory[valueIndex].timestamp?.toDateString()}"
+                }
             )
         }
         item {
@@ -169,7 +157,8 @@ private fun CardioStatsScreen(
 
             val durationValues = rawDurations.map { it.toMillis() / divider }
 
-            LineChartCard(
+            HorizontalDivider()
+            BasicLineChart(
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
@@ -184,69 +173,16 @@ private fun CardioStatsScreen(
                         )
                     }
                 },
-                values = durationValues,
-                dateLabels = if (durationHistory.isNotEmpty()) {
+                dataValues = durationValues,
+                bottomLabels = if (durationHistory.isNotEmpty()) {
                     listOf(
                         durationHistory.first().timestamp?.toDateString() ?: "",
                         durationHistory.last().timestamp?.toDateString() ?: "",
                     )
-                } else emptyList()
-            )
-        }
-    }
-}
-
-@Composable
-private fun LineChartCard(
-    title: @Composable () -> Unit,
-    values: List<Double>,
-    dateLabels: List<String>,
-    modifier: Modifier = Modifier
-) {
-    ElevatedCard(
-        modifier = modifier
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-        ) {
-            title()
-            LineChart(
-                modifier = Modifier.heightIn(max = 300.dp),
-                data = remember {
-                    listOf(
-                        Line(
-                            label = "",
-                            values = values.ifEmpty { listOf(0.0) },
-                            color = SolidColor(Color(0xFF23af92)),
-                            firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
-                            secondGradientFillColor = Color.Transparent,
-                            strokeAnimationSpec = tween(700, easing = EaseInOutCubic),
-                            gradientAnimationDelay = 700,
-                            drawStyle = DrawStyle.Stroke(width = 2.dp),
-                        )
-                    )
-                },
-                labelProperties = LabelProperties(
-                    enabled = true,
-                    textStyle = MaterialTheme.typography.labelSmall,
-                    labels = dateLabels,
-                    builder = { modifier, label, shouldRotate, index ->
-                        Text(
-                            text = label,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                ),
-                labelHelperProperties = LabelHelperProperties(
-                    enabled = false
-                ),
-                indicatorProperties = HorizontalIndicatorProperties(
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                ),
-                animationMode = AnimationMode.Together(delayBuilder = { it * 500L })
+                } else emptyList(),
+                popupContentBuilder = { dataIndex, valueIndex, value ->
+                    "${durationHistory[valueIndex].duration?.toMillis()?.div(divider)}\n ${durationHistory[valueIndex].timestamp?.toDateString()}"
+                }
             )
         }
     }
