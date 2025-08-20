@@ -232,11 +232,11 @@ fun EditExercise(
     var dropdownMenuOpen by remember { mutableStateOf(false) }
     var editingTitle by remember { mutableStateOf(false) }
 
-    var nameTextFieldValue by remember(editingTitle, exercise.name) {
+    var nameTextFieldValue by remember(editingTitle) {
         mutableStateOf(
             TextFieldValue(
                 text = exercise.name,
-                selection = if (editingTitle) TextRange(exercise.name.length) else TextRange.Zero // Initial selection
+                selection = if (editingTitle) TextRange(exercise.name.length) else TextRange.Zero
             )
         )
     }
