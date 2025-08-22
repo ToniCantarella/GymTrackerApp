@@ -2,7 +2,6 @@ package com.example.gymtracker.ui.gym.split
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,6 +11,7 @@ import com.example.gymtracker.database.repository.GymRepository
 import com.example.gymtracker.database.repository.SplitStats
 import com.example.gymtracker.database.repository.StatRepository
 import com.example.gymtracker.ui.gym.entity.Exercise
+import com.example.gymtracker.ui.info.SHOW_FINISH_WORKOUT_DIALOG
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.utility.SplitUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.UUID
-
-private val SHOW_FINISH_WORKOUT_DIALOG = booleanPreferencesKey("show_finish_workout_dialog")
 
 data class SplitUiState(
     val loading: Boolean = false,

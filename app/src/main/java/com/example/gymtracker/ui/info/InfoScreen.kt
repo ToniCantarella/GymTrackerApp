@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
@@ -19,12 +20,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -47,6 +51,7 @@ fun InfoScreen(
     onDeleteFinished: () -> Unit,
     viewModel: InfoViewModel = koinViewModel()
 ) {
+    val uiState = viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
     ProvideTopAppBar(
@@ -68,6 +73,8 @@ fun InfoScreen(
     )
 
     InfoScreen(
+        showFinishWorkoutDialog = uiState.value.showConfirmOnFinishWorkout,
+        onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
         onDeleteAllData = { deletionDialogOpen = true }
     )
 
@@ -111,6 +118,8 @@ fun InfoScreen(
 @Composable
 private fun InfoScreen(
     onDeleteAllData: () -> Unit,
+    showFinishWorkoutDialog: Boolean,
+    onFinishWorkoutDialogChecked: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -163,6 +172,19 @@ private fun InfoScreen(
                 )
                 Text(
                     text = stringResource(id = R.string.settings)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    text = stringResource(id = R.string.show_finish_workout_dialog)
+                )
+                Switch(
+                    checked = showFinishWorkoutDialog,
+                    onCheckedChange = onFinishWorkoutDialogChecked
                 )
             }
             Button(

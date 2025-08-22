@@ -67,4 +67,5 @@
     <string name="adding_for_date">Adding for</string>
     <string name="gym_workouts">Gym workouts</string>
     <string name="settings">Settings</string>
+    <string name="show_finish_workout_dialog">Confirm finishing workout</string>
 </resources>

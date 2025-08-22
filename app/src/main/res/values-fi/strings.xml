@@ -59,4 +59,5 @@
     <string name="adding_for_date">Lisätään</string>
     <string name="gym_workouts">Salitreenit</string>
     <string name="settings">Asetukset</string>
+    <string name="show_finish_workout_dialog">Varmista treenin lopettaminen</string>
 </resources>
