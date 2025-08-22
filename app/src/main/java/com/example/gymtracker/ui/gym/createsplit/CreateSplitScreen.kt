@@ -68,7 +68,10 @@ fun CreateSplitScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = { viewModel.onCreateSplitPressed { onNavigateBack() } },
+        onClick = {
+            onGuardReleased()
+            viewModel.onCreateSplitPressed { onNavigateBack() }
+        },
         enabled = uiState.exercises.last().name.isNotEmpty() && uiState.splitName.isNotEmpty()
     ) {
         Icon(
