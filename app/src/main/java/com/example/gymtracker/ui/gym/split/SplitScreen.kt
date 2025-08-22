@@ -1,6 +1,5 @@
 package com.example.gymtracker.ui.gym.split
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,14 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
+import com.example.gymtracker.ui.common.UnsavedChangesDialog
 import com.example.gymtracker.ui.gym.common.ExerciseListEdit
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
-import com.example.gymtracker.ui.navigation.ProvideNavigationBarGuard
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
-import com.example.gymtracker.ui.navigation.rememberProceedOnGuardCleared
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
@@ -59,31 +58,35 @@ import java.util.UUID
 @Composable
 fun SplitScreen(
     onNavigateBack: () -> Unit,
+    onNavigationGuardChange: (Boolean) -> Unit,
+    showNavigationGuard: Boolean,
+    onShowNavigationGuardChange: (Boolean) -> Unit,
+    onGuardReleased: () -> Unit,
     viewModel: SplitViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     var statsBottomSheetOpen by remember { mutableStateOf(false) }
-
     var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
-
-    var navigationDialogOpen by remember { mutableStateOf(false) }
-    var navigationDialogOnNavigate: () -> Unit by remember { mutableStateOf({}) }
 
     val hasUnsavedChanges =
         uiState.initialSplitName != uiState.splitName || uiState.initialExercises != uiState.exercises
     val hasPerformedSets = uiState.exercises.any { it.sets.any { set -> set.checked } }
 
-    fun navigationCheck(onNavigate: () -> Unit) {
-        if (hasUnsavedChanges) {
-            navigationDialogOpen = true
-            navigationDialogOnNavigate = onNavigate
+    LaunchedEffect(hasUnsavedChanges, hasPerformedSets) {
+        if (hasUnsavedChanges || hasPerformedSets) {
+            onNavigationGuardChange(true)
         } else {
-            onNavigate()
+            onNavigationGuardChange(false)
         }
     }
 
-    fun onFinishWorkout() = viewModel.onFinishWorkoutPressed { onNavigateBack() }
+    fun onFinishWorkout() {
+        onGuardReleased()
+        viewModel.onFinishWorkoutPressed {
+            onNavigateBack()
+        }
+    }
 
     fun finishWorkoutCheck() {
         if (hasPerformedSets && uiState.showConfirmOnFinishWorkout) {
@@ -92,16 +95,6 @@ fun SplitScreen(
             onFinishWorkout()
         }
     }
-
-    BackHandler {
-        navigationCheck { onNavigateBack() }
-    }
-
-    ProvideNavigationBarGuard(
-        isGuarded = hasUnsavedChanges,
-        onGuard = { navigationDialogOpen = true }
-    )
-    val proceedOnGuardCleared = rememberProceedOnGuardCleared()
 
     ProvideTopAppBar(
         title = {
@@ -113,7 +106,7 @@ fun SplitScreen(
         },
         navigationItem = {
             IconButton(
-                onClick = { navigationCheck { onNavigateBack() } }
+                onClick = { onNavigateBack() }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -196,37 +189,10 @@ fun SplitScreen(
         }
     }
 
-    if (navigationDialogOpen) {
-        ConfirmDialog(
-            subtitle = {
-                Text(
-                    text = stringResource(id = R.string.unsaved_changes),
-                    textAlign = TextAlign.Center
-                )
-            },
-            cancelButton = {
-                OutlinedButton(
-                    onClick = { navigationDialogOpen = false }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.cancel)
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        navigationDialogOpen = false
-                        navigationDialogOnNavigate.invoke()
-                        proceedOnGuardCleared()
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.ok)
-                    )
-                }
-            },
-            onDismissRequest = { navigationDialogOpen = false }
+    if (showNavigationGuard) {
+        UnsavedChangesDialog(
+            onConfirm = { onGuardReleased() },
+            onCancel = { onShowNavigationGuardChange(false) }
         )
     }
 

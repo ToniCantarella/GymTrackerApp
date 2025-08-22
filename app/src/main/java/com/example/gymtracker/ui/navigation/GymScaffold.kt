@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -28,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 @Composable
 fun GymScaffold(
     navController: NavController,
+    navigate: (Route) -> Unit,
     content: @Composable (innerPadding: PaddingValues) -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -36,25 +36,6 @@ fun GymScaffold(
 
     val matchesNavigationBarRoute = navigationBarRoutes.any { navigationBarRoute ->
         currentDestination?.hierarchy?.any { it.hasRoute(navigationBarRoute.route::class) } == true
-    }
-
-    val navigationBarGuard = navBackStackEntry?.let { entry ->
-        viewModel<NavigationBarGuardViewModel>(viewModelStoreOwner = entry)
-    }
-
-    fun onNavigationBarItemClick(navigationBarRoute: NavigationBarRoute) {
-        if (navigationBarGuard?.isGuarded == true) {
-            navigationBarGuard.onGuard.invoke()
-            navigationBarGuard.onProceed = {
-                navController.navigate(navigationBarRoute.route) {
-                    launchSingleTop = true
-                }
-            }
-        } else {
-            navController.navigate(navigationBarRoute.route) {
-                launchSingleTop = true
-            }
-        }
     }
 
     Row(
@@ -69,7 +50,7 @@ fun GymScaffold(
                     NavigationRailItem(
                         selected = selected,
                         onClick = {
-                            onNavigationBarItemClick(navigationBarRoute)
+                            navigate(navigationBarRoute.route)
                         },
                         icon = {
                             Icon(
@@ -103,7 +84,7 @@ fun GymScaffold(
                             NavigationBarItem(
                                 selected = selected,
                                 onClick = {
-                                    onNavigationBarItemClick(navigationBarRoute)
+                                    navigate(navigationBarRoute.route)
                                 },
                                 icon = {
                                     Icon(

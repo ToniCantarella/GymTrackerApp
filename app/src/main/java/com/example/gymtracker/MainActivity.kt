@@ -3,6 +3,7 @@ package com.example.gymtracker
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.fadeIn
@@ -49,7 +50,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -138,8 +142,49 @@ fun GymTrackerApp(
         }
     }
 
+    var isNavigationGuarded by remember { mutableStateOf(false) }
+    var showNavigationGuard by remember { mutableStateOf(false) }
+    var pendingNavigationAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    fun onNavigationGuardChange(guard: Boolean) {
+        isNavigationGuarded = guard
+    }
+
+    fun releaseNavigationGuard() {
+        pendingNavigationAction?.invoke()
+        pendingNavigationAction = null
+        showNavigationGuard = false
+        isNavigationGuarded = false
+    }
+
+    fun navigateGuarded(navigationAction: () -> Unit) {
+        if (isNavigationGuarded) {
+            pendingNavigationAction = navigationAction
+            showNavigationGuard = true
+        } else {
+            navigationAction()
+            pendingNavigationAction = null
+            showNavigationGuard = false
+        }
+    }
+
+    fun navigate(route: Route) {
+        navigateGuarded {
+            navController.navigate(route) {
+                launchSingleTop = true
+            }
+        }
+    }
+
+    fun popBackStack() {
+        navigateGuarded {
+            navController.popBackStack()
+        }
+    }
+
     GymScaffold(
-        navController = navController
+        navController = navController,
+        navigate = ::navigate
     ) { innerPadding ->
         NavHost(
             enterTransition = { enter },
@@ -154,7 +199,7 @@ fun GymTrackerApp(
                 WelcomeScreen(
                     onUnderstoodClick = {
                         viewModel.onUserWelcomed()
-                        navController.navigate(Route.Gym)
+                        navigate(Route.Gym)
                     }
                 )
             }
@@ -162,66 +207,78 @@ fun GymTrackerApp(
             navigation<Route.Gym>(startDestination = Route.SplitList) {
                 composable<Route.SplitList> {
                     SplitListScreen(
-                        onNavigateToSplit = { navController.navigate(Route.Split(it)) },
-                        onNavigateToCreateSplit = { navController.navigate(Route.CreateSplit) }
+                        onNavigateToSplit = { navigate(Route.Split(it)) },
+                        onNavigateToCreateSplit = { navigate(Route.CreateSplit) }
                     )
                 }
             }
 
             composable<Route.Split> {
                 SplitScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = ::popBackStack,
+                    onNavigationGuardChange = ::onNavigationGuardChange,
+                    onGuardReleased = ::releaseNavigationGuard,
+                    showNavigationGuard = showNavigationGuard,
+                    onShowNavigationGuardChange = { showNavigationGuard = it }
                 )
             }
 
             composable<Route.CreateSplit> {
                 CreateSplitScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = ::popBackStack,
+                    onNavigationGuardChange = ::onNavigationGuardChange,
+                    onGuardReleased = ::releaseNavigationGuard,
+                    showNavigationGuard = showNavigationGuard,
+                    onShowNavigationGuardChange = { showNavigationGuard = it }
                 )
             }
 
             navigation<Route.Cardio>(startDestination = Route.CardioList) {
                 composable<Route.CardioList> {
                     CardioListScreen(
-                        onNavigateToCardioItem = { navController.navigate(Route.CardioItem(it)) },
-                        onNavigateToCreateCardio = { navController.navigate(Route.CreateCardio) }
+                        onNavigateToCardioItem = { navigate(Route.CardioItem(it)) },
+                        onNavigateToCreateCardio = { navigate(Route.CreateCardio) }
                     )
                 }
             }
 
             composable<Route.CardioItem> {
                 CardioItemScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    onNavigateToStats = { navController.navigate(Route.CardioStats(it)) }
+                    onNavigateBack = ::popBackStack,
+                    onNavigationGuardChange = ::onNavigationGuardChange,
+                    onGuardReleased = ::releaseNavigationGuard,
+                    showNavigationGuard = showNavigationGuard,
+                    onShowNavigationGuardChange = { showNavigationGuard = it },
+                    onNavigateToStats = { navigate(Route.CardioStats(it)) }
                 )
             }
             composable<Route.CreateCardio> {
                 CreateCardioScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = ::popBackStack
                 )
             }
 
             navigation<Route.Stats>(startDestination = Route.StatsOverview) {
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
-                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateBack = ::popBackStack,
                         onSessionNavigate = { id, type ->
                             if (type == WorkoutType.GYM) {
-                                navController.navigate(Route.GymSession(id))
+                                navigate(Route.GymSession(id))
                             } else {
-                                navController.navigate(Route.CardioSession(id))
+                                navigate(Route.CardioSession(id))
                             }
                         },
                         onAddSessionNavigate = { workout, timestamp ->
                             if (workout.type == WorkoutType.GYM) {
-                                navController.navigate(
+                                navigate(
                                     Route.Split(
                                         workout.id,
                                         timestamp.toString()
                                     )
                                 )
                             } else {
-                                navController.navigate(
+                                navigate(
                                     Route.CardioItem(
                                         workout.id,
                                         timestamp.toString()
@@ -231,40 +288,44 @@ fun GymTrackerApp(
                         },
                         onWorkoutStatsNavigate = {
                             if (it.type == WorkoutType.GYM) {
-                                navController.navigate(Route.SplitStats(it.id))
+                                navigate(Route.SplitStats(it.id))
                             } else {
-                                navController.navigate(Route.CardioStats(it.id))
+                                navigate(Route.CardioStats(it.id))
                             }
                         }
                     )
                 }
                 composable<Route.GymSession> {
                     GymSessionScreen(
-                        onNavigateBack = navController::popBackStack
+                        onNavigateBack = ::popBackStack
                     )
                 }
                 composable<Route.CardioSession> {
                     CardioSessionScreen(
-                        onNavigateBack = navController::popBackStack
+                        onNavigateBack = ::popBackStack
                     )
                 }
                 composable<Route.SplitStats> {
                     SplitStatsScreen(
-                        onNavigateBack = navController::popBackStack
+                        onNavigateBack = ::popBackStack
                     )
                 }
                 composable<Route.CardioStats> {
                     CardioStatsScreen(
-                        onNavigateBack = navController::popBackStack
+                        onNavigateBack = ::popBackStack
                     )
                 }
             }
 
             composable<Route.Info> {
                 InfoScreen(
-                    onDeleteFinished = { navController.navigate(Route.Welcome) }
+                    onDeleteFinished = { navigate(Route.Welcome) }
                 )
             }
+        }
+
+        BackHandler {
+            popBackStack()
         }
     }
 }
