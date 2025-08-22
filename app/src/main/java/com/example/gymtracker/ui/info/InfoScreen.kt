@@ -1,8 +1,11 @@
 package com.example.gymtracker.ui.info
 
+import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -18,9 +21,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.core.net.toUri
 import com.example.gymtracker.BuildConfig
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
@@ -99,6 +108,13 @@ private fun InfoScreen(
     onDeleteAllData: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
+    fun openLink(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        context.startActivity(intent)
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_large))
@@ -106,12 +122,24 @@ private fun InfoScreen(
         Text(
             text = "${stringResource(id = R.string.version)}: ${BuildConfig.APP_VERSION}"
         )
-        Text(
-            text = "${stringResource(id = R.string.calendar_library)}: https://github.com/kizitonwose/Calendar"
-        )
-        Text(
-            text = "${stringResource(id = R.string.chart_library)}: https://github.com/ehsannarmani/ComposeCharts"
-        )
+        Column {
+            Text(
+                text = "${stringResource(id = R.string.calendar_library)}: "
+            )
+            LinkedText(
+                url = "https://github.com/kizitonwose/Calendar",
+                onClick = ::openLink
+            )
+        }
+        Column {
+            Text(
+                text = "${stringResource(id = R.string.chart_library)}: "
+            )
+            LinkedText(
+                url = "https://github.com/ehsannarmani/ComposeCharts",
+                onClick = ::openLink
+            )
+        }
         Button(
             onClick = onDeleteAllData,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
@@ -121,4 +149,28 @@ private fun InfoScreen(
             )
         }
     }
+}
+
+@Composable
+private fun LinkedText(
+    url: String,
+    onClick: (String) -> Unit
+) {
+    val annotatedString = buildAnnotatedString {
+        pushStringAnnotation(tag = "URL", annotation = url)
+        withStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colorScheme.tertiary,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            append(url)
+        }
+        pop()
+    }
+
+    BasicText(
+        text = annotatedString,
+        modifier = Modifier.clickable { onClick(url) }
+    )
 }
