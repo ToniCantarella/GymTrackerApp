@@ -3,7 +3,6 @@ package com.example.gymtracker
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.fadeIn
@@ -322,10 +321,6 @@ fun GymTrackerApp(
                     onDeleteFinished = { navigate(Route.Welcome) }
                 )
             }
-        }
-
-        BackHandler {
-            popBackStack()
         }
     }
 }

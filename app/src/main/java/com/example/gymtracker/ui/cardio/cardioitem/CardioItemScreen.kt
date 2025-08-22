@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.cardio.cardioitem
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,10 @@ fun CardioItemScreen(
     val uiState by viewModel.uiState.collectAsState()
     val hasUnsavedChanges =
         uiState.cardio != uiState.initialCardio
+
+    BackHandler {
+        onNavigateBack()
+    }
 
     LaunchedEffect(hasUnsavedChanges) {
         if (hasUnsavedChanges) {

@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.gym.createsplit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -33,6 +34,10 @@ fun CreateSplitScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val hasUnsavedChanges = uiState.splitName != "" || uiState.exercises != uiState.initialExercises
+
+    BackHandler {
+        onNavigateBack()
+    }
 
     LaunchedEffect(hasUnsavedChanges) {
         if (hasUnsavedChanges) {

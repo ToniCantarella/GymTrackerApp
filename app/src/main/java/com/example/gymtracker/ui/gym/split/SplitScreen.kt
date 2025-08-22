@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.gym.split
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -72,6 +73,10 @@ fun SplitScreen(
     val hasUnsavedChanges =
         uiState.initialSplitName != uiState.splitName || uiState.initialExercises != uiState.exercises
     val hasPerformedSets = uiState.exercises.any { it.sets.any { set -> set.checked } }
+
+    BackHandler {
+        onNavigateBack()
+    }
 
     LaunchedEffect(hasUnsavedChanges, hasPerformedSets) {
         if (hasUnsavedChanges || hasPerformedSets) {
