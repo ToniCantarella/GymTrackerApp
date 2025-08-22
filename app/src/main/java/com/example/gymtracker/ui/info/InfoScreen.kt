@@ -3,8 +3,12 @@ package com.example.gymtracker.ui.info
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,14 +24,38 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.gymtracker.BuildConfig
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
+import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun InfoScreen(
+    onNavigateBack: () -> Unit,
     onDeleteFinished: () -> Unit,
     viewModel: InfoViewModel = koinViewModel()
 ) {
     var deletionDialogOpen by remember { mutableStateOf(false) }
+
+    ProvideTopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.info)
+            )
+        },
+        navigationItem = {
+            IconButton(
+                onClick = onNavigateBack
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.back)
+                )
+            }
+        }
+    )
+
+    InfoScreen(
+        onDeleteAllData = { deletionDialogOpen = true }
+    )
 
     if (deletionDialogOpen) {
         ConfirmDialog(
@@ -64,10 +92,6 @@ fun InfoScreen(
             onDismissRequest = { deletionDialogOpen = false }
         )
     }
-
-    InfoScreen(
-        onDeleteAllData = { deletionDialogOpen = true }
-    )
 }
 
 @Composable
@@ -86,7 +110,7 @@ private fun InfoScreen(
             text = "${stringResource(id = R.string.calendar_library)}: https://github.com/kizitonwose/Calendar"
         )
         Text(
-            text = "${stringResource(id = R.string.chart_library)}: https://ehsannarmani.github.io/ComposeCharts"
+            text = "${stringResource(id = R.string.chart_library)}: https://github.com/ehsannarmani/ComposeCharts"
         )
         Button(
             onClick = onDeleteAllData,
