@@ -50,7 +50,10 @@ fun NumericTextField(
 ) {
     GenericNumericTextField(
         value = value,
-        onValueChange = { onValueChange(it.toDoubleOrNull() ?: 0.0) },
+        onValueChange = {
+            val newVal = if (it.contains(",")) it.replace(",", ".") else it
+            onValueChange(newVal.toDoubleOrNull() ?: 0.0)
+        },
         valueValidator = {
             val parts = it.split(",")
             parts.size <= 2 && parts[0].length <= valueMaxLength && (parts.getOrNull(1)?.length
