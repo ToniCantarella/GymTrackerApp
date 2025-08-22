@@ -4,12 +4,17 @@ import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -119,34 +124,55 @@ private fun InfoScreen(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_large))
     ) {
-        Text(
-            text = "${stringResource(id = R.string.version)}: ${BuildConfig.APP_VERSION}"
-        )
-        Column {
-            Text(
-                text = "${stringResource(id = R.string.calendar_library)}: "
-            )
-            LinkedText(
-                url = "https://github.com/kizitonwose/Calendar",
-                onClick = ::openLink
-            )
-        }
-        Column {
-            Text(
-                text = "${stringResource(id = R.string.chart_library)}: "
-            )
-            LinkedText(
-                url = "https://github.com/ehsannarmani/ComposeCharts",
-                onClick = ::openLink
-            )
-        }
-        Button(
-            onClick = onDeleteAllData,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
         ) {
             Text(
-                text = stringResource(id = R.string.delete_all_data)
+                text = "${stringResource(id = R.string.version)}: ${BuildConfig.APP_VERSION}"
             )
+            Column {
+                Text(
+                    text = "${stringResource(id = R.string.calendar_library)}: "
+                )
+                LinkedText(
+                    url = "https://github.com/kizitonwose/Calendar",
+                    onClick = ::openLink
+                )
+            }
+            Column {
+                Text(
+                    text = "${stringResource(id = R.string.chart_library)}: "
+                )
+                LinkedText(
+                    url = "https://github.com/ehsannarmani/ComposeCharts",
+                    onClick = ::openLink
+                )
+            }
+        }
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+        HorizontalDivider()
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = stringResource(id = R.string.settings)
+                )
+                Text(
+                    text = stringResource(id = R.string.settings)
+                )
+            }
+            Button(
+                onClick = onDeleteAllData,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.delete_all_data)
+                )
+            }
         }
     }
 }
