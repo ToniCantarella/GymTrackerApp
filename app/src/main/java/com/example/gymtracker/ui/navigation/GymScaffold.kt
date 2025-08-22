@@ -1,10 +1,16 @@
 package com.example.gymtracker.ui.navigation
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -39,32 +45,46 @@ fun GymScaffold(
     }
 
     Row(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .then(
+                if (isLandscape) {
+                    Modifier.windowInsetsPadding(WindowInsets.systemBars)
+                } else {
+                    Modifier
+                }
+            )
+
     ) {
         if (matchesNavigationBarRoute && currentDestination != null && isLandscape) {
             NavigationRail {
-                navigationBarRoutes.forEach { navigationBarRoute ->
-                    val selected = currentDestination.hierarchy.any {
-                        it.hasRoute(navigationBarRoute.route::class)
-                    }
-                    NavigationRailItem(
-                        selected = selected,
-                        onClick = {
-                            navigate(navigationBarRoute.route)
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(navigationBarRoute.iconResInt),
-                                contentDescription = stringResource(id = navigationBarRoute.titleResInt),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = {
-                            Text(
-                                text = stringResource(id = navigationBarRoute.titleResInt)
-                            )
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    navigationBarRoutes.forEach { navigationBarRoute ->
+                        val selected = currentDestination.hierarchy.any {
+                            it.hasRoute(navigationBarRoute.route::class)
                         }
-                    )
+                        NavigationRailItem(
+                            selected = selected,
+                            onClick = {
+                                navigate(navigationBarRoute.route)
+                            },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(navigationBarRoute.iconResInt),
+                                    contentDescription = stringResource(id = navigationBarRoute.titleResInt),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = stringResource(id = navigationBarRoute.titleResInt)
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
