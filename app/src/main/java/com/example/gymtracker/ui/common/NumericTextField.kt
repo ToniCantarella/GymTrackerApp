@@ -51,13 +51,11 @@ fun NumericTextField(
     GenericNumericTextField(
         value = value,
         onValueChange = {
-            val newVal = if (it.contains(",")) it.replace(",", ".") else it
-            onValueChange(newVal.toDoubleOrNull() ?: 0.0)
+            onValueChange(it.toDoubleOrNull() ?: 0.0)
         },
         valueValidator = {
             val parts = it.split(",")
-            parts.size <= 2 && parts[0].length <= valueMaxLength && (parts.getOrNull(1)?.length
-                ?: 0) <= 2
+            parts[0].length <= valueMaxLength && (parts.getOrNull(1)?.length ?: 0) <= 2
         },
         modifier = modifier.width(80.dp)
     )
@@ -109,11 +107,13 @@ private fun GenericNumericTextField(
         onValueChange = {
             val allowedCharacters =
                 it.text.filter { input -> input.isDigit() || input == '.' || input == ',' }
-            val newValue = allowedCharacters.replace(".", ",")
 
-            if (valueValidator(newValue)) {
+            val newValue = allowedCharacters.replace(".", ",")
+            val hasComma = newValue.count { char -> char == ','} > 1
+
+            if (!hasComma && valueValidator(newValue)) {
                 textFieldValue = it.copy(text = newValue)
-                onValueChange(newValue)
+                onValueChange(newValue.replace(",", "."))
             }
         },
         singleLine = true,
