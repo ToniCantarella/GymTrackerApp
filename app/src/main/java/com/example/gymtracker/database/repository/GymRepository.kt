@@ -25,7 +25,7 @@ data class SplitWithExercises(
     val exercises: List<Exercise>
 )
 
-data class WorkoutListItem(
+data class WorkoutWithLatestTimestamp(
     val id: Int,
     val name: String,
     val latestTimestamp: Instant?,
@@ -34,7 +34,7 @@ data class WorkoutListItem(
 
 interface GymRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
-    suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem>
+    suspend fun getSplitsWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
     suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises?
     suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
     suspend fun deleteSplit(splitId: Int)
@@ -85,13 +85,13 @@ class GymRepositoryImpl(
         }
     }
 
-    override suspend fun getSplitsWithLatestTimestamp(): List<WorkoutListItem> {
+    override suspend fun getSplitsWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
         val workouts = workoutDao.getAllGymWorkouts()
 
         return workouts.map {
             val timestamp = gymSessionDao.getLastSession(it.id)?.timestamp
 
-            WorkoutListItem(
+            WorkoutWithLatestTimestamp(
                 id = it.id,
                 name = it.name,
                 latestTimestamp = timestamp

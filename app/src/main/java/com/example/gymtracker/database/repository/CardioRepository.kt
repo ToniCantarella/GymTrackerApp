@@ -15,7 +15,7 @@ import java.time.Instant
 
 interface CardioRepository {
     suspend fun addCardio(name: String)
-    suspend fun getCardioListWithLatestTimestamp(): List<WorkoutListItem>
+    suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
     suspend fun getLatestCardio(id: Int): Cardio
     suspend fun getCardioBySession(sessionId: Int): Cardio
     suspend fun deleteCardio(cardioId: Int)
@@ -43,14 +43,14 @@ class CardioRepositoryImpl(
         )
     }
 
-    override suspend fun getCardioListWithLatestTimestamp(): List<WorkoutListItem> {
+    override suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
         val workouts = workoutDao.getAllCardioWorkouts()
 
         return workouts.map {
             val cardio = cardioDao.getCardioByWorkoutId(it.id)
             val session = cardioSessionDao.getLastSession(cardio.id)
 
-            WorkoutListItem(
+            WorkoutWithLatestTimestamp(
                 id = it.id,
                 name = it.name,
                 latestTimestamp = session?.timestamp

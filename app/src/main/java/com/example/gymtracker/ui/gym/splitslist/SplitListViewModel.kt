@@ -3,7 +3,7 @@ package com.example.gymtracker.ui.gym.splitslist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymtracker.database.repository.GymRepository
-import com.example.gymtracker.database.repository.WorkoutListItem
+import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 data class SplitListUiState(
     val loading: Boolean = true,
-    val splits: List<WorkoutListItem> = emptyList(),
+    val splits: List<WorkoutWithLatestTimestamp> = emptyList(),
     val selectingItems: Boolean = false
 )
 

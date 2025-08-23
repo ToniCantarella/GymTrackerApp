@@ -45,7 +45,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -83,10 +82,11 @@ import com.example.gymtracker.R
 import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.database.repository.Workout
 import com.example.gymtracker.database.repository.WorkoutSession
+import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
+import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.MAX_SPLITS
-import com.example.gymtracker.utility.toDateAndTimeString
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -225,7 +225,9 @@ private fun StatsOverviewScreen(
                                 PieChartCard(
                                     workouts = gymWorkouts,
                                     workoutSessions = gymSessions,
-                                    modifier = Modifier.width(itemWidth).height(itemHeight)
+                                    modifier = Modifier
+                                        .width(itemWidth)
+                                        .height(itemHeight)
                                 )
                             }
                         }
@@ -234,7 +236,9 @@ private fun StatsOverviewScreen(
                                 PieChartCard(
                                     workouts = cardioWorkouts,
                                     workoutSessions = cardioSessions,
-                                    modifier = Modifier.width(itemWidth).height(itemHeight)
+                                    modifier = Modifier
+                                        .width(itemWidth)
+                                        .height(itemHeight)
                                 )
                             }
                         }
@@ -243,6 +247,24 @@ private fun StatsOverviewScreen(
             }
             if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
                 item {
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                    Row(
+                        modifier = Modifier
+                            .padding(start = dimensionResource(id = R.dimen.padding_large))
+                    ){
+                        Icon(
+                            painter = painterResource(id = R.drawable.timeline),
+                            contentDescription = stringResource(id = R.string.stats),
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                        Text(
+                            text = stringResource(id = R.string.stats),
+                            style = MaterialTheme.typography.headlineLarge,
+
+                        )
+                    }
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                     WorkoutListing(
                         gymWorkouts = gymWorkouts,
                         cardioWorkouts = cardioWorkouts,
@@ -261,42 +283,28 @@ private fun WorkoutListing(
     onWorkoutNavigate: (workout: Workout) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-        modifier = modifier.fillMaxWidth()
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
     ) {
         if (gymWorkouts.isNotEmpty()) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.weight),
-                    contentDescription = stringResource(id = R.string.gym)
+            gymWorkouts.forEachIndexed { index, workout ->
+                WorkoutCard(
+                    workout = workout,
+                    onClick = { onWorkoutNavigate(workout) },
+                    iconColor = highlightColors[index % highlightColors.size]
                 )
-                gymWorkouts.forEach {
-                    WorkoutCard(
-                        workout = it,
-                        onClick = { onWorkoutNavigate(it) }
-                    )
-                }
             }
         }
         if (cardioWorkouts.isNotEmpty()) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.run),
-                    contentDescription = stringResource(id = R.string.cardio)
+            cardioWorkouts.forEachIndexed { index, workout ->
+                WorkoutCard(
+                    workout = workout,
+                    onClick = { onWorkoutNavigate(workout) },
+                    iconColor = highlightColors[index % highlightColors.size]
                 )
-                cardioWorkouts.forEach {
-                    WorkoutCard(
-                        workout = it,
-                        onClick = { onWorkoutNavigate(it) }
-                    )
-                }
             }
         }
     }
@@ -305,27 +313,48 @@ private fun WorkoutListing(
 @Composable
 private fun WorkoutCard(
     workout: Workout,
+    iconColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    OutlinedCard(
+    Card(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(id = R.dimen.padding_medium)
+        ),
         onClick = onClick,
         modifier = modifier
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.padding_medium))
+                .padding(dimensionResource(id = R.dimen.padding_large))
                 .fillMaxWidth()
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    painter =
+                        if (workout.type == WorkoutType.GYM)
+                            painterResource(id = R.drawable.weight)
+                        else
+                            painterResource(id = R.drawable.run),
+                    tint = iconColor,
+                    contentDescription = stringResource(id = R.string.icon)
+                )
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                Text(
+                    text = workout.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Icon(
-                painter = painterResource(id = R.drawable.timeline),
-                contentDescription = stringResource(id = R.string.stats)
-            )
-            Text(
-                text = workout.name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                painter = painterResource(id = R.drawable.keyboard_arrow_right),
+                contentDescription = stringResource(R.string.select),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
             )
         }
     }
@@ -610,39 +639,20 @@ private fun StatCalendar(
             ElevatedCard {
                 LazyColumn(
                     modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_large))
                         .fillMaxHeight(.5f)
                 ) {
                     itemsIndexed(sessionsForDialog) { index, session ->
                         val workout = allWorkouts.find { it.id == session.workoutId }
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onSessionClick(session.id, workout!!.type)
-                                }
-                        ) {
-                            Icon(
-                                painter = if (workout!!.type == WorkoutType.GYM)
-                                    painterResource(id = R.drawable.weight)
-                                else
-                                    painterResource(id = R.drawable.run),
-                                contentDescription = stringResource(id = R.string.icon)
-                            )
-                            Column(
-                                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
-                            ) {
-                                Text(
-                                    text = workout.name
-                                )
-                                Text(
-                                    text = session.timestamp.toDateAndTimeString()
-                                )
-                            }
-                        }
+                        WorkoutListItem(
+                            workout = WorkoutWithLatestTimestamp(
+                                id = workout!!.id,
+                                name = workout.name,
+                                latestTimestamp = session.timestamp
+                            ),
+                            onClick = { onSessionClick(session.id, workout.type) }
+                        )
+
                         if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.outline
@@ -675,10 +685,11 @@ private fun StatCalendar(
                                 }
                         ) {
                             Icon(
-                                painter = if (workout.type == WorkoutType.GYM)
-                                    painterResource(id = R.drawable.weight)
-                                else
-                                    painterResource(id = R.drawable.run),
+                                painter =
+                                    if (workout.type == WorkoutType.GYM)
+                                        painterResource(id = R.drawable.weight)
+                                    else
+                                        painterResource(id = R.drawable.run),
                                 contentDescription = stringResource(id = R.string.icon)
                             )
                             Column(

@@ -38,14 +38,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.WorkoutListItem
+import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.toDateString
 import kotlinx.coroutines.delay
 
 @Composable
 fun WorkoutList(
-    workouts: List<WorkoutListItem>,
+    workouts: List<WorkoutWithLatestTimestamp>,
     selectingItems: Boolean,
     onSelect: (id: Int, selected: Boolean) -> Unit,
     onHold: (id: Int) -> Unit,
@@ -85,14 +85,14 @@ fun WorkoutList(
 }
 
 @Composable
-private fun WorkoutListItem(
-    workout: WorkoutListItem,
-    selectingItems: Boolean,
-    selected: Boolean,
-    onSelect: (selected: Boolean) -> Unit,
-    onHold: (id: Int) -> Unit,
+fun WorkoutListItem(
+    workout: WorkoutWithLatestTimestamp,
     onClick: (id: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectingItems: Boolean = false,
+    selected: Boolean = false,
+    onHold: (id: Int) -> Unit = {},
+    onSelect: (selected: Boolean) -> Unit = {}
 ) {
     Surface(
         color = Color.Transparent,
@@ -173,7 +173,7 @@ private fun WorkoutListItemPreview() {
     GymTrackerTheme {
         Surface {
             WorkoutListItem(
-                workout = WorkoutListItem(
+                workout = WorkoutWithLatestTimestamp(
                     id = 0,
                     name = "Workout 1",
                     latestTimestamp = null
@@ -194,7 +194,7 @@ private fun WorkoutListItemPreviewDark() {
     GymTrackerTheme(darkTheme = true) {
         Surface {
             WorkoutListItem(
-                workout = WorkoutListItem(
+                workout = WorkoutWithLatestTimestamp(
                     id = 0,
                     name = "Workout 1",
                     latestTimestamp = null

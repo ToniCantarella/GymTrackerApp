@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.WorkoutListItem
+import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.common.WorkoutList
@@ -162,7 +162,7 @@ fun SplitListScreen(
 @Composable
 fun SplitListScreen(
     loading: Boolean,
-    splits: List<WorkoutListItem>,
+    splits: List<WorkoutWithLatestTimestamp>,
     selectingItems: Boolean,
     onSelect: (id: Int, selected: Boolean) -> Unit,
     onSplitHold: (id: Int) -> Unit,
@@ -205,7 +205,7 @@ private fun SplitsPreview() {
             SplitListScreen(
                 loading = false,
                 splits = listOf(
-                    WorkoutListItem(
+                    WorkoutWithLatestTimestamp(
                         id = 0,
                         name = "Workout 1",
                         latestTimestamp = Instant.now()
