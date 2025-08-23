@@ -47,6 +47,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ripple
@@ -85,7 +86,6 @@ import com.example.gymtracker.database.repository.Workout
 import com.example.gymtracker.database.repository.WorkoutSession
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.utility.MAX_CARDIO
 import com.example.gymtracker.utility.MAX_SPLITS
 import com.example.gymtracker.utility.toDateAndTimeString
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -601,7 +601,7 @@ private fun StatCalendar(
                 }
             }
         )
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
         CalendarFooter(
             gymWorkouts = gymWorkouts,
             cardioWorkouts = cardioWorkouts,
@@ -787,7 +787,7 @@ fun MonthPicker(
                         ) {
                             Text(
                                 text = month.getDisplayName(
-                                    TextStyle.FULL,
+                                    TextStyle.FULL_STANDALONE,
                                     Locale.getDefault()
                                 ),
                                 color =
@@ -813,6 +813,7 @@ fun CalendarFooter(
         workoutSessions.groupBy { it.workoutId }
     }
     Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -821,9 +822,7 @@ fun CalendarFooter(
             sessionsByWorkoutId = sessionsByWorkoutId
         )
         if (gymWorkouts.isNotEmpty() && cardioWorkouts.isNotEmpty()) {
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline
-            )
+            HorizontalDivider()
         }
         WorkoutLegendsRow(
             workouts = cardioWorkouts,
@@ -841,8 +840,9 @@ fun WorkoutLegendsRow(
     sessionsByWorkoutId: Map<Int, List<WorkoutSession>>,
     modifier: Modifier = Modifier
 ) {
+    val maxItemsInRow = 3
     FlowRow(
-        maxItemsInEachRow = 3,
+        maxItemsInEachRow = maxItemsInRow,
         modifier = modifier.fillMaxWidth()
     ) {
         workouts.forEachIndexed { index, workout ->
@@ -854,6 +854,9 @@ fun WorkoutLegendsRow(
                 highlightColor = highlightColors[index % highlightColors.size],
                 modifier = Modifier.weight(1f)
             )
+        }
+        if (workouts.size % maxItemsInRow != 0) {
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -1060,7 +1063,7 @@ private fun StatsScreenForPreview() {
             type = WorkoutType.GYM
         )
     }
-    val cardioWorkouts = List(MAX_CARDIO) {
+    val cardioWorkouts = List(5) {
         val name =
             if (it == 0)
                 "This is a very long name that can overflow"
@@ -1120,14 +1123,18 @@ private fun StatsScreenForPreview() {
 @Composable
 private fun StatsOverviewPreview() {
     GymTrackerTheme {
-        StatsScreenForPreview()
+        Surface {
+            StatsScreenForPreview()
+        }
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, locale = "fi")
 @Composable
 private fun StatsOverviewPreviewDark() {
     GymTrackerTheme {
-        StatsScreenForPreview()
+        Surface {
+            StatsScreenForPreview()
+        }
     }
 }
