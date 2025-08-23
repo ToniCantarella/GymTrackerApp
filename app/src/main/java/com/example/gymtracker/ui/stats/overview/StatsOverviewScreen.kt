@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -96,6 +97,7 @@ import com.kizitonwose.calendar.core.minusMonths
 import com.kizitonwose.calendar.core.plusMonths
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
@@ -251,7 +253,7 @@ private fun StatsOverviewScreen(
                     Row(
                         modifier = Modifier
                             .padding(start = dimensionResource(id = R.dimen.padding_large))
-                    ){
+                    ) {
                         Icon(
                             painter = painterResource(id = R.drawable.timeline),
                             contentDescription = stringResource(id = R.string.stats),
@@ -262,7 +264,7 @@ private fun StatsOverviewScreen(
                             text = stringResource(id = R.string.stats),
                             style = MaterialTheme.typography.headlineLarge,
 
-                        )
+                            )
                     }
                     Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                     WorkoutListing(
@@ -570,7 +572,6 @@ private fun StatCalendar(
                                         addSessionDialogOpen = true
                                     }
                                     .matchParentSize()
-
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
@@ -581,38 +582,42 @@ private fun StatCalendar(
                             }
                         }
                         if (hasSessions) {
-                            FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            Box(
                                 modifier = Modifier.align(Alignment.BottomStart)
                             ) {
-                                sessionsOnDay.forEach { session ->
+                                sessionsOnDay.take(3).forEachIndexed { index, session ->
                                     val workout = allWorkouts.find { it.id == session.workoutId }
                                     var visible by remember { mutableStateOf(false) }
+                                    val workoutIndex = if (workout?.type == WorkoutType.GYM) {
+
+                                        gymWorkouts.indexOf(workout)
+                                    } else
+                                        cardioWorkouts.indexOf(workout)
 
                                     LaunchedEffect(Unit) {
+                                        delay(200 * index.toLong())
                                         visible = true
                                     }
 
-                                    AnimatedVisibility(
+                                    androidx.compose.animation.AnimatedVisibility(
                                         visible = visible,
-                                        enter = fadeIn(),
+                                        enter = slideInHorizontally(
+                                            initialOffsetX = { -it / 2 },
+                                        ) + fadeIn(),
                                         exit = fadeOut()
                                     ) {
-                                        if (workout?.type == WorkoutType.GYM) {
-                                            val workoutIndex =
-                                                gymWorkouts.indexOf(workout)
-                                            WorkoutIcon(
-                                                painter = painterResource(id = R.drawable.weight),
-                                                tint = highlightColors[workoutIndex % highlightColors.size]
-                                            )
-                                        } else {
-                                            val workoutIndex =
-                                                cardioWorkouts.indexOf(workout)
-                                            WorkoutIcon(
-                                                painter = painterResource(id = R.drawable.run),
-                                                tint = highlightColors[workoutIndex % highlightColors.size]
-                                            )
-                                        }
+                                        Icon(
+                                            painter =
+                                                if (workout?.type == WorkoutType.GYM)
+                                                    painterResource(id = R.drawable.weight)
+                                                else
+                                                    painterResource(id = R.drawable.run),
+                                            tint = highlightColors[workoutIndex % highlightColors.size],
+                                            contentDescription = stringResource(id = R.string.icon),
+                                            modifier = Modifier
+                                                .padding(start = dimensionResource(id = R.dimen.padding_medium) * index)
+                                                .alpha(1f - index.toFloat() / 3)
+                                        )
                                     }
                                 }
                             }
@@ -974,7 +979,9 @@ private fun Day(
         Text(
             text = day.date.day.toString(),
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.align(Alignment.TopEnd)
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = dimensionResource(id = R.dimen.padding_small))
         )
     }
 }
