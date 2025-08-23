@@ -1,6 +1,5 @@
 package com.example.gymtracker.ui.gym.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,9 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
@@ -443,17 +439,7 @@ private fun ExerciseHeader(
     modifier: Modifier = Modifier,
     headerActions: @Composable () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .background(Brush.linearGradient(
-                colors = listOf(
-                    MaterialTheme.colorScheme.primary,
-                    Color.Transparent
-                ),
-                start = Offset(0f, 0f),
-                end = Offset(40f, 200f)
-            ))
-    ) {
+    Column {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier
