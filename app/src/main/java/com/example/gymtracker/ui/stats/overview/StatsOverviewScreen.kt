@@ -204,9 +204,6 @@ private fun StatsOverviewScreen(
             }
             if (gymWorkouts.isNotEmpty()) {
                 item {
-                    HorizontalDivider()
-                }
-                item {
                     PieChartSection(
                         workouts = gymWorkouts,
                         workoutSessions = gymSessions
@@ -215,9 +212,6 @@ private fun StatsOverviewScreen(
             }
             if (cardioWorkouts.isNotEmpty()) {
                 item {
-                    HorizontalDivider()
-                }
-                item {
                     PieChartSection(
                         workouts = cardioWorkouts,
                         workoutSessions = cardioSessions
@@ -225,9 +219,6 @@ private fun StatsOverviewScreen(
                 }
             }
             if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
-                item {
-                    HorizontalDivider()
-                }
                 item {
                     WorkoutListing(
                         gymWorkouts = gymWorkouts,
@@ -412,29 +403,6 @@ private fun StatCalendar(
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
-            val addSessionButtonRotation by animateFloatAsState(
-                targetValue = if (addingSessions) 45f else 0f,
-                label = "Icon Rotation"
-            )
-
-            if (allWorkouts.isNotEmpty()) {
-                TextButton(
-                    onClick = { addingSessions = !addingSessions },
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .rotate(addSessionButtonRotation)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = if (addingSessions) stringResource(id = R.string.close) else stringResource(
-                            id = R.string.add
-                        )
-                    )
-                }
-            }
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -605,7 +573,10 @@ private fun StatCalendar(
         CalendarFooter(
             gymWorkouts = gymWorkouts,
             cardioWorkouts = cardioWorkouts,
-            workoutSessions = sessionsForMonth
+            workoutSessions = sessionsForMonth,
+            addingSessions = addingSessions,
+            onAddSessionsClick = { addingSessions = !addingSessions },
+            addingSessionsEnabled = allWorkouts.isNotEmpty()
         )
     }
 
@@ -807,13 +778,15 @@ fun CalendarFooter(
     gymWorkouts: List<Workout>,
     cardioWorkouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
+    addingSessions: Boolean,
+    addingSessionsEnabled: Boolean,
+    onAddSessionsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sessionsByWorkoutId = remember(workoutSessions) {
         workoutSessions.groupBy { it.workoutId }
     }
     Column(
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -822,15 +795,46 @@ fun CalendarFooter(
             sessionsByWorkoutId = sessionsByWorkoutId
         )
         if (gymWorkouts.isNotEmpty() && cardioWorkouts.isNotEmpty()) {
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
             HorizontalDivider()
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
         }
         WorkoutLegendsRow(
             workouts = cardioWorkouts,
             sessionsByWorkoutId = sessionsByWorkoutId
         )
-        Text(
-            text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
+            )
+            val addSessionIconRotation by animateFloatAsState(
+                targetValue = if (addingSessions) 45f else 0f,
+                label = "Icon Rotation"
+            )
+
+            TextButton(
+                onClick = onAddSessionsClick,
+                enabled = addingSessionsEnabled,
+                shape = CircleShape,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription =
+                        if (addingSessions) stringResource(id = R.string.close)
+                        else stringResource(id = R.string.add),
+                    modifier = Modifier.rotate(addSessionIconRotation)
+                )
+                Text(
+                    text =
+                        if (addingSessions) stringResource(id = R.string.close)
+                        else stringResource(id = R.string.add)
+                )
+            }
+        }
     }
 }
 
