@@ -959,6 +959,7 @@ private fun Day(
 ) {
     Box(
         modifier = Modifier
+            .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_medium)))
             .aspectRatio(1f)
             .padding(1.dp)
             .background(MaterialTheme.colorScheme.inverseOnSurface)
@@ -970,7 +971,12 @@ private fun Day(
             }
             .then(
                 if (day.date == today)
-                    Modifier.border(1.dp, MaterialTheme.colorScheme.primary)
+                    Modifier
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_medium))
+                        )
                 else Modifier
             ),
         contentAlignment = Alignment.Center
