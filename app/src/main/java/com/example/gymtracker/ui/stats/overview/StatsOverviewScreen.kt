@@ -193,7 +193,7 @@ private fun StatsOverviewScreen(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
         ) {
             item {
-                CalendarCard(
+                StatCalendar(
                     gymWorkouts = gymWorkouts,
                     cardioWorkouts = cardioWorkouts,
                     sessionsForMonth = workoutSessionsForMonth,
@@ -204,7 +204,10 @@ private fun StatsOverviewScreen(
             }
             if (gymWorkouts.isNotEmpty()) {
                 item {
-                    PieChartCard(
+                    HorizontalDivider()
+                }
+                item {
+                    PieChartSection(
                         workouts = gymWorkouts,
                         workoutSessions = gymSessions
                     )
@@ -212,13 +215,19 @@ private fun StatsOverviewScreen(
             }
             if (cardioWorkouts.isNotEmpty()) {
                 item {
-                    PieChartCard(
+                    HorizontalDivider()
+                }
+                item {
+                    PieChartSection(
                         workouts = cardioWorkouts,
                         workoutSessions = cardioSessions
                     )
                 }
             }
             if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
+                item {
+                    HorizontalDivider()
+                }
                 item {
                     WorkoutListing(
                         gymWorkouts = gymWorkouts,
@@ -308,24 +317,6 @@ private fun WorkoutCard(
     }
 }
 
-@Composable
-private fun StatsCard(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    ElevatedCard(
-        modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier.padding(
-                dimensionResource(id = R.dimen.padding_large)
-            )
-        ) {
-            content()
-        }
-    }
-}
-
 val highlightColors = listOf(
     Color(0xFFE63946),
     Color(0xFFF1A208),
@@ -338,7 +329,7 @@ val highlightColors = listOf(
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun CalendarCard(
+private fun StatCalendar(
     gymWorkouts: List<Workout>,
     cardioWorkouts: List<Workout>,
     sessionsForMonth: List<WorkoutSession>,
@@ -417,7 +408,7 @@ private fun CalendarCard(
             }
     }
 
-    StatsCard(modifier = modifier) {
+    Column(modifier = modifier) {
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -969,7 +960,7 @@ private fun Day(
 }
 
 @Composable
-private fun PieChartCard(
+private fun PieChartSection(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
     modifier: Modifier = Modifier
@@ -994,66 +985,64 @@ private fun PieChartCard(
         )
     }
 
-    StatsCard(modifier = modifier) {
-        Row(
-            modifier = Modifier.height(180.dp)
+    Row(
+        modifier = modifier.height(180.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .weight(1.5f)
+                .fillMaxHeight()
         ) {
             Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .weight(1.5f)
-                    .fillMaxHeight()
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
-                    ) {
-                        Icon(
-                            painter = if (workouts.first().type == WorkoutType.GYM) painterResource(
-                                id = R.drawable.weight
-                            ) else painterResource(id = R.drawable.run),
-                            contentDescription = stringResource(id = R.string.icon)
-                        )
-                        Text(
-                            text = stringResource(id = R.string.all_time)
-                        )
-                    }
-                    WorkoutLegendsColumn(
-                        workouts = workouts,
-                        sessionsByWorkoutId = sessionsByWorkoutId
+                    Icon(
+                        painter = if (workouts.first().type == WorkoutType.GYM) painterResource(
+                            id = R.drawable.weight
+                        ) else painterResource(id = R.drawable.run),
+                        contentDescription = stringResource(id = R.string.icon)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.all_time)
                     )
                 }
-                Text(
-                    text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
+                WorkoutLegendsColumn(
+                    workouts = workouts,
+                    sessionsByWorkoutId = sessionsByWorkoutId
                 )
             }
-            PieChart(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(2f),
-                data = data,
-                onPieClick = {
-                    val clickedIndex = data.indexOf(it)
-                    val isAlreadySelected = data.getOrNull(clickedIndex)?.selected == true
-
-                    data = data.mapIndexed { index, pie ->
-                        pie.copy(selected = if (clickedIndex == index) !isAlreadySelected else false)
-                    }
-                },
-                selectedScale = 1.2f,
-                scaleAnimEnterSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                colorAnimEnterSpec = tween(300),
-                colorAnimExitSpec = tween(300),
-                scaleAnimExitSpec = tween(300),
-                spaceDegreeAnimExitSpec = tween(300),
-                style = Pie.Style.Fill
+            Text(
+                text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
             )
         }
+        PieChart(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(2f),
+            data = data,
+            onPieClick = {
+                val clickedIndex = data.indexOf(it)
+                val isAlreadySelected = data.getOrNull(clickedIndex)?.selected == true
+
+                data = data.mapIndexed { index, pie ->
+                    pie.copy(selected = if (clickedIndex == index) !isAlreadySelected else false)
+                }
+            },
+            selectedScale = 1.2f,
+            scaleAnimEnterSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            colorAnimEnterSpec = tween(300),
+            colorAnimExitSpec = tween(300),
+            scaleAnimExitSpec = tween(300),
+            spaceDegreeAnimExitSpec = tween(300),
+            style = Pie.Style.Fill
+        )
     }
 }
 
