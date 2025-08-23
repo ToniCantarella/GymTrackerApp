@@ -2,10 +2,7 @@ package com.example.gymtracker.ui.stats.overview
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -27,7 +24,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -189,7 +188,7 @@ private fun StatsOverviewScreen(
         }
     } else {
         LazyColumn(
-            contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
+            contentPadding = PaddingValues(vertical = dimensionResource(id = R.dimen.padding_large)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
         ) {
             item {
@@ -199,23 +198,47 @@ private fun StatsOverviewScreen(
                     sessionsForMonth = workoutSessionsForMonth,
                     getMonthData = getMonthData,
                     onSessionClick = onSessionNavigate,
-                    onAddSessionClick = onAddSessionNavigate
+                    onAddSessionClick = onAddSessionNavigate,
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large))
                 )
             }
-            if (gymWorkouts.isNotEmpty()) {
+
+
+            if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
+                val itemWidth = 300.dp
+                val itemHeight = 350.dp
+
                 item {
-                    PieChartSection(
-                        workouts = gymWorkouts,
-                        workoutSessions = gymSessions
+                    Text(
+                        text = stringResource(id = R.string.all_time),
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_large))
                     )
-                }
-            }
-            if (cardioWorkouts.isNotEmpty()) {
-                item {
-                    PieChartSection(
-                        workouts = cardioWorkouts,
-                        workoutSessions = cardioSessions
-                    )
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_large)),
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (gymWorkouts.isNotEmpty()) {
+                            item {
+                                PieChartCard(
+                                    workouts = gymWorkouts,
+                                    workoutSessions = gymSessions,
+                                    modifier = Modifier.width(itemWidth).height(itemHeight)
+                                )
+                            }
+                        }
+                        if (cardioWorkouts.isNotEmpty()) {
+                            item {
+                                PieChartCard(
+                                    workouts = cardioWorkouts,
+                                    workoutSessions = cardioSessions,
+                                    modifier = Modifier.width(itemWidth).height(itemHeight)
+                                )
+                            }
+                        }
+                    }
                 }
             }
             if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
@@ -866,27 +889,6 @@ fun WorkoutLegendsRow(
 }
 
 @Composable
-fun WorkoutLegendsColumn(
-    workouts: List<Workout>,
-    sessionsByWorkoutId: Map<Int, List<WorkoutSession>>,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-    ) {
-        workouts.forEachIndexed { index, workout ->
-            val sessionsAmount = sessionsByWorkoutId[workout.id]?.size ?: 0
-
-            WorkoutLegend(
-                workout = workout,
-                sessionsAmount = sessionsAmount,
-                highlightColor = highlightColors[index % highlightColors.size],
-            )
-        }
-    }
-}
-
-@Composable
 fun WorkoutLegend(
     workout: Workout,
     sessionsAmount: Int,
@@ -967,7 +969,7 @@ private fun Day(
 }
 
 @Composable
-private fun PieChartSection(
+private fun PieChartCard(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
     modifier: Modifier = Modifier
@@ -992,64 +994,50 @@ private fun PieChartSection(
         )
     }
 
-    Row(
-        modifier = modifier.height(180.dp)
+    Card(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(id = R.dimen.padding_medium)
+        ),
+        modifier = modifier
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .weight(1.5f)
-                .fillMaxHeight()
+                .fillMaxSize()
+                .padding(dimensionResource(id = R.dimen.padding_large))
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+            Box(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
-                ) {
-                    Icon(
-                        painter = if (workouts.first().type == WorkoutType.GYM) painterResource(
-                            id = R.drawable.weight
-                        ) else painterResource(id = R.drawable.run),
-                        contentDescription = stringResource(id = R.string.icon)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.all_time)
-                    )
-                }
-                WorkoutLegendsColumn(
-                    workouts = workouts,
-                    sessionsByWorkoutId = sessionsByWorkoutId
+                Icon(
+                    painter =
+                        if (workouts.first().type == WorkoutType.GYM)
+                            painterResource(id = R.drawable.weight)
+                        else
+                            painterResource(id = R.drawable.run),
+                    contentDescription = stringResource(id = R.string.icon),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.Center)
+                )
+                PieChart(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(200.dp),
+                    data = data,
+                    spaceDegree = 2f,
+                    style = Pie.Style.Stroke(width = 20.dp)
                 )
             }
+            WorkoutLegendsRow(
+                workouts = workouts,
+                sessionsByWorkoutId = sessionsByWorkoutId,
+                modifier = Modifier
+            )
             Text(
                 text = "${stringResource(id = R.string.total)}: ${workoutSessions.size}"
             )
         }
-        PieChart(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(2f),
-            data = data,
-            onPieClick = {
-                val clickedIndex = data.indexOf(it)
-                val isAlreadySelected = data.getOrNull(clickedIndex)?.selected == true
-
-                data = data.mapIndexed { index, pie ->
-                    pie.copy(selected = if (clickedIndex == index) !isAlreadySelected else false)
-                }
-            },
-            selectedScale = 1.2f,
-            scaleAnimEnterSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            ),
-            colorAnimEnterSpec = tween(300),
-            colorAnimExitSpec = tween(300),
-            scaleAnimExitSpec = tween(300),
-            spaceDegreeAnimExitSpec = tween(300),
-            style = Pie.Style.Fill
-        )
     }
 }
 
@@ -1092,7 +1080,7 @@ private fun StatsScreenForPreview() {
         )
     }
 
-    val gymSessions = List(20) {
+    val gymSessions = List(200) {
         val timestamp = if (it > 4) now.minus(Duration.ofDays(it.toLong())) else now
         WorkoutSession(
             id = 0,
@@ -1123,7 +1111,7 @@ private fun StatsScreenForPreview() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=4000px,dpi=440")
 @Composable
 private fun StatsOverviewPreview() {
     GymTrackerTheme {
@@ -1133,7 +1121,10 @@ private fun StatsOverviewPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, locale = "fi")
+@Preview(
+    showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, locale = "fi",
+    device = "spec:width=1080px,height=4000px,dpi=440"
+)
 @Composable
 private fun StatsOverviewPreviewDark() {
     GymTrackerTheme {
