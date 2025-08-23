@@ -15,7 +15,7 @@ koin = "4.1.0"
 datastore = "1.1.7"
 room = "2.7.2"
 ksp = "2.1.21-2.0.1"
-composeCharts = "0.1.9"
+composeCharts = "0.1.10"
 composeCalendar = "2.8.0"
 
 [libraries]
