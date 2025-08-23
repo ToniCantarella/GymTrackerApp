@@ -1,6 +1,6 @@
 [versions]
-appVersion = "1.0.6"
-agp = "8.12.0"
+appVersion = "1.0.7"
+agp = "8.12.1"
 kotlin = "2.2.10"
 coreKtx = "1.17.0"
 core-splashscreen = "1.0.1"
