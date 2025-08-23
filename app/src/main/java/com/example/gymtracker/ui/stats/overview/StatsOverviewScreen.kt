@@ -24,14 +24,22 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -46,6 +54,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,11 +70,14 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.database.entity.WorkoutType
@@ -95,12 +107,14 @@ import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaYearMonth
 import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinMonth
 import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toKotlinYearMonth
 import kotlinx.datetime.todayIn
 import org.koin.androidx.compose.koinViewModel
 import java.time.Duration
 import java.time.Instant
+import java.time.Month
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.TextStyle
@@ -372,10 +386,15 @@ private fun CalendarCard(
     }
     val sessionsForMonth = remember(sessionsForMonth, state) {
         sessionsForMonth.filter {
-            YearMonth.from(it.timestamp.atZone(zoneId))
-                .toKotlinYearMonth() == state.firstVisibleMonth.yearMonth
+            val sessionDate = it.timestamp.atZone(zoneId).toLocalDate()
+            val yearMatches = sessionDate.year == state.firstVisibleMonth.yearMonth.year
+            val monthMatches =
+                sessionDate.month.toKotlinMonth() == state.firstVisibleMonth.yearMonth.month
+            yearMatches && monthMatches
         }
     }
+
+    var monthPickerOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(state) {
         snapshotFlow { state.firstVisibleMonth }
@@ -402,7 +421,7 @@ private fun CalendarCard(
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
-            val rotation by animateFloatAsState(
+            val addSessionButtonRotation by animateFloatAsState(
                 targetValue = if (addingSessions) 45f else 0f,
                 label = "Icon Rotation"
             )
@@ -415,7 +434,7 @@ private fun CalendarCard(
                         .align(Alignment.CenterStart)
                         .size(48.dp)
                         .clip(CircleShape)
-                        .rotate(rotation)
+                        .rotate(addSessionButtonRotation)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -425,10 +444,45 @@ private fun CalendarCard(
                     )
                 }
             }
-            Text(
-                text = "$monthString $yearString",
-                modifier = Modifier.align(Alignment.Center)
-            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_medium)))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = ripple(),
+                        onClick = { monthPickerOpen = true }
+                    )
+                    .padding(
+                        vertical = dimensionResource(id = R.dimen.padding_small),
+                        horizontal = dimensionResource(id = R.dimen.padding_medium)
+                    )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "$monthString $yearString"
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null
+                    )
+                }
+                if (monthPickerOpen) {
+                    MonthPicker(
+                        onDismissRequest = { monthPickerOpen = false },
+                        year = currentMonth.year,
+                        onMonthClick = {
+                            coroutineScope.launch {
+                                state.animateScrollToMonth(it)
+                            }
+                        },
+                        startMonth = startMonth,
+                        endMonth = endMonth
+                    )
+                }
+            }
             TextButton(
                 onClick = {
                     coroutineScope.launch {
@@ -653,6 +707,101 @@ private fun CalendarCard(
                         if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MonthPicker(
+    onDismissRequest: () -> Unit,
+    year: Int,
+    startMonth: kotlinx.datetime.YearMonth,
+    endMonth: kotlinx.datetime.YearMonth,
+    onMonthClick: (month: kotlinx.datetime.YearMonth) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var monthPickerYear by remember(year) { mutableIntStateOf(year) }
+    val calendarStartYear = startMonth.year
+    val calendarEndYear = endMonth.year
+
+    Popup(
+        alignment = Alignment.TopCenter,
+        offset = IntOffset(0, 80),
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth(0.8f)
+                .heightIn(max = 400.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(id = R.dimen.padding_medium)
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { if (monthPickerYear > calendarStartYear) monthPickerYear-- },
+                        enabled = monthPickerYear > calendarStartYear
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = stringResource(id = R.string.previous)
+                        )
+                    }
+                    Text(
+                        text = monthPickerYear.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = { if (monthPickerYear < calendarEndYear) monthPickerYear++ },
+                        enabled = monthPickerYear < calendarEndYear
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = stringResource(id = R.string.next)
+                        )
+                    }
+                }
+                HorizontalDivider()
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val monthsInPickerYear = Month.entries
+                    items(monthsInPickerYear) { month ->
+                        val targetYearMonth = YearMonth
+                            .of(monthPickerYear, month)
+                            .toKotlinYearMonth()
+                        val isEnabled = targetYearMonth >= startMonth && targetYearMonth <= endMonth
+
+                        TextButton(
+                            onClick = {
+                                onMonthClick(targetYearMonth)
+                                onDismissRequest()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = isEnabled,
+                        ) {
+                            Text(
+                                text = month.getDisplayName(
+                                    TextStyle.FULL,
+                                    Locale.getDefault()
+                                ),
+                                color =
+                                    if (isEnabled) MaterialTheme.colorScheme.onSurface
+                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = .5f)
                             )
                         }
                     }

@@ -60,4 +60,6 @@
     <string name="gym_workouts">Salitreenit</string>
     <string name="settings">Asetukset</string>
     <string name="show_finish_workout_dialog">Varmista treenin lopettaminen</string>
+    <string name="previous">Edellinen</string>
+    <string name="next">Seuraava</string>
 </resources>
