@@ -1004,17 +1004,18 @@ private fun PieChartCard(
 
     var data by remember {
         mutableStateOf(
-            workouts.map { workout ->
-                val workoutIndex = workouts.indexOf(workout)
-                val amountOfSessions = sessionsByWorkoutId[workout.id]?.size?.toDouble() ?: 0.0
-                val color = highlightColors[workoutIndex % highlightColors.size]
-                Pie(
-                    label = workout.name,
-                    data = amountOfSessions,
-                    color = color,
-                    selectedColor = color.copy(alpha = .5f)
-                )
-            }.ifEmpty {
+            if (workouts.isNotEmpty() && workoutSessions.isNotEmpty()) {
+                workouts.map { workout ->
+                    val workoutIndex = workouts.indexOf(workout)
+                    val amountOfSessions = sessionsByWorkoutId[workout.id]?.size?.toDouble() ?: 0.0
+                    val color = highlightColors[workoutIndex % highlightColors.size]
+                    Pie(
+                        label = workout.name,
+                        data = amountOfSessions,
+                        color = color
+                    )
+                }
+            } else {
                 listOf(
                     Pie(
                         label = "",
