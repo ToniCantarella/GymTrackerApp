@@ -206,67 +206,66 @@ private fun StatsOverviewScreen(
             }
 
 
-            if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
+            item {
                 val itemWidth = 300.dp
                 val itemHeight = 350.dp
 
-                item {
-                    Text(
-                        text = stringResource(id = R.string.all_time),
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_large))
-                    )
-                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_large)),
-                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        if (gymWorkouts.isNotEmpty()) {
-                            item {
-                                PieChartCard(
-                                    workouts = gymWorkouts,
-                                    workoutSessions = gymSessions,
-                                    modifier = Modifier
-                                        .width(itemWidth)
-                                        .height(itemHeight)
-                                )
-                            }
-                        }
-                        if (cardioWorkouts.isNotEmpty()) {
-                            item {
-                                PieChartCard(
-                                    workouts = cardioWorkouts,
-                                    workoutSessions = cardioSessions,
-                                    modifier = Modifier
-                                        .width(itemWidth)
-                                        .height(itemHeight)
-                                )
-                            }
-                        }
+                Text(
+                    text = stringResource(id = R.string.all_time),
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_large))
+                )
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_large)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item {
+                        PieChartCard(
+                            workouts = gymWorkouts.ifEmpty { emptyList() },
+                            workoutSessions = gymSessions.ifEmpty { emptyList() },
+                            type = WorkoutType.GYM,
+                            modifier = Modifier
+                                .width(itemWidth)
+                                .height(itemHeight)
+                        )
+                    }
+                    item {
+                        PieChartCard(
+                            workouts = cardioWorkouts.ifEmpty { emptyList() },
+                            workoutSessions = cardioSessions.ifEmpty { emptyList() },
+                            type = WorkoutType.CARDIO,
+                            modifier = Modifier
+                                .width(itemWidth)
+                                .height(itemHeight)
+                        )
                     }
                 }
             }
-            if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                    Row(
-                        modifier = Modifier
-                            .padding(start = dimensionResource(id = R.dimen.padding_large))
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.timeline),
-                            contentDescription = stringResource(id = R.string.stats),
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
-                        Text(
-                            text = stringResource(id = R.string.stats),
-                            style = MaterialTheme.typography.headlineLarge,
 
-                            )
-                    }
-                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+
+            item {
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                Row(
+                    modifier = Modifier
+                        .padding(start = dimensionResource(id = R.dimen.padding_large))
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.timeline),
+                        contentDescription = stringResource(id = R.string.stats),
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                    Text(
+                        text = stringResource(id = R.string.stats),
+                        style = MaterialTheme.typography.headlineLarge,
+
+                        )
+                }
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+
+                if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
                     WorkoutListing(
                         gymWorkouts = gymWorkouts,
                         cardioWorkouts = cardioWorkouts,
@@ -996,6 +995,7 @@ private fun Day(
 private fun PieChartCard(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
+    type: WorkoutType,
     modifier: Modifier = Modifier
 ) {
     val sessionsByWorkoutId = remember(workoutSessions) {
@@ -1013,6 +1013,14 @@ private fun PieChartCard(
                     data = amountOfSessions,
                     color = color,
                     selectedColor = color.copy(alpha = .5f)
+                )
+            }.ifEmpty {
+                listOf(
+                    Pie(
+                        label = "",
+                        data = 1.0,
+                        color = Color.Gray
+                    )
                 )
             }
         )
@@ -1035,7 +1043,7 @@ private fun PieChartCard(
             ) {
                 Icon(
                     painter =
-                        if (workouts.first().type == WorkoutType.GYM)
+                        if (type == WorkoutType.GYM)
                             painterResource(id = R.drawable.weight)
                         else
                             painterResource(id = R.drawable.run),
