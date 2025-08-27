@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
@@ -131,7 +133,9 @@ private fun InfoScreen(
 
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_large))
+        modifier = modifier
+            .padding(dimensionResource(id = R.dimen.padding_large))
+            .verticalScroll(rememberScrollState())
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
