@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.splitslist
+package com.example.gymtracker.ui.gym.gymworkoutplans
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,24 +9,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class SplitListUiState(
+data class GymWorkoutPlansUiState(
     val loading: Boolean = true,
-    val splits: List<WorkoutWithLatestTimestamp> = emptyList(),
+    val workoutPlans: List<WorkoutWithLatestTimestamp> = emptyList(),
     val selectingItems: Boolean = false
 )
 
-class SplitListViewModel(
+class GymWorkoutPlansViewModel(
     private val gymRepository: GymRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SplitListUiState())
+    private val _uiState = MutableStateFlow(GymWorkoutPlansUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun getSplits() {
+    fun getWorkoutPlans() {
         viewModelScope.launch {
-            val splits = gymRepository.getSplitsWithLatestTimestamp()
+            val workoutPlans = gymRepository.getGymWorkoutPlans()
             _uiState.update {
                 it.copy(
-                    splits = splits,
+                    workoutPlans = workoutPlans,
                     loading = false
                 )
             }
@@ -37,12 +37,12 @@ class SplitListViewModel(
         _uiState.update {
             it.copy(
                 selectingItems = true,
-                splits = it.splits.map { split ->
-                    if (split.id == id) {
-                        split.copy(
+                workoutPlans = it.workoutPlans.map { workout ->
+                    if (workout.id == id) {
+                        workout.copy(
                             selected = true
                         )
-                    } else split
+                    } else workout
                 }
             )
         }
@@ -52,8 +52,8 @@ class SplitListViewModel(
         _uiState.update {
             it.copy(
                 selectingItems = false,
-                splits = it.splits.map { split ->
-                    split.copy(
+                workoutPlans = it.workoutPlans.map { workout ->
+                    workout.copy(
                         selected = false
                     )
                 }
@@ -64,26 +64,26 @@ class SplitListViewModel(
     fun onSelectItem(id: Int, selected: Boolean) {
         _uiState.update {
             it.copy(
-                splits = it.splits.map { split ->
-                    if (split.id == id) {
-                        split.copy(
+                workoutPlans = it.workoutPlans.map { workout ->
+                    if (workout.id == id) {
+                        workout.copy(
                             selected = selected
                         )
-                    } else split
+                    } else workout
                 }
             )
         }
     }
 
-    fun onDeleteSplits(onDeletionDone: () -> Unit) {
-        val itemsToDelete = uiState.value.splits.filter { it.selected }
+    fun onDeleteWorkoutPlans(onDeletionDone: () -> Unit) {
+        val itemsToDelete = uiState.value.workoutPlans.filter { it.selected }
 
         viewModelScope.launch {
             itemsToDelete.forEach {
-                gymRepository.deleteSplit(it.id)
+                gymRepository.deleteGymWorkoutPlan(it.id)
             }
             stopSelectingItems()
-            getSplits()
+            getWorkoutPlans()
             onDeletionDone()
         }
     }

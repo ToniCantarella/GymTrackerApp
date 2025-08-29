@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.splitslist
+package com.example.gymtracker.ui.gym.gymworkoutplans
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,24 +39,24 @@ import com.example.gymtracker.ui.common.WorkoutList
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.utility.MAX_SPLITS
+import com.example.gymtracker.utility.MAX_GYM_WORKOUTS
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 
 @Composable
-fun SplitListScreen(
-    onNavigateToSplit: (id: Int) -> Unit,
-    onNavigateToCreateSplit: () -> Unit,
-    viewModel: SplitListViewModel = koinViewModel()
+fun GymWorkoutPlansScreen(
+    onNavigateToWorkout: (id: Int) -> Unit,
+    onNavigateToCreateWorkout: () -> Unit,
+    viewModel: GymWorkoutPlansViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val selectedItemsCount by remember(uiState.splits) {
-        derivedStateOf { uiState.splits.count { it.selected } }
+    val selectedItemsCount by remember(uiState.workoutPlans) {
+        derivedStateOf { uiState.workoutPlans.count { it.selected } }
     }
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.getSplits()
+        viewModel.getWorkoutPlans()
     }
 
     ProvideTopAppBar(
@@ -88,7 +88,7 @@ fun SplitListScreen(
             } else {
                 IconButton(
                     onClick = viewModel::startSelectingItems,
-                    enabled = uiState.splits.isNotEmpty()
+                    enabled = uiState.workoutPlans.isNotEmpty()
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.checklist),
@@ -100,8 +100,8 @@ fun SplitListScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = onNavigateToCreateSplit,
-        visible = !uiState.selectingItems && uiState.splits.size < MAX_SPLITS
+        onClick = onNavigateToCreateWorkout,
+        visible = !uiState.selectingItems && uiState.workoutPlans.size < MAX_GYM_WORKOUTS
     ) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -125,7 +125,7 @@ fun SplitListScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.onDeleteSplits { deletionDialogOpen = false }
+                        viewModel.onDeleteWorkoutPlans { deletionDialogOpen = false }
                     }
                 ) {
                     Text(
@@ -149,24 +149,24 @@ fun SplitListScreen(
         )
     }
 
-    SplitListScreen(
+    GymWorkoutPlansScreen(
         loading = uiState.loading,
-        splits = uiState.splits,
+        workoutPlans = uiState.workoutPlans,
         selectingItems = uiState.selectingItems,
         onSelect = viewModel::onSelectItem,
-        onSplitClick = onNavigateToSplit,
-        onSplitHold = viewModel::startSelectingItems
+        onWorkoutClick = onNavigateToWorkout,
+        onWorkoutHold = viewModel::startSelectingItems
     )
 }
 
 @Composable
-fun SplitListScreen(
+fun GymWorkoutPlansScreen(
     loading: Boolean,
-    splits: List<WorkoutWithLatestTimestamp>,
+    workoutPlans: List<WorkoutWithLatestTimestamp>,
     selectingItems: Boolean,
     onSelect: (id: Int, selected: Boolean) -> Unit,
-    onSplitHold: (id: Int) -> Unit,
-    onSplitClick: (id: Int) -> Unit
+    onWorkoutClick: (id: Int) -> Unit,
+    onWorkoutHold: (id: Int) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -175,23 +175,23 @@ fun SplitListScreen(
     ) {
         if (loading) {
             CircularProgressIndicator()
-        } else if (splits.isEmpty()) {
+        } else if (workoutPlans.isEmpty()) {
             EmptyListCard(
                 iconPainter = painterResource(id = R.drawable.weight),
                 subtitle = {
                     Text(
-                        text = stringResource(id = R.string.workouts_intro),
+                        text = stringResource(id = R.string.gym_workouts_intro),
                         textAlign = TextAlign.Center
                     )
                 }
             )
         } else {
             WorkoutList(
-                workouts = splits,
+                workouts = workoutPlans,
                 selectingItems = selectingItems,
                 onSelect = onSelect,
-                onHold = onSplitHold,
-                onClick = onSplitClick
+                onHold = onWorkoutHold,
+                onClick = onWorkoutClick
             )
         }
     }
@@ -199,12 +199,12 @@ fun SplitListScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun SplitsPreview() {
+private fun WorkoutPlansPreview() {
     GymTrackerTheme {
         Surface {
-            SplitListScreen(
+            GymWorkoutPlansScreen(
                 loading = false,
-                splits = listOf(
+                workoutPlans = listOf(
                     WorkoutWithLatestTimestamp(
                         id = 0,
                         name = "Workout 1",
@@ -212,9 +212,9 @@ private fun SplitsPreview() {
                     )
                 ),
                 selectingItems = false,
-                onSplitClick = {},
+                onWorkoutClick = {},
                 onSelect = { _, _ -> },
-                onSplitHold = {}
+                onWorkoutHold = {}
             )
         }
     }
@@ -222,16 +222,16 @@ private fun SplitsPreview() {
 
 @Preview(showBackground = true, locale = "fi")
 @Composable
-private fun EmptySplitsPreview() {
+private fun EmptyListPreview() {
     GymTrackerTheme(darkTheme = true) {
         Surface {
-            SplitListScreen(
+            GymWorkoutPlansScreen(
                 loading = false,
-                splits = emptyList(),
+                workoutPlans = emptyList(),
                 selectingItems = false,
                 onSelect = { _, _ -> },
-                onSplitClick = {},
-                onSplitHold = {}
+                onWorkoutClick = {},
+                onWorkoutHold = {}
             )
         }
     }

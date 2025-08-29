@@ -69,8 +69,8 @@ import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioScreen
 import com.example.gymtracker.ui.gym.createsplit.CreateSplitScreen
+import com.example.gymtracker.ui.gym.gymworkoutplans.GymWorkoutPlansScreen
 import com.example.gymtracker.ui.gym.split.SplitScreen
-import com.example.gymtracker.ui.gym.splitslist.SplitListScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
@@ -203,11 +203,11 @@ fun GymTrackerApp(
                 )
             }
 
-            navigation<Route.Gym>(startDestination = Route.SplitList) {
-                composable<Route.SplitList> {
-                    SplitListScreen(
-                        onNavigateToSplit = { navigate(Route.Split(it)) },
-                        onNavigateToCreateSplit = { navigate(Route.CreateSplit) }
+            navigation<Route.Gym>(startDestination = Route.GymWorkoutPlans) {
+                composable<Route.GymWorkoutPlans> {
+                    GymWorkoutPlansScreen(
+                        onNavigateToWorkout = { navigate(Route.Split(it)) },
+                        onNavigateToCreateWorkout = { navigate(Route.CreateSplit) }
                     )
                 }
             }

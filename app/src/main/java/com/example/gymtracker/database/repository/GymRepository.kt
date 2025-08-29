@@ -34,10 +34,10 @@ data class WorkoutWithLatestTimestamp(
 
 interface GymRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
-    suspend fun getSplitsWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
+    suspend fun getGymWorkoutPlans(): List<WorkoutWithLatestTimestamp>
     suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises?
     suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
-    suspend fun deleteSplit(splitId: Int)
+    suspend fun deleteGymWorkoutPlan(splitId: Int)
     suspend fun markSplitSessionDone(
         splitId: Int,
         splitName: String,
@@ -85,7 +85,7 @@ class GymRepositoryImpl(
         }
     }
 
-    override suspend fun getSplitsWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
+    override suspend fun getGymWorkoutPlans(): List<WorkoutWithLatestTimestamp> {
         val workouts = workoutDao.getAllGymWorkouts()
 
         return workouts.map {
@@ -162,7 +162,7 @@ class GymRepositoryImpl(
         )
     }
 
-    override suspend fun deleteSplit(splitId: Int) = workoutDao.deleteById(splitId)
+    override suspend fun deleteGymWorkoutPlan(splitId: Int) = workoutDao.deleteById(splitId)
 
     override suspend fun markSplitSessionDone(
         splitId: Int,

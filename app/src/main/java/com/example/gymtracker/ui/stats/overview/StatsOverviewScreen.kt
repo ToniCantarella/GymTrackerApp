@@ -87,7 +87,7 @@ import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.utility.MAX_SPLITS
+import com.example.gymtracker.utility.MAX_GYM_WORKOUTS
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -1076,7 +1076,7 @@ private fun PieChartCard(
 
 @Composable
 private fun StatsScreenForPreview() {
-    val gymWorkouts = List(MAX_SPLITS) {
+    val gymWorkouts = List(MAX_GYM_WORKOUTS) {
         val name =
             if (it == 0)
                 "This is a very long name that can overflow"
@@ -1095,7 +1095,7 @@ private fun StatsScreenForPreview() {
             else
                 "Cardio ${it + 1}"
         Workout(
-            id = it + MAX_SPLITS,
+            id = it + MAX_GYM_WORKOUTS,
             name = name,
             type = WorkoutType.CARDIO
         )

@@ -1,6 +1,6 @@
 package com.example.gymtracker.utility
 
-const val MAX_SPLITS = 7
+const val MAX_GYM_WORKOUTS = 7
 const val MAX_EXERCISES = 10
 const val MAX_SETS = 6
 

@@ -12,7 +12,7 @@ open class Route {
     object Gym : Route()
 
     @Serializable
-    object SplitList : Route()
+    object GymWorkoutPlans : Route()
 
     @Serializable
     class Split(val id: Int, val timestampString: String? = null) : Route()

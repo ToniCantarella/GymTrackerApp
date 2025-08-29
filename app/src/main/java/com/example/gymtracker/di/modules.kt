@@ -18,8 +18,8 @@ import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioViewModel
 import com.example.gymtracker.ui.gym.createsplit.CreateSplitViewModel
+import com.example.gymtracker.ui.gym.gymworkoutplans.GymWorkoutPlansViewModel
 import com.example.gymtracker.ui.gym.split.SplitViewModel
-import com.example.gymtracker.ui.gym.splitslist.SplitListViewModel
 import com.example.gymtracker.ui.info.InfoViewModel
 import com.example.gymtracker.ui.stats.cardio.CardioSessionViewModel
 import com.example.gymtracker.ui.stats.cardio.CardioStatsViewModel
@@ -97,7 +97,7 @@ val databaseModule = module {
 
 val viewModelModule = module {
     viewModelOf(::MainViewModel)
-    viewModelOf(::SplitListViewModel)
+    viewModelOf(::GymWorkoutPlansViewModel)
     viewModelOf(::CardioListViewModel)
     viewModelOf(::CardioItemViewModel)
     viewModelOf(::SplitViewModel)

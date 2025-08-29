@@ -4,7 +4,7 @@
     <string name="stats">Tilastot</string>
     <string name="cardio">Liikunta</string>
     <string name="personal_record">Henkilökohtainen ennätys (PR)</string>
-    <string name="workouts_intro">Täällä voit luoda henkilökohtaisen listan salitreeneistä per päivä. Esimerkiksi: jalkapäivä, työntöliikkeet, kokovartalotreeni…</string>
+    <string name="gym_workouts_intro">Täällä voit luoda henkilökohtaisen listan salitreeneistä per päivä. Esimerkiksi: jalkapäivä, työntöliikkeet, kokovartalotreeni…</string>
     <string name="cardio_intro">Täällä voit luoda henkilökohtaisen listan muista harjoituksista, kuten juoksu, jooga, venyttely…</string>
     <string name="stats_intro">Kun aloitat kirjaamaan ja seuraamaan treenejäsi/liikuntaasi, tilastot näytetään täällä.</string>
     <string name="last_time">Viime kerta</string>
