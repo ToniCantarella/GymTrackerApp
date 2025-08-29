@@ -33,7 +33,7 @@ data class WorkoutWithLatestTimestamp(
 )
 
 interface GymRepository {
-    suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
+    suspend fun addGymWorkoutWithExercises(workoutName: String, exercises: List<Exercise>)
     suspend fun getGymWorkoutPlans(): List<WorkoutWithLatestTimestamp>
     suspend fun getLatestGymWorkoutWithExercises(id: Int): SplitWithExercises?
     suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
@@ -54,10 +54,10 @@ class GymRepositoryImpl(
     private val setSessionDao: SetSessionDao
 ): GymRepository {
 
-    override suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
+    override suspend fun addGymWorkoutWithExercises(workoutName: String, exercises: List<Exercise>) {
         val workoutId = workoutDao.insert(
             WorkoutEntity(
-                name = splitName.trim(),
+                name = workoutName.trim(),
                 type = WorkoutType.GYM
             )
         ).toInt()

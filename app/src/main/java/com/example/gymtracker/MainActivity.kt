@@ -68,7 +68,7 @@ import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioScreen
-import com.example.gymtracker.ui.gym.createsplit.CreateSplitScreen
+import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkoutplans.GymWorkoutPlansScreen
 import com.example.gymtracker.ui.info.InfoScreen
@@ -223,7 +223,7 @@ fun GymTrackerApp(
             }
 
             composable<Route.CreateSplit> {
-                CreateSplitScreen(
+                CreateGymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
                     onGuardReleased = ::releaseNavigationGuard,

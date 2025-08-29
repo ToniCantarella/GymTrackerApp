@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.createsplit
+package com.example.gymtracker.ui.gym.creategymworkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +13,8 @@ import java.util.UUID
 
 
 
-data class CreateSplitUiState(
-    val splitName: String = "",
+data class CreateGymWorkoutUiState(
+    val workoutName: String = "",
     val exercises: List<Exercise> = defaultExercises,
     val initialExercises: List<Exercise> = defaultExercises
 ){
@@ -23,17 +23,17 @@ data class CreateSplitUiState(
     }
 }
 
-class CreateSplitViewModel(
+class CreateGymWorkoutViewModel(
     private val gymRepository: GymRepository
 ) : ViewModel() {
     private val gymWorkoutUtil = GymWorkoutUtil()
-    private val _uiState = MutableStateFlow(CreateSplitUiState())
+    private val _uiState = MutableStateFlow(CreateGymWorkoutUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun onSplitNameChange(name: String) {
+    fun onWorkoutNameChange(name: String) {
         _uiState.update {
             it.copy(
-                splitName = name
+                workoutName = name
             )
         }
     }
@@ -107,10 +107,10 @@ class CreateSplitViewModel(
         }
     }
 
-    fun onCreateSplitPressed(onCreateDone: () -> Unit) {
+    fun onCreateWorkoutPressed(onCreateDone: () -> Unit) {
         viewModelScope.launch {
-            gymRepository.addSplitWithExercises(
-                splitName = uiState.value.splitName,
+            gymRepository.addGymWorkoutWithExercises(
+                workoutName = uiState.value.workoutName,
                 exercises = uiState.value.exercises
             )
             onCreateDone()

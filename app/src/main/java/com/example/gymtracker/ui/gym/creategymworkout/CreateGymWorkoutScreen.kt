@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.createsplit
+package com.example.gymtracker.ui.gym.creategymworkout
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -24,16 +24,16 @@ import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
 @Composable
-fun CreateSplitScreen(
+fun CreateGymWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
     showNavigationGuard: Boolean,
     onShowNavigationGuardChange: (Boolean) -> Unit,
     onGuardReleased: () -> Unit,
-    viewModel: CreateSplitViewModel = koinViewModel()
+    viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val hasUnsavedChanges = uiState.splitName != "" || uiState.exercises != uiState.initialExercises
+    val hasUnsavedChanges = uiState.workoutName != "" || uiState.exercises != uiState.initialExercises
 
     BackHandler {
         onNavigateBack()
@@ -50,8 +50,8 @@ fun CreateSplitScreen(
     ProvideTopAppBar(
         title = {
             TopBarTextField(
-                value = uiState.splitName,
-                onValueChange = viewModel::onSplitNameChange,
+                value = uiState.workoutName,
+                onValueChange = viewModel::onWorkoutNameChange,
                 maxSize = WORKOUT_NAME_MAX_SIZE
             )
         },
@@ -70,9 +70,9 @@ fun CreateSplitScreen(
     ProvideFloatingActionButton(
         onClick = {
             onGuardReleased()
-            viewModel.onCreateSplitPressed { onNavigateBack() }
+            viewModel.onCreateWorkoutPressed { onNavigateBack() }
         },
-        enabled = uiState.exercises.last().name.isNotEmpty() && uiState.splitName.isNotEmpty()
+        enabled = uiState.exercises.last().name.isNotEmpty() && uiState.workoutName.isNotEmpty()
     ) {
         Icon(
             painter = painterResource(id = R.drawable.save),
@@ -80,7 +80,7 @@ fun CreateSplitScreen(
         )
     }
 
-    CreateSplitScreen(
+    CreateGymWorkoutScreen(
         exercises = uiState.exercises,
         addExercise = viewModel::addExercise,
         onRemoveExercise = viewModel::onRemoveExercise,
@@ -101,7 +101,7 @@ fun CreateSplitScreen(
 }
 
 @Composable
-private fun CreateSplitScreen(
+private fun CreateGymWorkoutScreen(
     exercises: List<Exercise>,
     addExercise: () -> Unit,
     onRemoveExercise: (exerciseId: UUID) -> Unit,
