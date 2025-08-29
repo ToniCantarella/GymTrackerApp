@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.split
+package com.example.gymtracker.ui.gym.gymworkout
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -47,8 +47,8 @@ import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
 import com.example.gymtracker.utility.UnitUtil
+import com.example.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import com.example.gymtracker.utility.toDateAndTimeString
 import com.example.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
@@ -57,13 +57,13 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SplitScreen(
+fun GymWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
     showNavigationGuard: Boolean,
     onShowNavigationGuardChange: (Boolean) -> Unit,
     onGuardReleased: () -> Unit,
-    viewModel: SplitViewModel = koinViewModel()
+    viewModel: GymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -71,7 +71,7 @@ fun SplitScreen(
     var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
 
     val hasUnsavedChanges =
-        uiState.initialSplitName != uiState.splitName || uiState.initialExercises != uiState.exercises
+        uiState.initialWorkoutName != uiState.workoutName || uiState.initialExercises != uiState.exercises
     val hasPerformedSets = uiState.exercises.any { it.sets.any { set -> set.checked } }
 
     BackHandler {
@@ -104,9 +104,9 @@ fun SplitScreen(
     ProvideTopAppBar(
         title = {
             TopBarTextField(
-                value = uiState.splitName,
-                onValueChange = viewModel::onSplitNameChange,
-                maxSize = SPLIT_NAME_MAX_SIZE
+                value = uiState.workoutName,
+                onValueChange = viewModel::onWorkoutNameChange,
+                maxSize = WORKOUT_NAME_MAX_SIZE
             )
         },
         navigationItem = {
@@ -144,7 +144,7 @@ fun SplitScreen(
         )
     }
 
-    SplitScreen(
+    GymWorkoutScreen(
         loading = uiState.loading,
         latestTimestamp = uiState.latestTimestamp,
         addingTimestamp = uiState.selectedTimestamp,
@@ -247,7 +247,7 @@ fun SplitScreen(
 }
 
 @Composable
-fun SplitScreen(
+fun GymWorkoutScreen(
     loading: Boolean,
     latestTimestamp: Instant?,
     addingTimestamp: Instant?,
@@ -305,7 +305,7 @@ fun SplitScreen(
 @Composable
 private fun ScreenForPreview(
 ) {
-    SplitScreen(
+    GymWorkoutScreen(
         loading = false,
         latestTimestamp = Instant.now(),
         addingTimestamp = null,
@@ -359,7 +359,7 @@ private fun ScreenForPreview(
 
 @Preview(showBackground = true)
 @Composable
-private fun SplitPreview() {
+private fun GymWorkoutPreview() {
     GymTrackerTheme {
         ScreenForPreview()
     }

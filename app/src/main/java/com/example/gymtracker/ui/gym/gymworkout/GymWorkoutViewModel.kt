@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.split
+package com.example.gymtracker.ui.gym.gymworkout
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.gymtracker.database.repository.GymRepository
-import com.example.gymtracker.database.repository.SplitStats
+import com.example.gymtracker.database.repository.GymWorkoutStats
 import com.example.gymtracker.database.repository.StatRepository
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.info.SHOW_FINISH_WORKOUT_DIALOG
 import com.example.gymtracker.ui.navigation.Route
-import com.example.gymtracker.utility.SplitUtil
+import com.example.gymtracker.utility.GymWorkoutUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -23,37 +23,37 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.UUID
 
-data class SplitUiState(
+data class GymWorkoutUiState(
     val loading: Boolean = false,
-    val splitId: Int = 0,
-    val splitName: String = "",
+    val workoutId: Int = 0,
+    val workoutName: String = "",
     val latestTimestamp: Instant? = null,
     val exercises: List<Exercise> = emptyList(),
-    val initialSplitName: String = "",
+    val initialWorkoutName: String = "",
     val initialExercises: List<Exercise> = emptyList(),
     val showConfirmOnFinishWorkout: Boolean = true,
     val doNotAskAgain: Boolean = false,
     val selectedTimestamp: Instant? = null,
-    val stats: SplitStats? = null
+    val stats: GymWorkoutStats? = null
 )
 
-class SplitViewModel(
+class GymWorkoutViewModel(
     savedStateHandle: SavedStateHandle,
     private val gymRepository: GymRepository,
     private val statsRepository: StatRepository,
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
-    private val splitUtil = SplitUtil()
-    private val navParams = savedStateHandle.toRoute<Route.Split>()
+    private val gymWorkoutUtil = GymWorkoutUtil()
+    private val navParams = savedStateHandle.toRoute<Route.GymWorkout>()
 
-    private val _uiState = MutableStateFlow(SplitUiState())
+    private val _uiState = MutableStateFlow(GymWorkoutUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val latestSplit = gymRepository.getLatestSplitWithExercises(navParams.id)
-            val splitName = latestSplit?.name ?: ""
-            val exercises = latestSplit?.exercises ?: emptyList()
+            val latestWorkout = gymRepository.getLatestGymWorkoutWithExercises(navParams.id)
+            val workoutName = latestWorkout?.name ?: ""
+            val exercises = latestWorkout?.exercises ?: emptyList()
             val selectedTimestamp = navParams.timestampString?.let{ Instant.parse(it) }
 
             val showFinishWorkoutDialog = dataStore.data
@@ -62,32 +62,32 @@ class SplitViewModel(
 
             _uiState.update {
                 it.copy(
-                    splitId = navParams.id,
-                    splitName = splitName,
-                    latestTimestamp = latestSplit?.timestamp,
+                    workoutId = navParams.id,
+                    workoutName = workoutName,
+                    latestTimestamp = latestWorkout?.timestamp,
                     selectedTimestamp = selectedTimestamp,
                     exercises = exercises,
-                    initialSplitName = splitName,
+                    initialWorkoutName = workoutName,
                     initialExercises = exercises,
                     showConfirmOnFinishWorkout = showFinishWorkoutDialog,
                     loading = false
                 )
             }
 
-            val splitStats = statsRepository.getSplitStats(navParams.id)
+            val workoutStats = statsRepository.getGymWorkoutStats(navParams.id)
 
             _uiState.update {
                 it.copy(
-                    stats = splitStats
+                    stats = workoutStats
                 )
             }
         }
     }
 
-    fun onSplitNameChange(name: String) {
+    fun onWorkoutNameChange(name: String) {
         _uiState.update {
             it.copy(
-                splitName = name
+                workoutName = name
             )
         }
     }
@@ -95,7 +95,7 @@ class SplitViewModel(
     fun onExerciseNameChange(id: UUID, name: String) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateExerciseName(it.exercises, id, name)
+                exercises = gymWorkoutUtil.updateExerciseName(it.exercises, id, name)
             )
         }
     }
@@ -103,7 +103,7 @@ class SplitViewModel(
     fun onDescriptionChange(id: UUID, description: String) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateExerciseDescription(it.exercises, id, description)
+                exercises = gymWorkoutUtil.updateExerciseDescription(it.exercises, id, description)
             )
         }
     }
@@ -127,7 +127,7 @@ class SplitViewModel(
     fun onCheckSet(exerciseId: UUID, setId: UUID, checked: Boolean) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.checkSet(it.exercises, exerciseId, setId, checked)
+                exercises = gymWorkoutUtil.checkSet(it.exercises, exerciseId, setId, checked)
             )
         }
     }
@@ -135,7 +135,7 @@ class SplitViewModel(
     fun addSet(exerciseId: UUID) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.addSet(it.exercises, exerciseId)
+                exercises = gymWorkoutUtil.addSet(it.exercises, exerciseId)
             )
         }
     }
@@ -143,7 +143,7 @@ class SplitViewModel(
     fun onRemoveSet(exerciseId: UUID, setId: UUID) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.removeSet(it.exercises, exerciseId, setId)
+                exercises = gymWorkoutUtil.removeSet(it.exercises, exerciseId, setId)
             )
         }
     }
@@ -151,7 +151,7 @@ class SplitViewModel(
     fun onChangeWeight(exerciseId: UUID, setId: UUID, weight: Double) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateWeight(it.exercises, exerciseId, setId, weight)
+                exercises = gymWorkoutUtil.updateWeight(it.exercises, exerciseId, setId, weight)
             )
         }
     }
@@ -159,7 +159,7 @@ class SplitViewModel(
     fun onChangeRepetitions(exerciseId: UUID, setId: UUID, repetitions: Int) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateRepetitions(
+                exercises = gymWorkoutUtil.updateRepetitions(
                     it.exercises,
                     exerciseId,
                     setId,
@@ -179,9 +179,9 @@ class SplitViewModel(
 
     fun onFinishWorkoutPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
-            gymRepository.markSplitSessionDone(
-                splitId = navParams.id,
-                splitName = uiState.value.splitName,
+            gymRepository.markGymSessionDone(
+                workoutId = navParams.id,
+                workoutName = uiState.value.workoutName,
                 exercises = uiState.value.exercises,
                 timestamp = uiState.value.selectedTimestamp
             )

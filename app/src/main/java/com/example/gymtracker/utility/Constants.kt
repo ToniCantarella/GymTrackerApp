@@ -6,7 +6,7 @@ const val MAX_SETS = 6
 
 const val MAX_CARDIO = 7
 
-const val SPLIT_NAME_MAX_SIZE = 20
+const val WORKOUT_NAME_MAX_SIZE = 20
 const val EXERCISE_NAME_MAX_SIZE = 20
 const val EXERCISE_DESCRIPTION_MAX_SIZE = 40
 

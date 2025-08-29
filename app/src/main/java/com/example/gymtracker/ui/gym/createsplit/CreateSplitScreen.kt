@@ -19,7 +19,7 @@ import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
-import com.example.gymtracker.utility.SPLIT_NAME_MAX_SIZE
+import com.example.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
@@ -52,7 +52,7 @@ fun CreateSplitScreen(
             TopBarTextField(
                 value = uiState.splitName,
                 onValueChange = viewModel::onSplitNameChange,
-                maxSize = SPLIT_NAME_MAX_SIZE
+                maxSize = WORKOUT_NAME_MAX_SIZE
             )
         },
         navigationItem = {

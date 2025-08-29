@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymtracker.database.repository.GymRepository
 import com.example.gymtracker.ui.gym.entity.Exercise
-import com.example.gymtracker.utility.SplitUtil
+import com.example.gymtracker.utility.GymWorkoutUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,7 +26,7 @@ data class CreateSplitUiState(
 class CreateSplitViewModel(
     private val gymRepository: GymRepository
 ) : ViewModel() {
-    private val splitUtil = SplitUtil()
+    private val gymWorkoutUtil = GymWorkoutUtil()
     private val _uiState = MutableStateFlow(CreateSplitUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -41,7 +41,7 @@ class CreateSplitViewModel(
     fun onExerciseNameChange(id: UUID, name: String) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateExerciseName(it.exercises, id, name)
+                exercises = gymWorkoutUtil.updateExerciseName(it.exercises, id, name)
             )
         }
     }
@@ -49,7 +49,7 @@ class CreateSplitViewModel(
     fun onDescriptionChange(id: UUID, description: String) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateExerciseDescription(it.exercises, id, description)
+                exercises = gymWorkoutUtil.updateExerciseDescription(it.exercises, id, description)
             )
         }
     }
@@ -73,7 +73,7 @@ class CreateSplitViewModel(
     fun addSet(exerciseId: UUID) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.addSet(it.exercises, exerciseId)
+                exercises = gymWorkoutUtil.addSet(it.exercises, exerciseId)
             )
         }
     }
@@ -81,7 +81,7 @@ class CreateSplitViewModel(
     fun onRemoveSet(exerciseId: UUID, setId: UUID) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.removeSet(it.exercises, exerciseId, setId)
+                exercises = gymWorkoutUtil.removeSet(it.exercises, exerciseId, setId)
             )
         }
     }
@@ -89,7 +89,7 @@ class CreateSplitViewModel(
     fun onChangeWeight(exerciseId: UUID, setId: UUID, weight: Double) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateWeight(it.exercises, exerciseId, setId, weight)
+                exercises = gymWorkoutUtil.updateWeight(it.exercises, exerciseId, setId, weight)
             )
         }
     }
@@ -97,7 +97,7 @@ class CreateSplitViewModel(
     fun onChangeRepetitions(exerciseId: UUID, setId: UUID, repetitions: Int) {
         _uiState.update {
             it.copy(
-                exercises = splitUtil.updateRepetitions(
+                exercises = gymWorkoutUtil.updateRepetitions(
                     it.exercises,
                     exerciseId,
                     setId,

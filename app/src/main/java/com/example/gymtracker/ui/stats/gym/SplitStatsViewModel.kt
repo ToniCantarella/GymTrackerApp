@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.database.repository.SplitStats
+import com.example.gymtracker.database.repository.GymWorkoutStats
 import com.example.gymtracker.database.repository.StatRepository
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 data class SplitStatsUiState(
     val loading: Boolean = true,
     val splitName: String = "",
-    val stats: SplitStats? = null
+    val stats: GymWorkoutStats? = null
 )
 
 class SplitStatsViewModel(
@@ -29,7 +29,7 @@ class SplitStatsViewModel(
 
     init {
         viewModelScope.launch {
-            val stats = statRepository.getSplitStats(navParams.id)
+            val stats = statRepository.getGymWorkoutStats(navParams.id)
             _uiState.update {
                 it.copy(
                     splitName = stats.name,

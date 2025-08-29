@@ -4,7 +4,7 @@ import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import java.util.UUID
 
-class SplitUtil {
+class GymWorkoutUtil {
 
     fun updateExerciseName(
         exercises: List<Exercise>,

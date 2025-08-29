@@ -35,12 +35,12 @@ data class WorkoutWithLatestTimestamp(
 interface GymRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
     suspend fun getGymWorkoutPlans(): List<WorkoutWithLatestTimestamp>
-    suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises?
+    suspend fun getLatestGymWorkoutWithExercises(id: Int): SplitWithExercises?
     suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
     suspend fun deleteGymWorkoutPlan(splitId: Int)
-    suspend fun markSplitSessionDone(
-        splitId: Int,
-        splitName: String,
+    suspend fun markGymSessionDone(
+        workoutId: Int,
+        workoutName: String,
         exercises: List<Exercise>,
         timestamp: Instant? = null
     )
@@ -99,7 +99,7 @@ class GymRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises? {
+    override suspend fun getLatestGymWorkoutWithExercises(id: Int): SplitWithExercises? {
         val workout = workoutDao.getById(id)
         val timestamp = gymSessionDao.getLastSession(id)?.timestamp
 
@@ -164,16 +164,16 @@ class GymRepositoryImpl(
 
     override suspend fun deleteGymWorkoutPlan(splitId: Int) = workoutDao.deleteById(splitId)
 
-    override suspend fun markSplitSessionDone(
-        splitId: Int,
-        splitName: String,
+    override suspend fun markGymSessionDone(
+        workoutId: Int,
+        workoutName: String,
         exercises: List<Exercise>,
         timestamp: Instant?
     ) {
         if (exercises.isEmpty()) return
 
-        val currentSplit = workoutDao.getById(splitId)
-        val newName = splitName.trim()
+        val currentSplit = workoutDao.getById(workoutId)
+        val newName = workoutName.trim()
 
         if (newName.isNotEmpty() && currentSplit.name != newName) {
             workoutDao.updateWorkout(
@@ -188,13 +188,13 @@ class GymRepositoryImpl(
         val sessionId = if (performedSets.isNotEmpty()) {
             gymSessionDao.insert(
                 GymSessionEntity(
-                    workoutId = splitId,
+                    workoutId = workoutId,
                     timestamp = timestamp ?: Instant.now()
                 )
             ).toInt()
         } else null
 
-        val currentExercises = exerciseDao.getExercisesByWorkoutId(splitId).associateBy { it.uuid }
+        val currentExercises = exerciseDao.getExercisesByWorkoutId(workoutId).associateBy { it.uuid }
 
         val deletedExercises = currentExercises.values.filter { current ->
             exercises.none {
@@ -210,7 +210,7 @@ class GymRepositoryImpl(
             val currentExercise = currentExercises[exercise.uuid]
             val exerciseId = currentExercise?.id ?: exerciseDao.insert(
                 ExerciseEntity(
-                    workoutId = splitId,
+                    workoutId = workoutId,
                     uuid = exercise.uuid,
                     name = exercise.name.trim(),
                     description = exercise.description?.trim()

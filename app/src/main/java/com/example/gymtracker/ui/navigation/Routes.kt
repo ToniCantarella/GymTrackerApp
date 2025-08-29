@@ -15,7 +15,7 @@ open class Route {
     object GymWorkoutPlans : Route()
 
     @Serializable
-    class Split(val id: Int, val timestampString: String? = null) : Route()
+    class GymWorkout(val id: Int, val timestampString: String? = null) : Route()
 
     @Serializable
     object CreateSplit : Route()

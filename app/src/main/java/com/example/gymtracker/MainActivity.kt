@@ -69,8 +69,8 @@ import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioScreen
 import com.example.gymtracker.ui.gym.createsplit.CreateSplitScreen
+import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkoutplans.GymWorkoutPlansScreen
-import com.example.gymtracker.ui.gym.split.SplitScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
@@ -206,14 +206,14 @@ fun GymTrackerApp(
             navigation<Route.Gym>(startDestination = Route.GymWorkoutPlans) {
                 composable<Route.GymWorkoutPlans> {
                     GymWorkoutPlansScreen(
-                        onNavigateToWorkout = { navigate(Route.Split(it)) },
+                        onNavigateToWorkout = { navigate(Route.GymWorkout(it)) },
                         onNavigateToCreateWorkout = { navigate(Route.CreateSplit) }
                     )
                 }
             }
 
-            composable<Route.Split> {
-                SplitScreen(
+            composable<Route.GymWorkout> {
+                GymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
                     onGuardReleased = ::releaseNavigationGuard,
@@ -271,7 +271,7 @@ fun GymTrackerApp(
                         onAddSessionNavigate = { workout, timestamp ->
                             if (workout.type == WorkoutType.GYM) {
                                 navigate(
-                                    Route.Split(
+                                    Route.GymWorkout(
                                         workout.id,
                                         timestamp.toString()
                                     )

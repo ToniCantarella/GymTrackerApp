@@ -27,7 +27,7 @@ data class ExerciseWithHistory(
     val setHistory: List<SetData>
 )
 
-data class SplitStats(
+data class GymWorkoutStats(
     val id: Int,
     val name: String,
     val exercises: List<ExerciseWithHistory>
@@ -47,7 +47,7 @@ data class CardioStats(
 )
 
 interface StatRepository {
-    suspend fun getSplitStats(id: Int): SplitStats
+    suspend fun getGymWorkoutStats(id: Int): GymWorkoutStats
     suspend fun getCardioStats(id: Int): CardioStats
     suspend fun deleteAllData()
 }
@@ -63,12 +63,12 @@ class StatRepositoryImpl(
     private val cardioSessionDao: CardioSessionDao
 ): StatRepository {
 
-    override suspend fun getSplitStats(id: Int): SplitStats {
+    override suspend fun getGymWorkoutStats(id: Int): GymWorkoutStats {
         val workout = workoutDao.getById(id)
         val exercises = exerciseDao.getExercisesByWorkoutId(workout.id)
         val gymSessions = gymSessionDao.getByWorkoutId(workout.id)
 
-        return SplitStats(
+        return GymWorkoutStats(
             id = id,
             name = workout.name,
             exercises = exercises.map { exercise ->
