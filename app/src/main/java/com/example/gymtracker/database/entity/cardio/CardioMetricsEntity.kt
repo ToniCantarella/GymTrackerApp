@@ -9,7 +9,7 @@ import java.time.Duration
 @Entity(
     tableName = "cardio_metrics",
     foreignKeys = [ForeignKey(
-        entity = CardioWorkoutPlanEntity::class,
+        entity = CardioWorkoutEntity::class,
         parentColumns = ["id"],
         childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE

@@ -10,7 +10,7 @@ import java.util.UUID
 @Entity(
     tableName = "exercises",
     foreignKeys = [ForeignKey(
-        entity = GymWorkoutPlanEntity::class,
+        entity = GymWorkoutEntity::class,
         parentColumns = ["id"],
         childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE

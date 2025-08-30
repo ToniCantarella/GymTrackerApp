@@ -10,7 +10,7 @@ import java.time.Instant
 @Entity(
     tableName = "cardio_sessions",
     foreignKeys = [ForeignKey(
-        entity = CardioWorkoutPlanEntity::class,
+        entity = CardioWorkoutEntity::class,
         parentColumns = ["id"],
         childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE
@@ -23,7 +23,7 @@ import java.time.Instant
 data class CardioSessionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val workoutId: Int,            // <- renamed
+    val workoutId: Int,
     val timestamp: Instant,
     val steps: Int? = null,
     val distance: Double? = null,
