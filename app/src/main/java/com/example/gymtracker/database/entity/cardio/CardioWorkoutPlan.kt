@@ -1,0 +1,11 @@
+package com.example.gymtracker.database.entity.cardio
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "CardioWorkoutPlans")
+data class CardioWorkoutPlan(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String
+)

@@ -32,7 +32,7 @@ class SplitStatsViewModel(
             val stats = statRepository.getSplitStats(navParams.id)
             _uiState.update {
                 it.copy(
-                    splitName = stats.name,
+                    splitName = stats?.name ?: "",
                     stats = stats,
                     loading = false
                 )

@@ -1,14 +1,13 @@
 package com.example.gymtracker.database.repository
 
-import com.example.gymtracker.database.dao.WorkoutDao
 import com.example.gymtracker.database.dao.gym.ExerciseDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
+import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
-import com.example.gymtracker.database.entity.WorkoutEntity
-import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
+import com.example.gymtracker.database.entity.gym.GymWorkoutPlan
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import com.example.gymtracker.ui.gym.entity.Exercise
@@ -36,7 +35,7 @@ interface GymRepository {
     suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>)
     suspend fun getSplitsWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
     suspend fun getLatestSplitWithExercises(id: Int): SplitWithExercises?
-    suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
+    suspend fun getSplitBySession(sessionId: Int): SplitWithExercises?
     suspend fun deleteSplit(splitId: Int)
     suspend fun markSplitSessionDone(
         splitId: Int,
@@ -47,7 +46,7 @@ interface GymRepository {
 }
 
 class GymRepositoryImpl(
-    private val workoutDao: WorkoutDao,
+    private val workoutDao: GymWorkoutPlanDao,
     private val gymSessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
@@ -56,9 +55,8 @@ class GymRepositoryImpl(
 
     override suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
         val workoutId = workoutDao.insert(
-            WorkoutEntity(
-                name = splitName.trim(),
-                type = WorkoutType.GYM
+            GymWorkoutPlan(
+                name = splitName.trim()
             )
         ).toInt()
 
@@ -86,7 +84,7 @@ class GymRepositoryImpl(
     }
 
     override suspend fun getSplitsWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
-        val workouts = workoutDao.getAllGymWorkouts()
+        val workouts = workoutDao.getAll()
 
         return workouts.map {
             val timestamp = gymSessionDao.getLastSession(it.id)?.timestamp
@@ -123,7 +121,7 @@ class GymRepositoryImpl(
 
         return SplitWithExercises(
             id = id,
-            name = workout.name,
+            name = workout?.name ?: "",
             timestamp = timestamp,
             exercises = exercisesGrouped
         )
@@ -131,9 +129,12 @@ class GymRepositoryImpl(
 
     override suspend fun getSplitBySession(
         sessionId: Int
-    ): SplitWithExercises {
+    ): SplitWithExercises? {
         val gymSession = gymSessionDao.getById(sessionId)
         val split = workoutDao.getById(gymSession.workoutId)
+        if (split == null) {
+            return null
+        }
         val exercises = exerciseDao.getExercisesByWorkoutId(split.id)
         val setSession = setSessionDao.getSetsForSession(gymSession.id)
 
@@ -173,10 +174,13 @@ class GymRepositoryImpl(
         if (exercises.isEmpty()) return
 
         val currentSplit = workoutDao.getById(splitId)
+        if (currentSplit == null) {
+            return
+        }
         val newName = splitName.trim()
 
         if (newName.isNotEmpty() && currentSplit.name != newName) {
-            workoutDao.updateWorkout(
+            workoutDao.update(
                 currentSplit.copy(
                     name = newName
                 )

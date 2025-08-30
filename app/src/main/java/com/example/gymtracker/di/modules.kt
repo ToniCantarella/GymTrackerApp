@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
+import com.example.gymtracker.database.MIGRATION_5_6
 import com.example.gymtracker.database.repository.CardioRepository
 import com.example.gymtracker.database.repository.CardioRepositoryImpl
 import com.example.gymtracker.database.repository.GymRepository
@@ -46,10 +47,12 @@ val databaseModule = module {
             GymDatabase::class.java,
             "gym-tracker-db"
         )
+            .addMigrations(MIGRATION_5_6)
             .build()
     }
 
-    single { get<GymDatabase>().workoutDao() }
+    single { get<GymDatabase>().gymWorkoutPlanDao() }
+    single { get<GymDatabase>().cardioWorkoutPlanDao() }
     single { get<GymDatabase>().exerciseDao() }
     single { get<GymDatabase>().setDao() }
     single { get<GymDatabase>().setSessionDao() }
@@ -59,7 +62,8 @@ val databaseModule = module {
 
     single<WorkoutRepository> {
         WorkoutRepositoryImpl(
-            workoutDao = get(),
+            gymWorkoutPlanDao = get(),
+            cardioWorkoutPlanDao = get(),
             gymSessionDao = get(),
             cardioDao = get(),
             cardioSessionDao = get()
@@ -76,7 +80,7 @@ val databaseModule = module {
     }
     single<CardioRepository> {
         CardioRepositoryImpl(
-            workoutDao = get(),
+            cardioWorkoutPlanDao = get(),
             cardioDao = get(),
             cardioSessionDao = get()
         )
@@ -84,7 +88,8 @@ val databaseModule = module {
     single<StatRepository> {
         StatRepositoryImpl(
             db = get(),
-            workoutDao = get(),
+            gymWorkoutPlanDao = get(),
+            cardioWorkoutPlanDao = get(),
             exerciseDao = get(),
             setDao = get(),
             setSessionDao = get(),

@@ -1,12 +1,11 @@
 package com.example.gymtracker.database.repository
 
-import com.example.gymtracker.database.dao.WorkoutDao
 import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
-import com.example.gymtracker.database.entity.WorkoutEntity
-import com.example.gymtracker.database.entity.WorkoutType
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
 import com.example.gymtracker.database.entity.cardio.CardioEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
+import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlan
 import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.utility.DistanceUnit
 import com.example.gymtracker.utility.UnitUtil
@@ -16,23 +15,22 @@ import java.time.Instant
 interface CardioRepository {
     suspend fun addCardio(name: String)
     suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
-    suspend fun getLatestCardio(id: Int): Cardio
-    suspend fun getCardioBySession(sessionId: Int): Cardio
+    suspend fun getLatestCardio(id: Int): Cardio?
+    suspend fun getCardioBySession(sessionId: Int): Cardio?
     suspend fun deleteCardio(cardioId: Int)
     suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant? = null)
 }
 
 class CardioRepositoryImpl(
-    private val workoutDao: WorkoutDao,
+    private val cardioWorkoutPlanDao: CardioWorkoutPlanDao,
     private val cardioDao: CardioDao,
     private val cardioSessionDao: CardioSessionDao
 ) : CardioRepository {
 
     override suspend fun addCardio(name: String) {
-        val workoutId = workoutDao.insert(
-            WorkoutEntity(
-                name = name.trim(),
-                type = WorkoutType.CARDIO
+        val workoutId = cardioWorkoutPlanDao.insert(
+            CardioWorkoutPlan(
+                name = name.trim()
             )
         ).toInt()
 
@@ -44,7 +42,7 @@ class CardioRepositoryImpl(
     }
 
     override suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
-        val workouts = workoutDao.getAllCardioWorkouts()
+        val workouts = cardioWorkoutPlanDao.getAll()
 
         return workouts.map {
             val cardio = cardioDao.getCardioByWorkoutId(it.id)
@@ -58,8 +56,9 @@ class CardioRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestCardio(id: Int): Cardio {
-        val workout = workoutDao.getById(id)
+    override suspend fun getLatestCardio(id: Int): Cardio? {
+        val workout = cardioWorkoutPlanDao.getById(id)
+        if(workout == null) return null
         val cardio = cardioDao.getCardioByWorkoutId(workout.id)
         val sessions = cardioSessionDao.getAllSessionsForCardio(cardio.id)
 
@@ -82,10 +81,12 @@ class CardioRepositoryImpl(
 
     override suspend fun getCardioBySession(
         sessionId: Int
-    ): Cardio {
+    ): Cardio? {
         val session = cardioSessionDao.getById(sessionId)
         val cardio = cardioDao.getById(session.cardioId)
-        val workout = workoutDao.getById(cardio.workoutId)
+        val workout = cardioWorkoutPlanDao.getById(cardio.workoutId)
+
+        if(workout == null) return null
 
         return Cardio(
             name = workout.name,
@@ -99,15 +100,18 @@ class CardioRepositoryImpl(
         )
     }
 
-    override suspend fun deleteCardio(cardioId: Int) = workoutDao.deleteById(cardioId)
+    override suspend fun deleteCardio(cardioId: Int) = cardioWorkoutPlanDao.deleteById(cardioId)
 
 
     override suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant?) {
-        val workout = workoutDao.getById(id)
+        val workout = cardioWorkoutPlanDao.getById(id)
+
+        if(workout == null) return
+
         val newName = cardio.name.trim()
 
         if (newName.isNotEmpty() && workout.name != newName) {
-            workoutDao.updateWorkout(
+            cardioWorkoutPlanDao.update(
                 workout.copy(
                     name = newName
                 )

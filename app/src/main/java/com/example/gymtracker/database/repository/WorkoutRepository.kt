@@ -1,16 +1,15 @@
 package com.example.gymtracker.database.repository
 
-import com.example.gymtracker.database.dao.WorkoutDao
 import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
-import com.example.gymtracker.database.entity.WorkoutType
+import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
 import java.time.Instant
 
 data class Workout(
     val id: Int,
-    val name: String,
-    val type: WorkoutType
+    val name: String
 )
 
 data class WorkoutSession(
@@ -29,29 +28,28 @@ interface WorkoutRepository {
 }
 
 class WorkoutRepositoryImpl(
-    private val workoutDao: WorkoutDao,
+    private val gymWorkoutPlanDao : GymWorkoutPlanDao,
+    private val cardioWorkoutPlanDao : CardioWorkoutPlanDao,
     private val gymSessionDao: GymSessionDao,
     private val cardioDao: CardioDao,
     private val cardioSessionDao: CardioSessionDao
 ) : WorkoutRepository {
     override suspend fun getGymWorkouts(): List<Workout> {
-        val workouts = workoutDao.getAllGymWorkouts()
+        val workouts = gymWorkoutPlanDao.getAll()
         return workouts.map { workout ->
             Workout(
                 id = workout.id,
-                name = workout.name,
-                type = workout.type
+                name = workout.name
             )
         }
     }
 
     override suspend fun getCardioWorkouts(): List<Workout> {
-        val workouts = workoutDao.getAllCardioWorkouts()
+        val workouts = cardioWorkoutPlanDao.getAll()
         return workouts.map { workout ->
             Workout(
                 id = workout.id,
-                name = workout.name,
-                type = workout.type
+                name = workout.name
             )
         }
     }

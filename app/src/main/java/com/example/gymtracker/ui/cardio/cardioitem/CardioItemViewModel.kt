@@ -35,7 +35,7 @@ class CardioItemViewModel(
     init {
         viewModelScope.launch {
             val previousCardio = cardioRepository.getLatestCardio(navParams.id)
-            val cardio = uiState.value.cardio.copy(name = previousCardio.name)
+            val cardio = uiState.value.cardio.copy(name = previousCardio?.name ?: "")
             val selectedTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
             _uiState.update {
