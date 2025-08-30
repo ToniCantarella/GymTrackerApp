@@ -7,7 +7,7 @@ import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
-import com.example.gymtracker.database.entity.gym.GymWorkoutPlan
+import com.example.gymtracker.database.entity.gym.GymWorkoutPlanEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import com.example.gymtracker.ui.gym.entity.Exercise
@@ -55,7 +55,7 @@ class GymRepositoryImpl(
 
     override suspend fun addSplitWithExercises(splitName: String, exercises: List<Exercise>) {
         val workoutId = workoutDao.insert(
-            GymWorkoutPlan(
+            GymWorkoutPlanEntity(
                 name = splitName.trim()
             )
         ).toInt()

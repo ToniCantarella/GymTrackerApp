@@ -10,7 +10,7 @@ import java.time.Instant
 @Entity(
     tableName = "cardios",
     foreignKeys = [ForeignKey(
-        entity = CardioWorkoutPlan::class,
+        entity = CardioWorkoutPlanEntity::class,
         parentColumns = ["id"],
         childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE

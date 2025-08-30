@@ -16,10 +16,10 @@ import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.cardio.CardioEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
-import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlan
+import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlanEntity
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
-import com.example.gymtracker.database.entity.gym.GymWorkoutPlan
+import com.example.gymtracker.database.entity.gym.GymWorkoutPlanEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import java.time.Duration
@@ -28,8 +28,8 @@ import java.util.UUID
 
 @Database(
     entities = [
-        GymWorkoutPlan::class,
-        CardioWorkoutPlan::class,
+        GymWorkoutPlanEntity::class,
+        CardioWorkoutPlanEntity::class,
         ExerciseEntity::class,
         SetEntity::class,
         SetSessionEntity::class,

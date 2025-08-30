@@ -5,7 +5,7 @@ import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
 import com.example.gymtracker.database.entity.cardio.CardioEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
-import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlan
+import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlanEntity
 import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.utility.DistanceUnit
 import com.example.gymtracker.utility.UnitUtil
@@ -29,7 +29,7 @@ class CardioRepositoryImpl(
 
     override suspend fun addCardio(name: String) {
         val workoutId = cardioWorkoutPlanDao.insert(
-            CardioWorkoutPlan(
+            CardioWorkoutPlanEntity(
                 name = name.trim()
             )
         ).toInt()
