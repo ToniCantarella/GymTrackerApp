@@ -7,10 +7,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.repository.GymRepository
-import com.example.gymtracker.repository.GymWorkoutStats
-import com.example.gymtracker.repository.StatRepository
+import com.example.gymtracker.repository.gym.GymSessionRepository
+import com.example.gymtracker.repository.gym.GymStatsRepository
+import com.example.gymtracker.repository.gym.GymWorkoutRepository
 import com.example.gymtracker.ui.entity.gym.Exercise
+import com.example.gymtracker.ui.entity.gym.GymWorkoutStats
 import com.example.gymtracker.ui.info.SHOW_FINISH_WORKOUT_DIALOG
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.utility.GymWorkoutUtil
@@ -39,8 +40,9 @@ data class GymWorkoutUiState(
 
 class GymWorkoutViewModel(
     savedStateHandle: SavedStateHandle,
-    private val gymRepository: GymRepository,
-    private val statsRepository: StatRepository,
+    private val workoutRepository: GymWorkoutRepository,
+    private val statsRepository: GymStatsRepository,
+    private val sessionRepository: GymSessionRepository,
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
     private val gymWorkoutUtil = GymWorkoutUtil()
@@ -51,7 +53,7 @@ class GymWorkoutViewModel(
 
     init {
         viewModelScope.launch {
-            val latestWorkout = gymRepository.getLatestGymWorkoutWithExercises(navParams.id)
+            val latestWorkout = workoutRepository.getLatestWorkoutWithExercises(navParams.id)
             val workoutName = latestWorkout?.name ?: ""
             val exercises = latestWorkout?.exercises ?: emptyList()
             val selectedTimestamp = navParams.timestampString?.let{ Instant.parse(it) }
@@ -74,7 +76,7 @@ class GymWorkoutViewModel(
                 )
             }
 
-            val workoutStats = statsRepository.getGymWorkoutStats(navParams.id)
+            val workoutStats = statsRepository.getWorkoutStats(navParams.id)
 
             _uiState.update {
                 it.copy(
@@ -179,11 +181,9 @@ class GymWorkoutViewModel(
 
     fun onFinishWorkoutPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
-            gymRepository.markGymSessionDone(
+            sessionRepository.markSessionDone(
                 workoutId = navParams.id,
-                workoutName = uiState.value.workoutName,
                 exercises = uiState.value.exercises,
-                timestamp = uiState.value.selectedTimestamp
             )
 
             if (uiState.value.showConfirmOnFinishWorkout && uiState.value.doNotAskAgain) {

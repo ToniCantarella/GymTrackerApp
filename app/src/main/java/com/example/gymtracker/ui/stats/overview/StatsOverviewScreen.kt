@@ -80,10 +80,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
-import com.example.gymtracker.repository.Workout
-import com.example.gymtracker.repository.WorkoutSession
-import com.example.gymtracker.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.common.WorkoutListItem
+import com.example.gymtracker.ui.entity.WorkoutSession
+import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.MAX_GYM_WORKOUTS
@@ -127,8 +126,8 @@ import kotlin.time.toJavaInstant
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
     onSessionNavigate: (id: Int) -> Unit,
-    onAddSessionNavigate: (workout: Workout, timestamp: Instant) -> Unit,
-    onWorkoutStatsNavigate: (workout: Workout) -> Unit,
+    onAddSessionNavigate: (workout: WorkoutWithLatestTimestamp, timestamp: Instant) -> Unit,
+    onWorkoutStatsNavigate: (workout: WorkoutWithLatestTimestamp) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -168,15 +167,15 @@ fun StatsOverviewScreen(
 @Composable
 private fun StatsOverviewScreen(
     loading: Boolean,
-    gymWorkouts: List<Workout>,
-    cardioWorkouts: List<Workout>,
+    gymWorkouts: List<WorkoutWithLatestTimestamp>,
+    cardioWorkouts: List<WorkoutWithLatestTimestamp>,
     gymSessions: List<WorkoutSession>,
     cardioSessions: List<WorkoutSession>,
     workoutSessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
     onSessionNavigate: (id: Int) -> Unit,
-    onAddSessionNavigate: (workout: Workout, timestamp: Instant) -> Unit,
-    onWorkoutStatsNavigate: (workout: Workout) -> Unit
+    onAddSessionNavigate: (workout: WorkoutWithLatestTimestamp, timestamp: Instant) -> Unit,
+    onWorkoutStatsNavigate: (workout: WorkoutWithLatestTimestamp) -> Unit
 ) {
     if (loading) {
         Box(
@@ -276,9 +275,9 @@ private fun StatsOverviewScreen(
 
 @Composable
 private fun WorkoutListing(
-    gymWorkouts: List<Workout>,
-    cardioWorkouts: List<Workout>,
-    onWorkoutNavigate: (workout: Workout) -> Unit,
+    gymWorkouts: List<WorkoutWithLatestTimestamp>,
+    cardioWorkouts: List<WorkoutWithLatestTimestamp>,
+    onWorkoutNavigate: (workout: WorkoutWithLatestTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -310,7 +309,7 @@ private fun WorkoutListing(
 
 @Composable
 private fun WorkoutCard(
-    workout: Workout,
+    workout: WorkoutWithLatestTimestamp,
     iconColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -367,12 +366,12 @@ val highlightColors = listOf(
 @OptIn(ExperimentalTime::class)
 @Composable
 private fun StatCalendar(
-    gymWorkouts: List<Workout>,
-    cardioWorkouts: List<Workout>,
+    gymWorkouts: List<WorkoutWithLatestTimestamp>,
+    cardioWorkouts: List<WorkoutWithLatestTimestamp>,
     sessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
     onSessionClick: (id: Int) -> Unit,
-    onAddSessionClick: (workout: Workout, timestamp: Instant) -> Unit,
+    onAddSessionClick: (workout: WorkoutWithLatestTimestamp, timestamp: Instant) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -798,8 +797,8 @@ fun MonthPicker(
 
 @Composable
 fun CalendarFooter(
-    gymWorkouts: List<Workout>,
-    cardioWorkouts: List<Workout>,
+    gymWorkouts: List<WorkoutWithLatestTimestamp>,
+    cardioWorkouts: List<WorkoutWithLatestTimestamp>,
     workoutSessions: List<WorkoutSession>,
     addingSessions: Boolean,
     addingSessionsEnabled: Boolean,
@@ -863,7 +862,7 @@ fun CalendarFooter(
 
 @Composable
 fun WorkoutLegendsRow(
-    workouts: List<Workout>,
+    workouts: List<WorkoutWithLatestTimestamp>,
     sessionsByWorkoutId: Map<Int, List<WorkoutSession>>,
     modifier: Modifier = Modifier
 ) {
@@ -890,7 +889,7 @@ fun WorkoutLegendsRow(
 
 @Composable
 fun WorkoutLegend(
-    workout: Workout,
+    workout: WorkoutWithLatestTimestamp,
     sessionsAmount: Int,
     highlightColor: Color,
     modifier: Modifier = Modifier
@@ -978,7 +977,7 @@ private fun Day(
 
 @Composable
 private fun PieChartCard(
-    workouts: List<Workout>,
+    workouts: List<WorkoutWithLatestTimestamp>,
     workoutSessions: List<WorkoutSession>,
     modifier: Modifier = Modifier
 ) {
@@ -1063,9 +1062,10 @@ private fun StatsScreenForPreview() {
                 "This is a very long name that can overflow"
             else
                 "Gym ${it + 1}"
-        Workout(
+        WorkoutWithLatestTimestamp(
             id = it,
-            name = name
+            name = name,
+            latestTimestamp = Instant.now()
         )
     }
     val cardioWorkouts = List(5) {
@@ -1074,9 +1074,10 @@ private fun StatsScreenForPreview() {
                 "This is a very long name that can overflow"
             else
                 "Cardio ${it + 1}"
-        Workout(
+        WorkoutWithLatestTimestamp(
             id = it + MAX_GYM_WORKOUTS,
-            name = name
+            name = name,
+            latestTimestamp = Instant.now()
         )
     }
     val allWorkouts = gymWorkouts + cardioWorkouts

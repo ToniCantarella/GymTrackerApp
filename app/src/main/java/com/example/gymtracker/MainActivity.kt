@@ -267,24 +267,7 @@ fun GymTrackerApp(
                                 navigate(Route.CardioSession(id))
                             }*/
                         },
-                        onAddSessionNavigate = { workout, timestamp ->
-
-                            // TODO
-                            /*if (workout.type == WorkoutType.GYM) {
-                                navigate(
-                                    Route.GymWorkout(
-                                        workout.id,
-                                        timestamp.toString()
-                                    )
-                                )
-                            } else {
-                                navigate(
-                                    Route.CardioItem(
-                                        workout.id,
-                                        timestamp.toString()
-                                    )
-                                )
-                            }*/
+                        onAddSessionNavigate = {_, type ->
                         },
                         onWorkoutStatsNavigate = {
                             // TODO

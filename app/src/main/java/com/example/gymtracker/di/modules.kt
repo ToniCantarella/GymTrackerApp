@@ -6,14 +6,20 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
-import com.example.gymtracker.repository.CardioRepository
-import com.example.gymtracker.repository.CardioRepositoryImpl
-import com.example.gymtracker.repository.GymRepository
-import com.example.gymtracker.repository.GymRepositoryImpl
-import com.example.gymtracker.repository.StatRepository
-import com.example.gymtracker.repository.StatRepositoryImpl
-import com.example.gymtracker.repository.WorkoutRepository
-import com.example.gymtracker.repository.WorkoutRepositoryImpl
+import com.example.gymtracker.repository.AppRepository
+import com.example.gymtracker.repository.AppRepositoryImpl
+import com.example.gymtracker.repository.cardio.CardioSessionRepository
+import com.example.gymtracker.repository.cardio.CardioSessionRepositoryImpl
+import com.example.gymtracker.repository.cardio.CardioStatsRepository
+import com.example.gymtracker.repository.cardio.CardioStatsRepositoryImpl
+import com.example.gymtracker.repository.cardio.CardioWorkoutRepository
+import com.example.gymtracker.repository.cardio.CardioWorkoutRepositoryImpl
+import com.example.gymtracker.repository.gym.GymSessionRepository
+import com.example.gymtracker.repository.gym.GymSessionRepositoryImpl
+import com.example.gymtracker.repository.gym.GymStatsRepository
+import com.example.gymtracker.repository.gym.GymStatsRepositoryImpl
+import com.example.gymtracker.repository.gym.GymWorkoutRepository
+import com.example.gymtracker.repository.gym.GymWorkoutRepositoryImpl
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioViewModel
@@ -49,51 +55,63 @@ val databaseModule = module {
             .build()
     }
 
-    single { get<GymDatabase>().gymWorkoutPlanDao() }
-    single { get<GymDatabase>().cardioWorkoutPlanDao() }
+    single { get<GymDatabase>().gymWorkoutDao() }
+    single { get<GymDatabase>().cardioWorkoutDao() }
     single { get<GymDatabase>().exerciseDao() }
     single { get<GymDatabase>().setDao() }
     single { get<GymDatabase>().setSessionDao() }
     single { get<GymDatabase>().gymSessionDao() }
     single { get<GymDatabase>().cardioDao() }
     single { get<GymDatabase>().cardioSessionDao() }
+}
 
-    single<WorkoutRepository> {
-        WorkoutRepositoryImpl(
-            gymWorkoutDao = get(),
-            cardioWorkoutDao = get(),
-            gymSessionDao = get(),
-            cardioMetricsDao = get(),
-            cardioSessionDao = get()
+val repositoryModule = module {
+    single<AppRepository> { AppRepositoryImpl(get()) }
+
+    single<GymWorkoutRepository> {
+        GymWorkoutRepositoryImpl(
+            get(),
+            get(),
+            get(),
+            get()
         )
     }
-    single<GymRepository> {
-        GymRepositoryImpl(
-            workoutDao = get(),
-            exerciseDao = get(),
-            setDao = get(),
-            setSessionDao = get(),
-            gymSessionDao = get()
+    single<GymSessionRepository> {
+        GymSessionRepositoryImpl(
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
         )
     }
-    single<CardioRepository> {
-        CardioRepositoryImpl(
-            cardioWorkoutDao = get(),
-            cardioMetricsDao = get(),
-            cardioSessionDao = get()
+    single<GymStatsRepository> {
+        GymStatsRepositoryImpl(
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
         )
     }
-    single<StatRepository> {
-        StatRepositoryImpl(
-            db = get(),
-            gymWorkoutDao = get(),
-            cardioWorkoutDao = get(),
-            exerciseDao = get(),
-            setDao = get(),
-            setSessionDao = get(),
-            gymSessionDao = get(),
-            cardioMetricsDao = get(),
-            cardioSessionDao = get()
+
+    single<CardioWorkoutRepository> {
+        CardioWorkoutRepositoryImpl(
+            get(),
+            get(),
+            get()
+        )
+    }
+    single<CardioSessionRepository> {
+        CardioSessionRepositoryImpl(
+            get(),
+            get()
+        )
+    }
+    single<CardioStatsRepository> {
+        CardioStatsRepositoryImpl(
+            get(),
+            get()
         )
     }
 }

@@ -1,10 +1,9 @@
 package com.example.gymtracker.repository.cardio
 
-import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
-import com.example.gymtracker.repository.WorkoutSession
+import com.example.gymtracker.ui.entity.WorkoutSession
 import com.example.gymtracker.ui.entity.cardio.CardioMetrics
 import com.example.gymtracker.ui.entity.cardio.DistanceWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.DurationWithTimestamp
@@ -21,11 +20,10 @@ interface CardioSessionRepository {
 
 class CardioSessionRepositoryImpl(
     private val sessionDao: CardioSessionDao,
-    private val workoutDao: CardioWorkoutDao,
-    private val metricsDao: CardioMetricsDao
+    private val workoutDao: CardioWorkoutDao
 ) : CardioSessionRepository {
     override suspend fun getAllSessions(): List<WorkoutSession> {
-        val sessions  = sessionDao.getAllSessions()
+        val sessions = sessionDao.getAllSessions()
         return sessions.mapNotNull { session ->
             if (session != null) {
                 WorkoutSession(
@@ -41,7 +39,7 @@ class CardioSessionRepositoryImpl(
         start: Instant,
         end: Instant
     ): List<WorkoutSession> {
-        val sessions =  sessionDao.getSessionsForTimespan(start, end)
+        val sessions = sessionDao.getSessionsForTimespan(start, end)
 
         return sessions.mapNotNull { session ->
             if (session != null) {

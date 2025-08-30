@@ -2,9 +2,12 @@ package com.example.gymtracker.ui.stats.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.repository.Workout
-import com.example.gymtracker.repository.WorkoutRepository
-import com.example.gymtracker.repository.WorkoutSession
+import com.example.gymtracker.repository.cardio.CardioSessionRepository
+import com.example.gymtracker.repository.cardio.CardioWorkoutRepository
+import com.example.gymtracker.repository.gym.GymSessionRepository
+import com.example.gymtracker.repository.gym.GymWorkoutRepository
+import com.example.gymtracker.ui.entity.WorkoutSession
+import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,8 +25,8 @@ fun firstDayOfMonthInstant(zoneId: ZoneId = ZoneId.systemDefault()): Instant {
 
 data class StatsOverviewUiState(
     val loading: Boolean = true,
-    val gymWorkouts: List<Workout> = emptyList(),
-    val cardioWorkouts: List<Workout> = emptyList(),
+    val gymWorkouts: List<WorkoutWithLatestTimestamp> = emptyList(),
+    val cardioWorkouts: List<WorkoutWithLatestTimestamp> = emptyList(),
     val gymSessions: List<WorkoutSession> = emptyList(),
     val cardioSessions: List<WorkoutSession> = emptyList(),
     val workoutSessionsBetween: List<WorkoutSession> = emptyList(),
@@ -32,7 +35,10 @@ data class StatsOverviewUiState(
 )
 
 class StatsOverviewViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val gymWorkoutRepository: GymWorkoutRepository,
+    private val cardioWorkoutRepository: CardioWorkoutRepository,
+    private val gymSessionRepository: GymSessionRepository,
+    private val cardioSessionRepository: CardioSessionRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StatsOverviewUiState())
     val uiState = _uiState.asStateFlow()
@@ -63,8 +69,8 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkouts() {
-        val gymWorkouts = workoutRepository.getGymWorkouts()
-        val cardioWorkouts = workoutRepository.getCardioWorkouts()
+        val gymWorkouts = gymWorkoutRepository.getAllWorkouts()
+        val cardioWorkouts = cardioWorkoutRepository.getAllWorkouts()
         _uiState.update {
             it.copy(
                 gymWorkouts = gymWorkouts,
@@ -74,8 +80,8 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkoutSessions() {
-        val gymSessions = workoutRepository.getGymSessions()
-        val cardioSessions = workoutRepository.getCardioSessions()
+        val gymSessions = gymSessionRepository.getAllSessions()
+        val cardioSessions = cardioSessionRepository.getAllSessions()
         _uiState.update {
             it.copy(
                 gymSessions = gymSessions,
@@ -85,13 +91,17 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchWorkoutSessionsBetweenDates(startDate: Instant, endDate: Instant) {
-        val sessions = workoutRepository.getWorkoutSessionsBetween(
+        val gymSessions = gymSessionRepository.getSessionsForTimespan(
+            start = startDate,
+            end = endDate
+        )
+        val cardioSessions = cardioSessionRepository.getSessionsForTimespan(
             start = startDate,
             end = endDate
         )
         _uiState.update {
             it.copy(
-                workoutSessionsBetween = sessions
+                workoutSessionsBetween = gymSessions + cardioSessions
             )
         }
     }

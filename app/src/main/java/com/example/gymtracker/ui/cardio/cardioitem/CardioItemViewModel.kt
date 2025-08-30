@@ -4,7 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.repository.CardioRepository
+import com.example.gymtracker.repository.cardio.CardioSessionRepository
+import com.example.gymtracker.repository.cardio.CardioWorkoutRepository
+import com.example.gymtracker.ui.entity.cardio.CardioMetrics
+import com.example.gymtracker.ui.entity.cardio.DistanceWithTimestamp
+import com.example.gymtracker.ui.entity.cardio.DurationWithTimestamp
+import com.example.gymtracker.ui.entity.cardio.StepsWithTimestamp
+import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,16 +21,17 @@ import java.time.Instant
 
 data class CardioItemUiState(
     val loading: Boolean = true,
-    val previousCardio: Cardio? = null,
+    val previousCardio: WorkoutWithMetrics? = null,
     val cardioId: Int = 0,
-    val cardio: Cardio = Cardio.emptyCardio(),
-    val initialCardio: Cardio = Cardio.emptyCardio(),
+    val cardio: WorkoutWithMetrics? = null,
+    val initialCardio: WorkoutWithMetrics? = null,
     val selectedTimestamp: Instant? = null
 )
 
 class CardioItemViewModel(
     savedStateHandle: SavedStateHandle,
-    private val cardioRepository: CardioRepository
+    private val workoutRepository: CardioWorkoutRepository,
+    private val sessionRepository: CardioSessionRepository
 ) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.CardioItem>()
 
@@ -33,8 +40,8 @@ class CardioItemViewModel(
 
     init {
         viewModelScope.launch {
-            val previousCardio = cardioRepository.getLatestCardio(navParams.id)
-            val cardio = uiState.value.cardio.copy(name = previousCardio?.name ?: "")
+            val previousCardio = workoutRepository.getLatestWorkoutWithMetrics(navParams.id)
+            val cardio = uiState.value.cardio?.copy(name = previousCardio?.name ?: "")
             val selectedTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
             _uiState.update {
@@ -53,7 +60,7 @@ class CardioItemViewModel(
     fun onChangeName(name: String) {
         _uiState.update {
             it.copy(
-                cardio = it.cardio.copy(name = name)
+                cardio = it.cardio?.copy(name = name)
             )
         }
     }
@@ -61,7 +68,12 @@ class CardioItemViewModel(
     fun onStepsChange(steps: Int) {
         _uiState.update {
             it.copy(
-                cardio = it.cardio.copy(steps = steps)
+                cardio = it.cardio?.copy(
+                    steps = StepsWithTimestamp(
+                        value = steps,
+                        timestamp = uiState.value.selectedTimestamp
+                    )
+                )
             )
         }
     }
@@ -69,7 +81,12 @@ class CardioItemViewModel(
     fun onDistanceChange(distance: Double) {
         _uiState.update {
             it.copy(
-                cardio = it.cardio.copy(distance = distance)
+                cardio = it.cardio?.copy(
+                    distance = DistanceWithTimestamp(
+                        value = distance,
+                        timestamp = uiState.value.selectedTimestamp
+                    )
+                )
             )
         }
     }
@@ -77,7 +94,12 @@ class CardioItemViewModel(
     fun onDurationChange(duration: Duration) {
         _uiState.update {
             it.copy(
-                cardio = it.cardio.copy(duration = duration)
+                cardio = it.cardio?.copy(
+                    duration = DurationWithTimestamp(
+                        value = duration,
+                        timestamp = uiState.value.selectedTimestamp
+                    )
+                )
             )
         }
     }
@@ -85,14 +107,13 @@ class CardioItemViewModel(
     fun onFinishPressed(onFinish: () -> Unit) {
         viewModelScope.launch {
             val cardio = uiState.value.cardio
-            cardioRepository.markCardioSessionDone(
-                id = navParams.id,
-                cardio = cardio.copy(
-                    steps = if (cardio.steps == 0) null else cardio.steps,
-                    distance = if (cardio.distance == 0.0) null else cardio.distance,
-                    duration = if (cardio.duration == Duration.ZERO) null else cardio.duration
-                ),
-                timestamp = uiState.value.selectedTimestamp
+            sessionRepository.markSessionDone(
+                workoutId = navParams.id,
+                metrics = CardioMetrics(
+                    steps = if (cardio?.steps?.value == 0) null else cardio?.steps?.value,
+                    distance = if (cardio?.distance?.value == 0.0) null else cardio?.distance?.value,
+                    duration = if (cardio?.duration?.value == Duration.ZERO) null else cardio?.duration?.value
+                )
             )
             onFinish()
         }

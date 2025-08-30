@@ -7,5 +7,5 @@ data class CardioMetrics(
     val steps: Int?,
     val distance: Double?,
     val duration: Duration?,
-    val timestamp: Instant?
+    val timestamp: Instant? = null
 )

@@ -40,8 +40,8 @@ import java.util.UUID
 )
 @TypeConverters(Converters::class)
 abstract class GymDatabase : RoomDatabase() {
-    abstract fun gymWorkoutPlanDao(): GymWorkoutDao
-    abstract fun cardioWorkoutPlanDao(): CardioWorkoutDao
+    abstract fun gymWorkoutDao(): GymWorkoutDao
+    abstract fun cardioWorkoutDao(): CardioWorkoutDao
     abstract fun exerciseDao(): ExerciseDao
     abstract fun setDao(): SetDao
     abstract fun setSessionDao(): SetSessionDao

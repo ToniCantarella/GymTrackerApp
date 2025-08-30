@@ -7,7 +7,7 @@ import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
-import com.example.gymtracker.repository.WorkoutSession
+import com.example.gymtracker.ui.entity.WorkoutSession
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
