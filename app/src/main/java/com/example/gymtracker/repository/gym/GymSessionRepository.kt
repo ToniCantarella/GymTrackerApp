@@ -10,6 +10,7 @@ import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import com.example.gymtracker.repository.WorkoutSession
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
 import java.time.Instant
 
 interface GymSessionRepository {
