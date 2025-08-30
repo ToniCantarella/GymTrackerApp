@@ -35,7 +35,7 @@ interface GymRepository {
     suspend fun addGymWorkoutWithExercises(workoutName: String, exercises: List<Exercise>)
     suspend fun getGymWorkoutPlans(): List<WorkoutWithLatestTimestamp>
     suspend fun getLatestGymWorkoutWithExercises(id: Int): SplitWithExercises?
-    suspend fun getSplitBySession(sessionId: Int): SplitWithExercises
+    suspend fun getSplitBySession(sessionId: Int): SplitWithExercises?
     suspend fun deleteGymWorkoutPlan(splitId: Int)
     suspend fun markGymSessionDone(
         workoutId: Int,
@@ -56,7 +56,7 @@ class GymRepositoryImpl(
     override suspend fun addGymWorkoutWithExercises(workoutName: String, exercises: List<Exercise>) {
         val workoutId = workoutDao.insert(
             GymWorkoutEntity(
-                name = splitName.trim()
+                name = workoutName.trim()
             )
         ).toInt()
 

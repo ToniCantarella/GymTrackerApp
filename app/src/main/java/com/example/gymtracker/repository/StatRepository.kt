@@ -48,8 +48,8 @@ data class CardioStats(
 )
 
 interface StatRepository {
-    suspend fun getGymWorkoutStats(id: Int): GymWorkoutStats
-    suspend fun getCardioStats(id: Int): CardioStats
+    suspend fun getGymWorkoutStats(id: Int): GymWorkoutStats?
+    suspend fun getCardioStats(id: Int): CardioStats?
     suspend fun deleteAllData()
 }
 
@@ -65,8 +65,8 @@ class StatRepositoryImpl(
     private val cardioSessionDao: CardioSessionDao
 ): StatRepository {
 
-    override suspend fun getGymWorkoutStats(id: Int): GymWorkoutStats {
-        val workout = workoutDao.getById(id)
+    override suspend fun getGymWorkoutStats(id: Int): GymWorkoutStats? {
+        val workout = gymWorkoutDao.getById(id)
         if (workout == null) return null
         val exercises = exerciseDao.getExercisesByWorkoutId(workout.id)
         val gymSessions = gymSessionDao.getByWorkoutId(workout.id)

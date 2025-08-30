@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.GymWorkoutStats
+import com.example.gymtracker.repository.GymWorkoutStats
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.utility.UnitUtil
