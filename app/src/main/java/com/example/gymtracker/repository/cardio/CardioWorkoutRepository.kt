@@ -1,8 +1,9 @@
-package com.example.gymtracker.repository
+package com.example.gymtracker.repository.cardio
 
 import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
+import com.example.gymtracker.repository.WorkoutWithLatestTimestamp
 
 interface CardioWorkoutRepository {
     suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
