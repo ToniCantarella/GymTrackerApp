@@ -7,9 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.database.repository.GymRepository
-import com.example.gymtracker.database.repository.SplitStats
-import com.example.gymtracker.database.repository.StatRepository
+import com.example.gymtracker.repository.GymRepository
+import com.example.gymtracker.repository.SplitStats
+import com.example.gymtracker.repository.StatRepository
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.info.SHOW_FINISH_WORKOUT_DIALOG
 import com.example.gymtracker.ui.navigation.Route

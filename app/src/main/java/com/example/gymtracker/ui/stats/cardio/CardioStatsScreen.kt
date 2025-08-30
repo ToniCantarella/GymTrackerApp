@@ -21,7 +21,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.CardioStats
+import com.example.gymtracker.repository.CardioStats
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.utility.UnitUtil

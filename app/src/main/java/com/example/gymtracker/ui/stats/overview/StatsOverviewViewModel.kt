@@ -2,9 +2,9 @@ package com.example.gymtracker.ui.stats.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.Workout
-import com.example.gymtracker.database.repository.WorkoutRepository
-import com.example.gymtracker.database.repository.WorkoutSession
+import com.example.gymtracker.repository.Workout
+import com.example.gymtracker.repository.WorkoutRepository
+import com.example.gymtracker.repository.WorkoutSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

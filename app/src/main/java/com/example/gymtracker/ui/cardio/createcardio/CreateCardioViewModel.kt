@@ -2,7 +2,7 @@ package com.example.gymtracker.ui.cardio.createcardio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.CardioRepository
+import com.example.gymtracker.repository.CardioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

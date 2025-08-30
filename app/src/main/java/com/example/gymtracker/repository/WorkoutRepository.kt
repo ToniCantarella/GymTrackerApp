@@ -1,4 +1,4 @@
-package com.example.gymtracker.database.repository
+package com.example.gymtracker.repository
 
 import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
@@ -6,6 +6,7 @@ import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import java.time.Instant
+import kotlin.collections.get
 
 data class Workout(
     val id: Int,

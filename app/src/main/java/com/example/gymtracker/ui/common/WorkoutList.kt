@@ -38,7 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
+import com.example.gymtracker.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.toDateString
 import kotlinx.coroutines.delay

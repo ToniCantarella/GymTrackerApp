@@ -1,4 +1,4 @@
-package com.example.gymtracker.database.repository
+package com.example.gymtracker.repository
 
 import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao

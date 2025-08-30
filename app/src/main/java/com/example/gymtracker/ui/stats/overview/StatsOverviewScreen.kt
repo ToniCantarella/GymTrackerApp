@@ -80,9 +80,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
-import com.example.gymtracker.database.repository.Workout
-import com.example.gymtracker.database.repository.WorkoutSession
-import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
+import com.example.gymtracker.repository.Workout
+import com.example.gymtracker.repository.WorkoutSession
+import com.example.gymtracker.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
