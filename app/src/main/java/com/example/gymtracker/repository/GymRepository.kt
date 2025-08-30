@@ -10,6 +10,8 @@ import com.example.gymtracker.database.entity.gym.GymSessionEntity
 import com.example.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
+import com.example.gymtracker.repository.gym.WorkoutWithExercises
+import com.example.gymtracker.repository.gym.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import com.example.gymtracker.utility.UnitUtil
@@ -17,25 +19,13 @@ import com.example.gymtracker.utility.UnitUtil.roundToDisplay
 import com.example.gymtracker.utility.WeightUnit
 import java.time.Instant
 
-data class SplitWithExercises(
-    val id: Int,
-    val name: String,
-    val timestamp: Instant?,
-    val exercises: List<Exercise>
-)
 
-data class WorkoutWithLatestTimestamp(
-    val id: Int,
-    val name: String,
-    val latestTimestamp: Instant?,
-    val selected: Boolean = false
-)
 
 interface GymRepository {
     suspend fun addGymWorkoutWithExercises(workoutName: String, exercises: List<Exercise>)
     suspend fun getGymWorkoutPlans(): List<WorkoutWithLatestTimestamp>
-    suspend fun getLatestGymWorkoutWithExercises(id: Int): SplitWithExercises?
-    suspend fun getSplitBySession(sessionId: Int): SplitWithExercises?
+    suspend fun getLatestGymWorkoutWithExercises(id: Int): WorkoutWithExercises?
+    suspend fun getSplitBySession(sessionId: Int): WorkoutWithExercises?
     suspend fun deleteGymWorkoutPlan(splitId: Int)
     suspend fun markGymSessionDone(
         workoutId: Int,
@@ -97,7 +87,7 @@ class GymRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestGymWorkoutWithExercises(id: Int): SplitWithExercises? {
+    override suspend fun getLatestGymWorkoutWithExercises(id: Int): WorkoutWithExercises? {
         val workout = workoutDao.getById(id)
         val timestamp = gymSessionDao.getLastSession(id)?.timestamp
 
@@ -119,7 +109,7 @@ class GymRepositoryImpl(
             )
         }
 
-        return SplitWithExercises(
+        return WorkoutWithExercises(
             id = id,
             name = workout?.name ?: "",
             timestamp = timestamp,
@@ -129,7 +119,7 @@ class GymRepositoryImpl(
 
     override suspend fun getSplitBySession(
         sessionId: Int
-    ): SplitWithExercises? {
+    ): WorkoutWithExercises? {
         val gymSession = gymSessionDao.getById(sessionId)
         val split = workoutDao.getById(gymSession.workoutId)
         if (split == null) {
@@ -138,7 +128,7 @@ class GymRepositoryImpl(
         val exercises = exerciseDao.getExercisesByWorkoutId(split.id)
         val setSession = setSessionDao.getSetsForSession(gymSession.id)
 
-        return SplitWithExercises(
+        return WorkoutWithExercises(
             id = split.id,
             name = split.name,
             timestamp = gymSession.timestamp,
