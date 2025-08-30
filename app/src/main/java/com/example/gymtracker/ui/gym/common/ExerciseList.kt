@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.gym.entity.Exercise
+import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.utility.MAX_EXERCISES
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

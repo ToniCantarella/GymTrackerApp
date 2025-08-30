@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.gym.entity
+package com.example.gymtracker.ui.entity.gym
 
 import java.util.UUID
 

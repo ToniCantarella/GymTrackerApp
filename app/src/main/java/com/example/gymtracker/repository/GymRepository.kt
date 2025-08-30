@@ -12,8 +12,8 @@ import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import com.example.gymtracker.repository.gym.WorkoutWithExercises
 import com.example.gymtracker.repository.gym.WorkoutWithLatestTimestamp
-import com.example.gymtracker.ui.gym.entity.Exercise
-import com.example.gymtracker.ui.gym.entity.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.Exercise
+import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.UnitUtil.roundToDisplay
 import com.example.gymtracker.utility.WeightUnit

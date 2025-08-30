@@ -10,7 +10,7 @@ import androidx.navigation.toRoute
 import com.example.gymtracker.repository.GymRepository
 import com.example.gymtracker.repository.GymWorkoutStats
 import com.example.gymtracker.repository.StatRepository
-import com.example.gymtracker.ui.gym.entity.Exercise
+import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.info.SHOW_FINISH_WORKOUT_DIALOG
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.utility.GymWorkoutUtil

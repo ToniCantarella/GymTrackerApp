@@ -39,9 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.UnsavedChangesDialog
+import com.example.gymtracker.ui.entity.gym.Exercise
+import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.gym.common.ExerciseListEdit
-import com.example.gymtracker.ui.gym.entity.Exercise
-import com.example.gymtracker.ui.gym.entity.WorkoutSet
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField

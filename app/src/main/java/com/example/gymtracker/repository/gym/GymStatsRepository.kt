@@ -5,9 +5,9 @@ import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
-import com.example.gymtracker.repository.ExerciseWithHistory
-import com.example.gymtracker.repository.GymWorkoutStats
-import com.example.gymtracker.repository.SetData
+import com.example.gymtracker.ui.entity.gym.ExerciseWithHistory
+import com.example.gymtracker.ui.entity.gym.GymWorkoutStats
+import com.example.gymtracker.ui.entity.gym.SetStats
 
 interface GymStatsRepository {
     suspend fun getWorkoutStats(id: Int): GymWorkoutStats?
@@ -59,7 +59,7 @@ class GymStatsRepositoryImpl(
                         if (minWeight != null) lastKnownMinWeight = minWeight
                         if (maxWeight != null) lastKnownMaxWeight = maxWeight
 
-                        SetData(
+                        SetStats(
                             minWeight = finalMinWeight,
                             maxWeight = finalMaxWeight,
                             minRepetitions = minRepetitions,

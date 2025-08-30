@@ -7,30 +7,20 @@ import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
-import com.example.gymtracker.ui.gym.entity.Exercise
-import com.example.gymtracker.ui.gym.entity.WorkoutSet
-import java.time.Instant
-
-data class WorkoutWithExercises(
-    val id: Int,
-    val name: String,
-    val timestamp: Instant?,
-    val exercises: List<Exercise>
-)
-
-data class WorkoutWithLatestTimestamp(
-    val id: Int,
-    val name: String,
-    val latestTimestamp: Instant?,
-    val selected: Boolean = false
-)
+import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
+import com.example.gymtracker.ui.entity.gym.Exercise
+import com.example.gymtracker.ui.entity.gym.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
+import com.example.gymtracker.utility.UnitUtil
+import com.example.gymtracker.utility.UnitUtil.roundToDisplay
+import com.example.gymtracker.utility.WeightUnit
 
 interface GymWorkoutRepository {
-    suspend fun getGymWorkouts(): List<WorkoutWithLatestTimestamp>
-    suspend fun addGymWorkout(workoutName: String, exercises: List<Exercise>)
-    suspend fun updateGymWorkout(workoutId: Int, workoutName: String, exercises: List<Exercise>)
-    suspend fun getLatestWorkoutWithExercises(id: Int): WorkoutWithExercises?
-    suspend fun deleteGymWorkout(splitId: Int)
+    suspend fun getAllWorkouts(): List<WorkoutWithLatestTimestamp>
+    suspend fun addWorkout(workoutName: String, exercises: List<Exercise>)
+    suspend fun updateWorkout(workoutId: Int, workoutName: String, exercises: List<Exercise>)
+    suspend fun getLatestWorkoutWithExercises(workoutId: Int): WorkoutWithExercises?
+    suspend fun deleteWorkout(splitId: Int)
 }
 
 class GymWorkoutRepositoryImpl(
@@ -40,7 +30,7 @@ class GymWorkoutRepositoryImpl(
     private val setDao: SetDao,
 ) : GymWorkoutRepository {
 
-    override suspend fun getGymWorkouts(): List<WorkoutWithLatestTimestamp> {
+    override suspend fun getAllWorkouts(): List<WorkoutWithLatestTimestamp> {
         val workouts = workoutDao.getAll()
 
         return workouts.map {
@@ -54,36 +44,7 @@ class GymWorkoutRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestWorkoutWithExercises(id: Int): WorkoutWithExercises? {
-        val workout = workoutDao.getById(id)
-        val timestamp = sessionDao.getLastSession(id)?.timestamp
-
-        val exercises = exerciseDao.getExercisesByWorkoutId(id).map { exercise ->
-            val sets = setDao.getSetsForExercise(exercise.id)
-
-            Exercise(
-                uuid = exercise.uuid,
-                name = exercise.name,
-                description = exercise.description,
-                sets = sets.map { set ->
-                    WorkoutSet(
-                        uuid = set.uuid,
-                        weight = set.weight.convertWeightFromDatabase(),
-                        repetitions = set.repetitions
-                    )
-                }
-            )
-        }
-
-        return WorkoutWithExercises(
-            id = id,
-            name = workout?.name ?: "",
-            timestamp = timestamp,
-            exercises = exercises
-        )
-    }
-
-    override suspend fun addGymWorkout(workoutName: String, exercises: List<Exercise>) {
+    override suspend fun addWorkout(workoutName: String, exercises: List<Exercise>) {
         val workoutId = workoutDao.insert(
             GymWorkoutEntity(
                 name = workoutName.trim()
@@ -114,7 +75,7 @@ class GymWorkoutRepositoryImpl(
     }
 
     // TODO this tie to the save button
-    override suspend fun updateGymWorkout(
+    override suspend fun updateWorkout(
         workoutId: Int,
         workoutName: String,
         exercises: List<Exercise>
@@ -205,5 +166,48 @@ class GymWorkoutRepositoryImpl(
         }
     }
 
-    override suspend fun deleteGymWorkout(splitId: Int) = workoutDao.deleteById(splitId)
+    override suspend fun getLatestWorkoutWithExercises(workoutId: Int): WorkoutWithExercises? {
+        val workout = workoutDao.getById(workoutId)
+        val timestamp = sessionDao.getLastSession(workoutId)?.timestamp
+
+        val exercises = exerciseDao.getExercisesByWorkoutId(workoutId).map { exercise ->
+            val sets = setDao.getSetsForExercise(exercise.id)
+
+            Exercise(
+                uuid = exercise.uuid,
+                name = exercise.name,
+                description = exercise.description,
+                sets = sets.map { set ->
+                    WorkoutSet(
+                        uuid = set.uuid,
+                        weight = set.weight.convertWeightFromDatabase(),
+                        repetitions = set.repetitions
+                    )
+                }
+            )
+        }
+
+        return WorkoutWithExercises(
+            id = workoutId,
+            name = workout?.name ?: "",
+            timestamp = timestamp,
+            exercises = exercises
+        )
+    }
+
+    override suspend fun deleteWorkout(splitId: Int) {
+        workoutDao.deleteById(splitId)
+    }
+
+    private fun Double.convertWeightToDatabase(): Double =
+        if (UnitUtil.weightUnit == WeightUnit.KILOGRAM)
+            this
+        else
+            UnitUtil.lbToKg(this)
+
+    private fun Double.convertWeightFromDatabase(): Double =
+        if (UnitUtil.weightUnit == WeightUnit.KILOGRAM)
+            this
+        else
+            UnitUtil.kgToLb(this).roundToDisplay()
 }

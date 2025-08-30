@@ -8,8 +8,8 @@ import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import com.example.gymtracker.repository.WorkoutSession
-import com.example.gymtracker.ui.gym.entity.Exercise
-import com.example.gymtracker.ui.gym.entity.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.Exercise
+import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import java.time.Instant
 
 interface GymSessionRepository {

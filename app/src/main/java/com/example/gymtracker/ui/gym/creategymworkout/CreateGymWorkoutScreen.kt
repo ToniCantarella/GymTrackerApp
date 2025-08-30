@@ -14,8 +14,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.UnsavedChangesDialog
+import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.gym.common.ExerciseListCreate
-import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField

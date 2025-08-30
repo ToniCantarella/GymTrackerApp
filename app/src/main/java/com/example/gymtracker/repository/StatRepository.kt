@@ -9,30 +9,14 @@ import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
+import com.example.gymtracker.ui.entity.gym.ExerciseWithHistory
+import com.example.gymtracker.ui.entity.gym.GymWorkoutStats
+import com.example.gymtracker.ui.entity.gym.SetStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
-
-data class SetData(
-    val minWeight: Double,
-    val maxWeight: Double,
-    val minRepetitions: Int,
-    val maxRepetitions: Int,
-    val timestamp: Instant
-)
-
-data class ExerciseWithHistory(
-    val name: String,
-    val setHistory: List<SetData>
-)
-
-data class GymWorkoutStats(
-    val id: Int,
-    val name: String,
-    val exercises: List<ExerciseWithHistory>
-)
 
 data class CardioData(
     val steps: Int?,
@@ -92,8 +76,10 @@ class StatRepositoryImpl(
 
                         val minWeight = setSessionForExercise.minByOrNull { it.weight }?.weight
                         val maxWeight = setSessionForExercise.maxByOrNull { it.weight }?.weight
-                        val minRepetitions = setSessionForExercise.minByOrNull { it.repetitions }?.repetitions ?: 0
-                        val maxRepetitions = setSessionForExercise.maxByOrNull { it.repetitions }?.repetitions ?: 0
+                        val minRepetitions =
+                            setSessionForExercise.minByOrNull { it.repetitions }?.repetitions ?: 0
+                        val maxRepetitions =
+                            setSessionForExercise.maxByOrNull { it.repetitions }?.repetitions ?: 0
 
                         val finalMinWeight = minWeight ?: lastKnownMinWeight
                         val finalMaxWeight = maxWeight ?: lastKnownMaxWeight
@@ -101,7 +87,7 @@ class StatRepositoryImpl(
                         if (minWeight != null) lastKnownMinWeight = minWeight
                         if (maxWeight != null) lastKnownMaxWeight = maxWeight
 
-                        SetData(
+                        SetStats(
                             minWeight = finalMinWeight,
                             maxWeight = finalMaxWeight,
                             minRepetitions = minRepetitions,

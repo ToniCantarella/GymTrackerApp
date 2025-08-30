@@ -1,7 +1,7 @@
 package com.example.gymtracker.utility
 
-import com.example.gymtracker.ui.gym.entity.Exercise
-import com.example.gymtracker.ui.gym.entity.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.Exercise
+import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import java.util.UUID
 
 class GymWorkoutUtil {

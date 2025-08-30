@@ -27,7 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.NumericTextField
-import com.example.gymtracker.ui.gym.entity.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.utility.UnitUtil
 
 @Composable

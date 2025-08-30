@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.cardio.common.CardioContent
-import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.utility.toDateAndTimeString
 import org.koin.compose.viewmodel.koinViewModel

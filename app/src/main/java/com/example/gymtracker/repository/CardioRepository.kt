@@ -6,7 +6,6 @@ import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
-import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.utility.DistanceUnit
 import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.UnitUtil.roundToDisplay
