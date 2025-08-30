@@ -3,7 +3,7 @@ package com.example.gymtracker.database.repository
 import com.example.gymtracker.database.dao.cardio.CardioDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
-import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlanEntity
 import com.example.gymtracker.ui.cardio.entity.Cardio
@@ -35,7 +35,7 @@ class CardioRepositoryImpl(
         ).toInt()
 
         cardioDao.insert(
-            CardioEntity(
+            CardioMetricsEntity(
                 workoutId = workoutId
             )
         )
@@ -83,7 +83,7 @@ class CardioRepositoryImpl(
         sessionId: Int
     ): Cardio? {
         val session = cardioSessionDao.getById(sessionId)
-        val cardio = cardioDao.getById(session.cardioId)
+        val cardio = cardioDao.getById(session.workoutId)
         val workout = cardioWorkoutPlanDao.getById(cardio.workoutId)
 
         if(workout == null) return null
@@ -143,7 +143,7 @@ class CardioRepositoryImpl(
 
         cardioSessionDao.insert(
             CardioSessionEntity(
-                cardioId = currentCardio.id,
+                workoutId = currentCardio.id,
                 timestamp = timestamp ?: Instant.now(),
                 steps = cardio.steps,
                 distance = cardio.distance,

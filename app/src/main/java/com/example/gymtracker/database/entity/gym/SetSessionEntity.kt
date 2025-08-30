@@ -8,21 +8,32 @@ import kotlinx.serialization.Contextual
 import java.util.UUID
 
 @Entity(
-    tableName = "sets",
+    tableName = "set_sessions",
     foreignKeys = [
         ForeignKey(
-            entity = ExerciseEntity::class,
+            entity = SetEntity::class,
             parentColumns = ["id"],
-            childColumns = ["exerciseId"],
+            childColumns = ["setId"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = GymSessionEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["sessionId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("exerciseId")]
+    indices = [
+        Index("setId"),
+        Index("sessionId"),
+        Index(value = ["setId", "sessionId"])
+    ]
 )
-data class SetEntity(
+data class SetSessionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val exerciseId: Int,
+    val setId: Int,
+    val sessionId: Int,
     @Contextual
     val uuid: UUID,
     val weight: Double,

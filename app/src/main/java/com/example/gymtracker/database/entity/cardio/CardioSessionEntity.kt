@@ -8,7 +8,7 @@ import java.time.Duration
 import java.time.Instant
 
 @Entity(
-    tableName = "cardios",
+    tableName = "cardio_sessions",
     foreignKeys = [ForeignKey(
         entity = CardioWorkoutPlanEntity::class,
         parentColumns = ["id"],
@@ -16,35 +16,14 @@ import java.time.Instant
         onDelete = ForeignKey.CASCADE
     )],
     indices = [
-        Index("workoutId")
-    ]
-)
-data class CardioEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val workoutId: Int = 0,
-    val steps: Int? = null,
-    val distance: Double? = null,
-    val duration: Duration? = null
-)
-
-@Entity(
-    tableName = "cardio_sessions",
-    foreignKeys = [ForeignKey(
-        entity = CardioEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["cardioId"],
-        onDelete = ForeignKey.CASCADE
-    )],
-    indices = [
-        Index("cardioId"),
+        Index("workoutId"),
         Index("timestamp")
     ]
 )
 data class CardioSessionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val cardioId: Int,
+    val workoutId: Int,            // <- renamed
     val timestamp: Instant,
     val steps: Int? = null,
     val distance: Double? = null,

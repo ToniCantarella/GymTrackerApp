@@ -17,10 +17,10 @@ interface CardioSessionDao {
     @Query("SELECT * FROM cardio_sessions WHERE id = :id")
     suspend fun getById(id: Int): CardioSessionEntity
 
-    @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId ORDER BY timestamp ASC")
+    @Query("SELECT * FROM cardio_sessions WHERE workoutId = :cardioId ORDER BY timestamp ASC")
     suspend fun getAllSessionsForCardio(cardioId: Int): List<CardioSessionEntity?>
 
-    @Query("SELECT * FROM cardio_sessions WHERE cardioId = :cardioId ORDER BY timestamp DESC LIMIT 1")
+    @Query("SELECT * FROM cardio_sessions WHERE workoutId = :cardioId ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastSession(cardioId: Int): CardioSessionEntity?
 
     @Query("SELECT * FROM cardio_sessions WHERE timestamp BETWEEN :start AND :end")

@@ -72,7 +72,7 @@ class WorkoutRepositoryImpl(
         val cardioList = cardioDao.getAllCardio().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
-            val cardio = cardioList[session?.cardioId]
+            val cardio = cardioList[session?.workoutId]
             if (cardio != null && session != null) {
                 WorkoutSession(
                     id = session.id,
@@ -116,7 +116,7 @@ class WorkoutRepositoryImpl(
         val cardioList = cardioDao.getAllCardio().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
-            val cardio = cardioList[session?.cardioId]
+            val cardio = cardioList[session?.workoutId]
             if (cardio != null && session != null) {
                 WorkoutSession(
                     id = session.id,

@@ -7,6 +7,7 @@ import androidx.room.Room
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.database.MIGRATION_5_6
+import com.example.gymtracker.database.MIGRATION_6_7
 import com.example.gymtracker.database.repository.CardioRepository
 import com.example.gymtracker.database.repository.CardioRepositoryImpl
 import com.example.gymtracker.database.repository.GymRepository
@@ -48,6 +49,7 @@ val databaseModule = module {
             "gym-tracker-db"
         )
             .addMigrations(MIGRATION_5_6)
+            .addMigrations(MIGRATION_6_7)
             .build()
     }
 

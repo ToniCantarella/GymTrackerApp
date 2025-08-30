@@ -14,7 +14,7 @@ import com.example.gymtracker.database.dao.gym.GymSessionDao
 import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
-import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutPlanEntity
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
@@ -34,7 +34,7 @@ import java.util.UUID
         SetEntity::class,
         SetSessionEntity::class,
         GymSessionEntity::class,
-        CardioEntity::class,
+        CardioMetricsEntity::class,
         CardioSessionEntity::class
     ],
     version = 1
@@ -166,5 +166,60 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         db.execSQL("CREATE INDEX IF NOT EXISTS index_cardios_workoutId ON cardios(workoutId)")
 
         db.execSQL("DROP TABLE workouts")
+    }
+}
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // 1. Create new table
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS cardio_metrics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                workoutId INTEGER NOT NULL,
+                steps INTEGER,
+                distance REAL,
+                duration INTEGER,
+                FOREIGN KEY(workoutId) REFERENCES CardioWorkoutPlans(id) ON DELETE CASCADE
+            )
+        """)
+
+        // 2. Copy data
+        db.execSQL("""
+            INSERT INTO cardio_metrics (id, workoutId, steps, distance, duration)
+            SELECT id, workoutId, steps, distance, duration FROM cardios
+        """)
+
+        // 3. Drop old table
+        db.execSQL("DROP TABLE cardios")
+
+        // 4. Recreate index
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_cardio_metrics_workoutId ON cardio_metrics(workoutId)")
+
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS cardio_sessions_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                workoutId INTEGER NOT NULL,
+                timestamp INTEGER NOT NULL,
+                steps INTEGER,
+                distance REAL,
+                duration INTEGER,
+                FOREIGN KEY(workoutId) REFERENCES CardioWorkoutPlans(id) ON DELETE CASCADE
+            )
+        """.trimIndent())
+
+        // 2. Copy data, mapping cardioId -> workoutId
+        db.execSQL("""
+            INSERT INTO cardio_sessions_new (id, workoutId, timestamp, steps, distance, duration)
+            SELECT id, cardioId, timestamp, steps, distance, duration FROM cardio_sessions
+        """.trimIndent())
+
+        // 3. Drop old table and rename
+        db.execSQL("DROP TABLE cardio_sessions")
+        db.execSQL("ALTER TABLE cardio_sessions_new RENAME TO cardio_sessions")
+
+        // 4. Recreate indices
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_cardio_sessions_workoutId ON cardio_sessions(workoutId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_cardio_sessions_timestamp ON cardio_sessions(timestamp)")
+
     }
 }

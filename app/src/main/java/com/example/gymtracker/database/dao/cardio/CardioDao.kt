@@ -4,25 +4,25 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 
 @Dao
 interface CardioDao {
     @Insert
-    suspend fun insert(cardio: CardioEntity): Long
+    suspend fun insert(cardio: CardioMetricsEntity): Long
 
-    @Query("SELECT * FROM cardios WHERE id = :id")
-    suspend fun getById(id: Int): CardioEntity
+    @Query("SELECT * FROM cardio_metrics WHERE id = :id")
+    suspend fun getById(id: Int): CardioMetricsEntity
 
     @Update
-    suspend fun updateCardio(cardio: CardioEntity)
+    suspend fun updateCardio(cardio: CardioMetricsEntity)
 
-    @Query("SELECT * FROM cardios")
-    suspend fun getAllCardio(): List<CardioEntity>
+    @Query("SELECT * FROM cardio_metrics")
+    suspend fun getAllCardio(): List<CardioMetricsEntity>
 
-    @Query("SELECT * FROM cardios WHERE workoutId = :workoutId")
-    suspend fun getCardioByWorkoutId(workoutId: Int): CardioEntity
+    @Query("SELECT * FROM cardio_metrics WHERE workoutId = :workoutId")
+    suspend fun getCardioByWorkoutId(workoutId: Int): CardioMetricsEntity
 
-    @Query("DELETE FROM cardios WHERE id = :id")
+    @Query("DELETE FROM cardio_metrics WHERE id = :id")
     suspend fun deleteById(id: Int)
 }

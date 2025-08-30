@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "e8b85824dce84c283444331aa4ecf775",
+    "identityHash": "cf9184a1fb879c1afbbd72e146391e3f",
     "entities": [
       {
         "tableName": "GymWorkoutPlans",
@@ -349,7 +349,7 @@
         ]
       },
       {
-        "tableName": "cardios",
+        "tableName": "cardio_metrics",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workoutId` INTEGER NOT NULL, `steps` INTEGER, `distance` REAL, `duration` INTEGER, FOREIGN KEY(`workoutId`) REFERENCES `CardioWorkoutPlans`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
@@ -388,13 +388,13 @@
         },
         "indices": [
           {
-            "name": "index_cardios_workoutId",
+            "name": "index_cardio_metrics_workoutId",
             "unique": false,
             "columnNames": [
               "workoutId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_cardios_workoutId` ON `${TABLE_NAME}` (`workoutId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cardio_metrics_workoutId` ON `${TABLE_NAME}` (`workoutId`)"
           }
         ],
         "foreignKeys": [
@@ -413,7 +413,7 @@
       },
       {
         "tableName": "cardio_sessions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cardioId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `steps` INTEGER, `distance` REAL, `duration` INTEGER, FOREIGN KEY(`cardioId`) REFERENCES `cardios`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workoutId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `steps` INTEGER, `distance` REAL, `duration` INTEGER, FOREIGN KEY(`workoutId`) REFERENCES `CardioWorkoutPlans`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -422,8 +422,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "cardioId",
-            "columnName": "cardioId",
+            "fieldPath": "workoutId",
+            "columnName": "workoutId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -457,13 +457,13 @@
         },
         "indices": [
           {
-            "name": "index_cardio_sessions_cardioId",
+            "name": "index_cardio_sessions_workoutId",
             "unique": false,
             "columnNames": [
-              "cardioId"
+              "workoutId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_cardio_sessions_cardioId` ON `${TABLE_NAME}` (`cardioId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cardio_sessions_workoutId` ON `${TABLE_NAME}` (`workoutId`)"
           },
           {
             "name": "index_cardio_sessions_timestamp",
@@ -477,11 +477,11 @@
         ],
         "foreignKeys": [
           {
-            "table": "cardios",
+            "table": "CardioWorkoutPlans",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "cardioId"
+              "workoutId"
             ],
             "referencedColumns": [
               "id"
@@ -492,7 +492,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e8b85824dce84c283444331aa4ecf775')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf9184a1fb879c1afbbd72e146391e3f')"
     ]
   }
 }
