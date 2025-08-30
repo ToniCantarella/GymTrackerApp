@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.database.repository.CardioRepository
+import com.example.gymtracker.repository.CardioRepository
 import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,7 @@ class CardioItemViewModel(
     init {
         viewModelScope.launch {
             val previousCardio = cardioRepository.getLatestCardio(navParams.id)
-            val cardio = uiState.value.cardio.copy(name = previousCardio.name)
+            val cardio = uiState.value.cardio.copy(name = previousCardio?.name ?: "")
             val selectedTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
             _uiState.update {

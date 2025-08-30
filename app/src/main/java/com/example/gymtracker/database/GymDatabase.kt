@@ -4,18 +4,20 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.gymtracker.database.dao.WorkoutDao
-import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.dao.gym.ExerciseDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
+import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
-import com.example.gymtracker.database.entity.WorkoutEntity
-import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
+import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
+import com.example.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.example.gymtracker.database.entity.gym.SetEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
 import java.time.Duration
@@ -24,24 +26,27 @@ import java.util.UUID
 
 @Database(
     entities = [
-        WorkoutEntity::class,
+        GymWorkoutEntity::class,
+        CardioWorkoutEntity::class,
         ExerciseEntity::class,
         SetEntity::class,
         SetSessionEntity::class,
         GymSessionEntity::class,
-        CardioEntity::class,
+        CardioMetricsEntity::class,
         CardioSessionEntity::class
     ],
-    version = 1
+    version = 1,
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class GymDatabase : RoomDatabase() {
-    abstract fun workoutDao(): WorkoutDao
+    abstract fun gymWorkoutPlanDao(): GymWorkoutDao
+    abstract fun cardioWorkoutPlanDao(): CardioWorkoutDao
     abstract fun exerciseDao(): ExerciseDao
     abstract fun setDao(): SetDao
     abstract fun setSessionDao(): SetSessionDao
     abstract fun gymSessionDao(): GymSessionDao
-    abstract fun cardioDao(): CardioDao
+    abstract fun cardioDao(): CardioMetricsDao
     abstract fun cardioSessionDao(): CardioSessionDao
 }
 

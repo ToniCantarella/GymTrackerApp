@@ -6,14 +6,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
-import com.example.gymtracker.database.repository.CardioRepository
-import com.example.gymtracker.database.repository.CardioRepositoryImpl
-import com.example.gymtracker.database.repository.GymRepository
-import com.example.gymtracker.database.repository.GymRepositoryImpl
-import com.example.gymtracker.database.repository.StatRepository
-import com.example.gymtracker.database.repository.StatRepositoryImpl
-import com.example.gymtracker.database.repository.WorkoutRepository
-import com.example.gymtracker.database.repository.WorkoutRepositoryImpl
+import com.example.gymtracker.repository.CardioRepository
+import com.example.gymtracker.repository.CardioRepositoryImpl
+import com.example.gymtracker.repository.GymRepository
+import com.example.gymtracker.repository.GymRepositoryImpl
+import com.example.gymtracker.repository.StatRepository
+import com.example.gymtracker.repository.StatRepositoryImpl
+import com.example.gymtracker.repository.WorkoutRepository
+import com.example.gymtracker.repository.WorkoutRepositoryImpl
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioViewModel
@@ -49,7 +49,8 @@ val databaseModule = module {
             .build()
     }
 
-    single { get<GymDatabase>().workoutDao() }
+    single { get<GymDatabase>().gymWorkoutPlanDao() }
+    single { get<GymDatabase>().cardioWorkoutPlanDao() }
     single { get<GymDatabase>().exerciseDao() }
     single { get<GymDatabase>().setDao() }
     single { get<GymDatabase>().setSessionDao() }
@@ -59,9 +60,10 @@ val databaseModule = module {
 
     single<WorkoutRepository> {
         WorkoutRepositoryImpl(
-            workoutDao = get(),
+            gymWorkoutDao = get(),
+            cardioWorkoutDao = get(),
             gymSessionDao = get(),
-            cardioDao = get(),
+            cardioMetricsDao = get(),
             cardioSessionDao = get()
         )
     }
@@ -76,20 +78,21 @@ val databaseModule = module {
     }
     single<CardioRepository> {
         CardioRepositoryImpl(
-            workoutDao = get(),
-            cardioDao = get(),
+            cardioWorkoutDao = get(),
+            cardioMetricsDao = get(),
             cardioSessionDao = get()
         )
     }
     single<StatRepository> {
         StatRepositoryImpl(
             db = get(),
-            workoutDao = get(),
+            gymWorkoutDao = get(),
+            cardioWorkoutDao = get(),
             exerciseDao = get(),
             setDao = get(),
             setSessionDao = get(),
             gymSessionDao = get(),
-            cardioDao = get(),
+            cardioMetricsDao = get(),
             cardioSessionDao = get()
         )
     }

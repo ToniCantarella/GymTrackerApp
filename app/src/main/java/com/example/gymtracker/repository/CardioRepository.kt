@@ -1,12 +1,11 @@
-package com.example.gymtracker.database.repository
+package com.example.gymtracker.repository
 
-import com.example.gymtracker.database.dao.WorkoutDao
-import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
-import com.example.gymtracker.database.entity.WorkoutEntity
-import com.example.gymtracker.database.entity.WorkoutType
-import com.example.gymtracker.database.entity.cardio.CardioEntity
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
+import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
+import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
 import com.example.gymtracker.ui.cardio.entity.Cardio
 import com.example.gymtracker.utility.DistanceUnit
 import com.example.gymtracker.utility.UnitUtil
@@ -16,38 +15,37 @@ import java.time.Instant
 interface CardioRepository {
     suspend fun addCardio(name: String)
     suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp>
-    suspend fun getLatestCardio(id: Int): Cardio
-    suspend fun getCardioBySession(sessionId: Int): Cardio
+    suspend fun getLatestCardio(id: Int): Cardio?
+    suspend fun getCardioBySession(sessionId: Int): Cardio?
     suspend fun deleteCardio(cardioId: Int)
     suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant? = null)
 }
 
 class CardioRepositoryImpl(
-    private val workoutDao: WorkoutDao,
-    private val cardioDao: CardioDao,
+    private val cardioWorkoutDao: CardioWorkoutDao,
+    private val cardioMetricsDao: CardioMetricsDao,
     private val cardioSessionDao: CardioSessionDao
 ) : CardioRepository {
 
     override suspend fun addCardio(name: String) {
-        val workoutId = workoutDao.insert(
-            WorkoutEntity(
-                name = name.trim(),
-                type = WorkoutType.CARDIO
+        val workoutId = cardioWorkoutDao.insert(
+            CardioWorkoutEntity(
+                name = name.trim()
             )
         ).toInt()
 
-        cardioDao.insert(
-            CardioEntity(
+        cardioMetricsDao.insert(
+            CardioMetricsEntity(
                 workoutId = workoutId
             )
         )
     }
 
     override suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
-        val workouts = workoutDao.getAllCardioWorkouts()
+        val workouts = cardioWorkoutDao.getAll()
 
         return workouts.map {
-            val cardio = cardioDao.getCardioByWorkoutId(it.id)
+            val cardio = cardioMetricsDao.getCardioByWorkoutId(it.id)
             val session = cardioSessionDao.getLastSession(cardio.id)
 
             WorkoutWithLatestTimestamp(
@@ -58,9 +56,10 @@ class CardioRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestCardio(id: Int): Cardio {
-        val workout = workoutDao.getById(id)
-        val cardio = cardioDao.getCardioByWorkoutId(workout.id)
+    override suspend fun getLatestCardio(id: Int): Cardio? {
+        val workout = cardioWorkoutDao.getById(id)
+        if(workout == null) return null
+        val cardio = cardioMetricsDao.getCardioByWorkoutId(workout.id)
         val sessions = cardioSessionDao.getAllSessionsForCardio(cardio.id)
 
         val stepSession = sessions.firstOrNull { it?.steps != null }
@@ -82,10 +81,12 @@ class CardioRepositoryImpl(
 
     override suspend fun getCardioBySession(
         sessionId: Int
-    ): Cardio {
+    ): Cardio? {
         val session = cardioSessionDao.getById(sessionId)
-        val cardio = cardioDao.getById(session.cardioId)
-        val workout = workoutDao.getById(cardio.workoutId)
+        val cardio = cardioMetricsDao.getById(session.workoutId)
+        val workout = cardioWorkoutDao.getById(cardio.workoutId)
+
+        if(workout == null) return null
 
         return Cardio(
             name = workout.name,
@@ -99,22 +100,25 @@ class CardioRepositoryImpl(
         )
     }
 
-    override suspend fun deleteCardio(cardioId: Int) = workoutDao.deleteById(cardioId)
+    override suspend fun deleteCardio(cardioId: Int) = cardioWorkoutDao.deleteById(cardioId)
 
 
     override suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant?) {
-        val workout = workoutDao.getById(id)
+        val workout = cardioWorkoutDao.getById(id)
+
+        if(workout == null) return
+
         val newName = cardio.name.trim()
 
         if (newName.isNotEmpty() && workout.name != newName) {
-            workoutDao.updateWorkout(
+            cardioWorkoutDao.update(
                 workout.copy(
                     name = newName
                 )
             )
         }
 
-        val currentCardio = cardioDao.getCardioByWorkoutId(workout.id)
+        val currentCardio = cardioMetricsDao.getCardioByWorkoutId(workout.id)
 
         val distance =
             if (cardio.distance != null)
@@ -128,7 +132,7 @@ class CardioRepositoryImpl(
         val cardioUpdated = (stepsChanced || distanceChanced || durationChanced)
 
         if (cardioUpdated) {
-            cardioDao.updateCardio(
+            cardioMetricsDao.updateCardio(
                 currentCardio.copy(
                     steps = cardio.steps ?: currentCardio.steps,
                     distance = distance ?: currentCardio.distance,
@@ -139,7 +143,7 @@ class CardioRepositoryImpl(
 
         cardioSessionDao.insert(
             CardioSessionEntity(
-                cardioId = currentCardio.id,
+                workoutId = currentCardio.id,
                 timestamp = timestamp ?: Instant.now(),
                 steps = cardio.steps,
                 distance = cardio.distance,

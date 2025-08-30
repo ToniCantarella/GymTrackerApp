@@ -64,7 +64,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.gymtracker.database.entity.WorkoutType
 import com.example.gymtracker.ui.cardio.cardioitem.CardioItemScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioScreen
@@ -261,15 +260,17 @@ fun GymTrackerApp(
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
                         onNavigateBack = ::popBackStack,
-                        onSessionNavigate = { id, type ->
-                            if (type == WorkoutType.GYM) {
+                        onSessionNavigate = { id,  ->
+                            /*if (type == WorkoutType.GYM) {
                                 navigate(Route.GymSession(id))
                             } else {
                                 navigate(Route.CardioSession(id))
-                            }
+                            }*/
                         },
                         onAddSessionNavigate = { workout, timestamp ->
-                            if (workout.type == WorkoutType.GYM) {
+
+                            // TODO
+                            /*if (workout.type == WorkoutType.GYM) {
                                 navigate(
                                     Route.GymWorkout(
                                         workout.id,
@@ -283,14 +284,15 @@ fun GymTrackerApp(
                                         timestamp.toString()
                                     )
                                 )
-                            }
+                            }*/
                         },
                         onWorkoutStatsNavigate = {
-                            if (it.type == WorkoutType.GYM) {
+                            // TODO
+                            /*if (it.type == WorkoutType.GYM) {
                                 navigate(Route.SplitStats(it.id))
                             } else {
                                 navigate(Route.CardioStats(it.id))
-                            }
+                            }*/
                         }
                     )
                 }

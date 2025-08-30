@@ -4,13 +4,12 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.gymtracker.database.entity.WorkoutEntity
 import java.time.Instant
 
 @Entity(
     tableName = "gym_sessions",
     foreignKeys = [ForeignKey(
-        entity = WorkoutEntity::class,
+        entity = GymWorkoutEntity::class,
         parentColumns = ["id"],
         childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE

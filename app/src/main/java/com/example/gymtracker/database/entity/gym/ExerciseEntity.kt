@@ -4,14 +4,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.gymtracker.database.entity.WorkoutEntity
 import kotlinx.serialization.Contextual
 import java.util.UUID
 
 @Entity(
     tableName = "exercises",
     foreignKeys = [ForeignKey(
-        entity = WorkoutEntity::class,
+        entity = GymWorkoutEntity::class,
         parentColumns = ["id"],
         childColumns = ["workoutId"],
         onDelete = ForeignKey.CASCADE

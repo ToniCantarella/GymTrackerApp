@@ -80,10 +80,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
-import com.example.gymtracker.database.entity.WorkoutType
-import com.example.gymtracker.database.repository.Workout
-import com.example.gymtracker.database.repository.WorkoutSession
-import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
+import com.example.gymtracker.repository.Workout
+import com.example.gymtracker.repository.WorkoutSession
+import com.example.gymtracker.repository.WorkoutWithLatestTimestamp
 import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
@@ -127,7 +126,7 @@ import kotlin.time.toJavaInstant
 @Composable
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
-    onSessionNavigate: (id: Int, type: WorkoutType) -> Unit,
+    onSessionNavigate: (id: Int) -> Unit,
     onAddSessionNavigate: (workout: Workout, timestamp: Instant) -> Unit,
     onWorkoutStatsNavigate: (workout: Workout) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
@@ -175,7 +174,7 @@ private fun StatsOverviewScreen(
     cardioSessions: List<WorkoutSession>,
     workoutSessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
-    onSessionNavigate: (id: Int, type: WorkoutType) -> Unit,
+    onSessionNavigate: (id: Int) -> Unit,
     onAddSessionNavigate: (workout: Workout, timestamp: Instant) -> Unit,
     onWorkoutStatsNavigate: (workout: Workout) -> Unit
 ) {
@@ -225,7 +224,6 @@ private fun StatsOverviewScreen(
                         PieChartCard(
                             workouts = gymWorkouts.ifEmpty { emptyList() },
                             workoutSessions = gymSessions.ifEmpty { emptyList() },
-                            type = WorkoutType.GYM,
                             modifier = Modifier
                                 .width(itemWidth)
                                 .height(itemHeight)
@@ -235,7 +233,6 @@ private fun StatsOverviewScreen(
                         PieChartCard(
                             workouts = cardioWorkouts.ifEmpty { emptyList() },
                             workoutSessions = cardioSessions.ifEmpty { emptyList() },
-                            type = WorkoutType.CARDIO,
                             modifier = Modifier
                                 .width(itemWidth)
                                 .height(itemHeight)
@@ -336,11 +333,7 @@ private fun WorkoutCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
-                    painter =
-                        if (workout.type == WorkoutType.GYM)
-                            painterResource(id = R.drawable.weight)
-                        else
-                            painterResource(id = R.drawable.run),
+                    painter = painterResource(id = R.drawable.weight),
                     tint = iconColor,
                     contentDescription = stringResource(id = R.string.icon)
                 )
@@ -378,7 +371,7 @@ private fun StatCalendar(
     cardioWorkouts: List<Workout>,
     sessionsForMonth: List<WorkoutSession>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
-    onSessionClick: (id: Int, type: WorkoutType) -> Unit,
+    onSessionClick: (id: Int) -> Unit,
     onAddSessionClick: (workout: Workout, timestamp: Instant) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -544,7 +537,7 @@ private fun StatCalendar(
                     if (sessionsOnDay?.size!! == 1) {
                         val session = sessionsOnDay.first()
                         val workout = allWorkouts.find { it.id == session.workoutId }
-                        onSessionClick(session.id, workout!!.type)
+                        onSessionClick(session.id)
                     } else {
                         sessionDialogOpen = true
                         sessionsForDialog = sessionsOnDay
@@ -587,11 +580,8 @@ private fun StatCalendar(
                                 sessionsOnDay.take(3).forEachIndexed { index, session ->
                                     val workout = allWorkouts.find { it.id == session.workoutId }
                                     var visible by remember { mutableStateOf(false) }
-                                    val workoutIndex = if (workout?.type == WorkoutType.GYM) {
-
-                                        gymWorkouts.indexOf(workout)
-                                    } else
-                                        cardioWorkouts.indexOf(workout)
+                                    // TODO
+                                    val workoutIndex = gymWorkouts.indexOf(workout)
 
                                     LaunchedEffect(Unit) {
                                         delay(200 * index.toLong())
@@ -606,11 +596,8 @@ private fun StatCalendar(
                                         exit = fadeOut()
                                     ) {
                                         Icon(
-                                            painter =
-                                                if (workout?.type == WorkoutType.GYM)
-                                                    painterResource(id = R.drawable.weight)
-                                                else
-                                                    painterResource(id = R.drawable.run),
+                                            //TODO
+                                            painter = painterResource(id = R.drawable.weight),
                                             tint = highlightColors[workoutIndex % highlightColors.size],
                                             contentDescription = stringResource(id = R.string.icon),
                                             modifier = Modifier
@@ -654,7 +641,7 @@ private fun StatCalendar(
                                 name = workout.name,
                                 latestTimestamp = session.timestamp
                             ),
-                            onClick = { onSessionClick(session.id, workout.type) }
+                            onClick = { onSessionClick(session.id) }
                         )
 
                         if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
@@ -690,10 +677,8 @@ private fun StatCalendar(
                         ) {
                             Icon(
                                 painter =
-                                    if (workout.type == WorkoutType.GYM)
-                                        painterResource(id = R.drawable.weight)
-                                    else
-                                        painterResource(id = R.drawable.run),
+                                    // TODO
+                                        painterResource(id = R.drawable.weight),
                                 contentDescription = stringResource(id = R.string.icon)
                             )
                             Column(
@@ -917,8 +902,8 @@ fun WorkoutLegend(
     ) {
         WorkoutIcon(
             painter =
-                if (workout.type == WorkoutType.GYM) painterResource(id = R.drawable.weight)
-                else painterResource(id = R.drawable.run),
+                // TODO
+                painterResource(id = R.drawable.weight),
             tint = highlightColor
         )
         Text(
@@ -995,7 +980,6 @@ private fun Day(
 private fun PieChartCard(
     workouts: List<Workout>,
     workoutSessions: List<WorkoutSession>,
-    type: WorkoutType,
     modifier: Modifier = Modifier
 ) {
     val sessionsByWorkoutId = remember(workoutSessions) {
@@ -1043,11 +1027,8 @@ private fun PieChartCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    painter =
-                        if (type == WorkoutType.GYM)
-                            painterResource(id = R.drawable.weight)
-                        else
-                            painterResource(id = R.drawable.run),
+                    // TODO
+                    painter = painterResource(id = R.drawable.weight),
                     contentDescription = stringResource(id = R.string.icon),
                     modifier = Modifier
                         .size(40.dp)
@@ -1084,8 +1065,7 @@ private fun StatsScreenForPreview() {
                 "Gym ${it + 1}"
         Workout(
             id = it,
-            name = name,
-            type = WorkoutType.GYM
+            name = name
         )
     }
     val cardioWorkouts = List(5) {
@@ -1096,8 +1076,7 @@ private fun StatsScreenForPreview() {
                 "Cardio ${it + 1}"
         Workout(
             id = it + MAX_GYM_WORKOUTS,
-            name = name,
-            type = WorkoutType.CARDIO
+            name = name
         )
     }
     val allWorkouts = gymWorkouts + cardioWorkouts
@@ -1138,7 +1117,7 @@ private fun StatsScreenForPreview() {
         cardioSessions = cardioSessions,
         workoutSessionsForMonth = workoutSessionsBetween,
         getMonthData = { _, _ -> },
-        onSessionNavigate = { _, _ -> },
+        onSessionNavigate = { _ -> },
         onWorkoutStatsNavigate = {},
         onAddSessionNavigate = { _, _ -> }
     )

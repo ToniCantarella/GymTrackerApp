@@ -2,8 +2,8 @@ package com.example.gymtracker.ui.gym.gymworkoutplans
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.GymRepository
-import com.example.gymtracker.database.repository.WorkoutWithLatestTimestamp
+import com.example.gymtracker.repository.GymRepository
+import com.example.gymtracker.repository.WorkoutWithLatestTimestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

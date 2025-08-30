@@ -2,7 +2,7 @@ package com.example.gymtracker.ui.gym.creategymworkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.database.repository.GymRepository
+import com.example.gymtracker.repository.GymRepository
 import com.example.gymtracker.ui.gym.entity.Exercise
 import com.example.gymtracker.utility.GymWorkoutUtil
 import kotlinx.coroutines.flow.MutableStateFlow
