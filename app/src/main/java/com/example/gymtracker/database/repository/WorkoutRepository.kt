@@ -1,10 +1,10 @@
 package com.example.gymtracker.database.repository
 
-import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
-import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
-import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
+import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import java.time.Instant
 
 data class Workout(
@@ -28,14 +28,14 @@ interface WorkoutRepository {
 }
 
 class WorkoutRepositoryImpl(
-    private val gymWorkoutPlanDao : GymWorkoutPlanDao,
-    private val cardioWorkoutPlanDao : CardioWorkoutPlanDao,
+    private val gymWorkoutDao : GymWorkoutDao,
+    private val cardioWorkoutDao : CardioWorkoutDao,
     private val gymSessionDao: GymSessionDao,
-    private val cardioDao: CardioDao,
+    private val cardioMetricsDao: CardioMetricsDao,
     private val cardioSessionDao: CardioSessionDao
 ) : WorkoutRepository {
     override suspend fun getGymWorkouts(): List<Workout> {
-        val workouts = gymWorkoutPlanDao.getAll()
+        val workouts = gymWorkoutDao.getAll()
         return workouts.map { workout ->
             Workout(
                 id = workout.id,
@@ -45,7 +45,7 @@ class WorkoutRepositoryImpl(
     }
 
     override suspend fun getCardioWorkouts(): List<Workout> {
-        val workouts = cardioWorkoutPlanDao.getAll()
+        val workouts = cardioWorkoutDao.getAll()
         return workouts.map { workout ->
             Workout(
                 id = workout.id,
@@ -69,7 +69,7 @@ class WorkoutRepositoryImpl(
 
     override suspend fun getCardioSessions(): List<WorkoutSession> {
         val sessions = cardioSessionDao.getAllSessions()
-        val cardioList = cardioDao.getAllCardio().associateBy { it.id }
+        val cardioList = cardioMetricsDao.getAllCardio().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
             val cardio = cardioList[session?.workoutId]
@@ -113,7 +113,7 @@ class WorkoutRepositoryImpl(
         end: Instant
     ): List<WorkoutSession> {
         val sessions = cardioSessionDao.getSessionsForTimespan(start, end)
-        val cardioList = cardioDao.getAllCardio().associateBy { it.id }
+        val cardioList = cardioMetricsDao.getAllCardio().associateBy { it.id }
 
         return sessions.mapNotNull { session ->
             val cardio = cardioList[session?.workoutId]

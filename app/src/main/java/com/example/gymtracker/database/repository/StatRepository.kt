@@ -1,12 +1,12 @@
 package com.example.gymtracker.database.repository
 
 import com.example.gymtracker.database.GymDatabase
-import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
-import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.dao.gym.ExerciseDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
-import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
+import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import kotlinx.coroutines.CoroutineScope
@@ -55,18 +55,18 @@ interface StatRepository {
 
 class StatRepositoryImpl(
     private val db: GymDatabase,
-    private val gymWorkoutPlanDao: GymWorkoutPlanDao,
-    private val cardioWorkoutPlanDao: CardioWorkoutPlanDao,
+    private val gymWorkoutDao: GymWorkoutDao,
+    private val cardioWorkoutDao: CardioWorkoutDao,
     private val gymSessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
     private val setSessionDao: SetSessionDao,
-    private val cardioDao: CardioDao,
+    private val cardioMetricsDao: CardioMetricsDao,
     private val cardioSessionDao: CardioSessionDao
 ): StatRepository {
 
     override suspend fun getSplitStats(id: Int): SplitStats? {
-        val workout = gymWorkoutPlanDao.getById(id)
+        val workout = gymWorkoutDao.getById(id)
         if (workout == null) return null
         val exercises = exerciseDao.getExercisesByWorkoutId(workout.id)
         val gymSessions = gymSessionDao.getByWorkoutId(workout.id)
@@ -115,9 +115,9 @@ class StatRepositoryImpl(
     }
 
     override suspend fun getCardioStats(id: Int): CardioStats? {
-        val workout = cardioWorkoutPlanDao.getById(id)
+        val workout = cardioWorkoutDao.getById(id)
         if (workout == null) return null
-        val cardio = cardioDao.getCardioByWorkoutId(workout.id)
+        val cardio = cardioMetricsDao.getCardioByWorkoutId(workout.id)
         val sessions = cardioSessionDao.getAllSessionsForCardio(cardio.id)
 
         return CardioStats(

@@ -1,8 +1,8 @@
 package com.example.gymtracker.database.repository
 
-import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
-import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
@@ -22,19 +22,19 @@ interface CardioRepository {
 }
 
 class CardioRepositoryImpl(
-    private val cardioWorkoutPlanDao: CardioWorkoutPlanDao,
-    private val cardioDao: CardioDao,
+    private val cardioWorkoutDao: CardioWorkoutDao,
+    private val cardioMetricsDao: CardioMetricsDao,
     private val cardioSessionDao: CardioSessionDao
 ) : CardioRepository {
 
     override suspend fun addCardio(name: String) {
-        val workoutId = cardioWorkoutPlanDao.insert(
+        val workoutId = cardioWorkoutDao.insert(
             CardioWorkoutEntity(
                 name = name.trim()
             )
         ).toInt()
 
-        cardioDao.insert(
+        cardioMetricsDao.insert(
             CardioMetricsEntity(
                 workoutId = workoutId
             )
@@ -42,10 +42,10 @@ class CardioRepositoryImpl(
     }
 
     override suspend fun getCardioListWithLatestTimestamp(): List<WorkoutWithLatestTimestamp> {
-        val workouts = cardioWorkoutPlanDao.getAll()
+        val workouts = cardioWorkoutDao.getAll()
 
         return workouts.map {
-            val cardio = cardioDao.getCardioByWorkoutId(it.id)
+            val cardio = cardioMetricsDao.getCardioByWorkoutId(it.id)
             val session = cardioSessionDao.getLastSession(cardio.id)
 
             WorkoutWithLatestTimestamp(
@@ -57,9 +57,9 @@ class CardioRepositoryImpl(
     }
 
     override suspend fun getLatestCardio(id: Int): Cardio? {
-        val workout = cardioWorkoutPlanDao.getById(id)
+        val workout = cardioWorkoutDao.getById(id)
         if(workout == null) return null
-        val cardio = cardioDao.getCardioByWorkoutId(workout.id)
+        val cardio = cardioMetricsDao.getCardioByWorkoutId(workout.id)
         val sessions = cardioSessionDao.getAllSessionsForCardio(cardio.id)
 
         val stepSession = sessions.firstOrNull { it?.steps != null }
@@ -83,8 +83,8 @@ class CardioRepositoryImpl(
         sessionId: Int
     ): Cardio? {
         val session = cardioSessionDao.getById(sessionId)
-        val cardio = cardioDao.getById(session.workoutId)
-        val workout = cardioWorkoutPlanDao.getById(cardio.workoutId)
+        val cardio = cardioMetricsDao.getById(session.workoutId)
+        val workout = cardioWorkoutDao.getById(cardio.workoutId)
 
         if(workout == null) return null
 
@@ -100,25 +100,25 @@ class CardioRepositoryImpl(
         )
     }
 
-    override suspend fun deleteCardio(cardioId: Int) = cardioWorkoutPlanDao.deleteById(cardioId)
+    override suspend fun deleteCardio(cardioId: Int) = cardioWorkoutDao.deleteById(cardioId)
 
 
     override suspend fun markCardioSessionDone(id: Int, cardio: Cardio, timestamp: Instant?) {
-        val workout = cardioWorkoutPlanDao.getById(id)
+        val workout = cardioWorkoutDao.getById(id)
 
         if(workout == null) return
 
         val newName = cardio.name.trim()
 
         if (newName.isNotEmpty() && workout.name != newName) {
-            cardioWorkoutPlanDao.update(
+            cardioWorkoutDao.update(
                 workout.copy(
                     name = newName
                 )
             )
         }
 
-        val currentCardio = cardioDao.getCardioByWorkoutId(workout.id)
+        val currentCardio = cardioMetricsDao.getCardioByWorkoutId(workout.id)
 
         val distance =
             if (cardio.distance != null)
@@ -132,7 +132,7 @@ class CardioRepositoryImpl(
         val cardioUpdated = (stepsChanced || distanceChanced || durationChanced)
 
         if (cardioUpdated) {
-            cardioDao.updateCardio(
+            cardioMetricsDao.updateCardio(
                 currentCardio.copy(
                     steps = cardio.steps ?: currentCardio.steps,
                     distance = distance ?: currentCardio.distance,

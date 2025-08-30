@@ -6,12 +6,12 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.gymtracker.database.dao.cardio.CardioDao
+import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
-import com.example.gymtracker.database.dao.cardio.CardioWorkoutPlanDao
+import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.dao.gym.ExerciseDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
-import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
+import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
@@ -41,13 +41,13 @@ import java.util.UUID
 )
 @TypeConverters(Converters::class)
 abstract class GymDatabase : RoomDatabase() {
-    abstract fun gymWorkoutPlanDao(): GymWorkoutPlanDao
-    abstract fun cardioWorkoutPlanDao(): CardioWorkoutPlanDao
+    abstract fun gymWorkoutPlanDao(): GymWorkoutDao
+    abstract fun cardioWorkoutPlanDao(): CardioWorkoutDao
     abstract fun exerciseDao(): ExerciseDao
     abstract fun setDao(): SetDao
     abstract fun setSessionDao(): SetSessionDao
     abstract fun gymSessionDao(): GymSessionDao
-    abstract fun cardioDao(): CardioDao
+    abstract fun cardioDao(): CardioMetricsDao
     abstract fun cardioSessionDao(): CardioSessionDao
 }
 

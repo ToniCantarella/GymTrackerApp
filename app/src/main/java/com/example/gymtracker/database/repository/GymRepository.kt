@@ -2,7 +2,7 @@ package com.example.gymtracker.database.repository
 
 import com.example.gymtracker.database.dao.gym.ExerciseDao
 import com.example.gymtracker.database.dao.gym.GymSessionDao
-import com.example.gymtracker.database.dao.gym.GymWorkoutPlanDao
+import com.example.gymtracker.database.dao.gym.GymWorkoutDao
 import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.gym.ExerciseEntity
@@ -46,7 +46,7 @@ interface GymRepository {
 }
 
 class GymRepositoryImpl(
-    private val workoutDao: GymWorkoutPlanDao,
+    private val workoutDao: GymWorkoutDao,
     private val gymSessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,

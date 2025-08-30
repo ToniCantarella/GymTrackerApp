@@ -7,7 +7,7 @@ import androidx.room.Update
 import com.example.gymtracker.database.entity.cardio.CardioMetricsEntity
 
 @Dao
-interface CardioDao {
+interface CardioMetricsDao {
     @Insert
     suspend fun insert(cardio: CardioMetricsEntity): Long
 

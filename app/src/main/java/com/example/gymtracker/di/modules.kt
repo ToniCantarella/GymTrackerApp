@@ -66,10 +66,10 @@ val databaseModule = module {
 
     single<WorkoutRepository> {
         WorkoutRepositoryImpl(
-            gymWorkoutPlanDao = get(),
-            cardioWorkoutPlanDao = get(),
+            gymWorkoutDao = get(),
+            cardioWorkoutDao = get(),
             gymSessionDao = get(),
-            cardioDao = get(),
+            cardioMetricsDao = get(),
             cardioSessionDao = get()
         )
     }
@@ -84,21 +84,21 @@ val databaseModule = module {
     }
     single<CardioRepository> {
         CardioRepositoryImpl(
-            cardioWorkoutPlanDao = get(),
-            cardioDao = get(),
+            cardioWorkoutDao = get(),
+            cardioMetricsDao = get(),
             cardioSessionDao = get()
         )
     }
     single<StatRepository> {
         StatRepositoryImpl(
             db = get(),
-            gymWorkoutPlanDao = get(),
-            cardioWorkoutPlanDao = get(),
+            gymWorkoutDao = get(),
+            cardioWorkoutDao = get(),
             exerciseDao = get(),
             setDao = get(),
             setSessionDao = get(),
             gymSessionDao = get(),
-            cardioDao = get(),
+            cardioMetricsDao = get(),
             cardioSessionDao = get()
         )
     }
