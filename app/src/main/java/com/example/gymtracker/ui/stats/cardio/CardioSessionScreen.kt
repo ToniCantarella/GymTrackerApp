@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.cardio.common.CardioContent
+import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.utility.toDateAndTimeString
 import org.koin.compose.viewmodel.koinViewModel
@@ -62,7 +63,7 @@ fun CardioSessionScreen(
 @Composable
 private fun CardioSessionScreen(
     loading: Boolean,
-    cardio: Cardio?,
+    cardio: WorkoutWithMetrics?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -87,13 +88,13 @@ private fun CardioSessionScreen(
                             .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
                     ) {
                         Text(
-                            text = cardio.latestTimestamp?.toDateAndTimeString() ?: "-"
+                            text = cardio.timestamp?.toDateAndTimeString() ?: "-"
                         )
                     }
                     CardioContent(
-                        steps = cardio.steps,
-                        distance = cardio.distance,
-                        displayDuration = cardio.duration
+                        steps = cardio.steps.value,
+                        distance = cardio.distance.value,
+                        displayDuration = cardio.duration.value
                     )
                 }
             }

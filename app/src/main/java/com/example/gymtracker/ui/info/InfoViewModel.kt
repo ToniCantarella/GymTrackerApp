@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.repository.StatRepository
+import com.example.gymtracker.repository.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -20,9 +20,9 @@ data class InfoUiState(
 )
 
 class InfoViewModel(
-    private val statRepository: StatRepository,
+    private val appRepository: AppRepository,
     private val dataStore: DataStore<Preferences>
-): ViewModel() {
+) : ViewModel() {
     private val _uiState = MutableStateFlow(InfoUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -51,7 +51,7 @@ class InfoViewModel(
 
     fun onDeleteAllData(onDeleteFinished: () -> Unit) {
         viewModelScope.launch {
-            statRepository.deleteAllData()
+            appRepository.deleteAllData()
             dataStore.edit { it.clear() }
             onDeleteFinished()
         }

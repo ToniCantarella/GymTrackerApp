@@ -28,9 +28,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
-import com.example.gymtracker.repository.SplitWithExercises
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
+import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.UnitUtil
@@ -74,7 +74,7 @@ fun GymSessionStatsScreen(
 @Composable
 fun GymSessionStatsScreen(
     loading: Boolean,
-    split: SplitWithExercises?,
+    split: WorkoutWithExercises?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -159,7 +159,7 @@ private fun GymSessionPreview() {
         Surface {
             GymSessionStatsScreen(
                 loading = false,
-                split = SplitWithExercises(
+                split = WorkoutWithExercises(
                     id = 0,
                     name = "Split",
                     timestamp = Instant.now(),

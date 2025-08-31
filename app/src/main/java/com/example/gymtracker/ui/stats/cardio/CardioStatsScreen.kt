@@ -21,7 +21,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
-import com.example.gymtracker.repository.CardioStats
+import com.example.gymtracker.ui.entity.cardio.CardioWorkoutStats
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.utility.UnitUtil
@@ -69,7 +69,7 @@ fun CardioStatsScreen(
 
 @Composable
 private fun CardioStatsScreen(
-    stats: CardioStats,
+    stats: CardioWorkoutStats,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -77,8 +77,8 @@ private fun CardioStatsScreen(
             .fillMaxSize()
     ) {
         item {
-            val stepHistory = stats.cardioHistory.filter { it.steps != null }
-            val stepValues = stepHistory.map { it.steps!!.toDouble() }
+            val stepHistory = stats.stepsHistory.filter { it.value != null }
+            val stepValues = stepHistory.map { it.value!!.toDouble() }
 
             HorizontalDivider()
             BasicLineChart(
@@ -104,13 +104,13 @@ private fun CardioStatsScreen(
                 } else emptyList(),
                 dataValues = stepValues,
                 popupContentBuilder = { dataIndex, valueIndex, value ->
-                    "${stepHistory[valueIndex].steps}\n ${stepHistory[valueIndex].timestamp?.toDateString()}"
+                    "${stepHistory[valueIndex].value}\n ${stepHistory[valueIndex].timestamp?.toDateString()}"
                 },
             )
         }
         item {
-            val distanceHistory = stats.cardioHistory.filter { it.distance != null }
-            val distanceValues = distanceHistory.map { it.distance!! }
+            val distanceHistory = stats.distanceHistory.filter { it.value != null }
+            val distanceValues = distanceHistory.map { it.value!! }
 
             HorizontalDivider()
             BasicLineChart(
@@ -140,13 +140,13 @@ private fun CardioStatsScreen(
                 } else emptyList(),
                 dataValues = distanceValues,
                 popupContentBuilder = { dataIndex, valueIndex, value ->
-                    "${distanceHistory[valueIndex].distance}\n ${distanceHistory[valueIndex].timestamp?.toDateString()}"
+                    "${distanceHistory[valueIndex].value}\n ${distanceHistory[valueIndex].timestamp?.toDateString()}"
                 }
             )
         }
         item {
-            val durationHistory = stats.cardioHistory.filter { it.duration != null }
-            val rawDurations = durationHistory.map { it.duration!! }
+            val durationHistory = stats.durationHistory.filter { it.value != null }
+            val rawDurations = durationHistory.map { it.value!! }
 
             val maxMillis = rawDurations.maxOfOrNull { it.toMillis() } ?: 0L
             val (divider, unitLabel) = when {
@@ -181,7 +181,9 @@ private fun CardioStatsScreen(
                     )
                 } else emptyList(),
                 popupContentBuilder = { dataIndex, valueIndex, value ->
-                    "${durationHistory[valueIndex].duration?.toMillis()?.div(divider)}\n ${durationHistory[valueIndex].timestamp?.toDateString()}"
+                    "${
+                        durationHistory[valueIndex].value?.toMillis()?.div(divider)
+                    }\n ${durationHistory[valueIndex].timestamp?.toDateString()}"
                 }
             )
         }

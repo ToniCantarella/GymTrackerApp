@@ -4,7 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.repository.CardioRepository
+import com.example.gymtracker.repository.cardio.CardioSessionRepository
+import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,12 +14,12 @@ import kotlinx.coroutines.launch
 
 data class CardioSessionUiState(
     val loading: Boolean = true,
-    val cardio: Cardio? = null
+    val cardio: WorkoutWithMetrics? = null
 )
 
 class CardioSessionViewModel(
     savedStateHandle: SavedStateHandle,
-    private val cardioRepository: CardioRepository
+    private val sessionRepository: CardioSessionRepository
 ) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.CardioSession>()
 
@@ -27,7 +28,7 @@ class CardioSessionViewModel(
 
     init {
         viewModelScope.launch {
-            val cardio = cardioRepository.getCardioBySession(navParams.id)
+            val cardio = sessionRepository.getWorkoutForSession(navParams.id)
             _uiState.update {
                 it.copy(
                     cardio = cardio,

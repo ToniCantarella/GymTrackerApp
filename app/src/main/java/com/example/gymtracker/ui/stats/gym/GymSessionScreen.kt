@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
-import com.example.gymtracker.repository.SplitWithExercises
+import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
 import com.example.gymtracker.ui.gym.common.ExerciseListView
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.utility.toDateAndTimeString
@@ -58,7 +58,7 @@ fun GymSessionScreen(
 @Composable
 fun GymSessionScreen(
     loading: Boolean,
-    split: SplitWithExercises?,
+    split: WorkoutWithExercises?,
     modifier: Modifier = Modifier
 ) {
     Column(

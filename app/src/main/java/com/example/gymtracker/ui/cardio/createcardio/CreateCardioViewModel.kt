@@ -2,7 +2,7 @@ package com.example.gymtracker.ui.cardio.createcardio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.repository.CardioRepository
+import com.example.gymtracker.repository.cardio.CardioWorkoutRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -13,7 +13,7 @@ data class CreateCardioUiState(
 )
 
 class CreateCardioViewModel(
-    private val cardioRepository: CardioRepository
+    private val workoutRepository: CardioWorkoutRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateCardioUiState())
     val uiState = _uiState.asStateFlow()
@@ -29,7 +29,7 @@ class CreateCardioViewModel(
     fun onSavePressed(onSave: () -> Unit) {
         viewModelScope.launch {
             val cardioName = uiState.value.name
-            cardioRepository.addCardio(cardioName)
+            workoutRepository.addWorkout(cardioName)
             onSave()
         }
     }

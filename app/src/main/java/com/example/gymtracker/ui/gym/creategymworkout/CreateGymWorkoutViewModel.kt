@@ -2,7 +2,7 @@ package com.example.gymtracker.ui.gym.creategymworkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.repository.GymRepository
+import com.example.gymtracker.repository.gym.GymWorkoutRepository
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.utility.GymWorkoutUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
-
 
 
 data class CreateGymWorkoutUiState(
@@ -24,7 +23,7 @@ data class CreateGymWorkoutUiState(
 }
 
 class CreateGymWorkoutViewModel(
-    private val gymRepository: GymRepository
+    private val workoutRepository: GymWorkoutRepository
 ) : ViewModel() {
     private val gymWorkoutUtil = GymWorkoutUtil()
     private val _uiState = MutableStateFlow(CreateGymWorkoutUiState())
@@ -109,7 +108,7 @@ class CreateGymWorkoutViewModel(
 
     fun onCreateWorkoutPressed(onCreateDone: () -> Unit) {
         viewModelScope.launch {
-            gymRepository.addGymWorkoutWithExercises(
+            workoutRepository.addWorkout(
                 workoutName = uiState.value.workoutName,
                 exercises = uiState.value.exercises
             )

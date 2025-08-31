@@ -54,7 +54,7 @@ fun CardioItemScreen(
     ProvideTopAppBar(
         title = {
             TopBarTextField(
-                value = uiState.cardio.name,
+                value = uiState.cardio?.name ?: "",
                 onValueChange = viewModel::onChangeName,
                 maxSize = CARDIO_NAME_MAX_SIZE
             )
@@ -99,16 +99,16 @@ fun CardioItemScreen(
         }
     } else {
         CardioContent(
-            steps = uiState.cardio.steps,
+            steps = uiState.cardio?.steps?.value,
             onStepsChange = viewModel::onStepsChange,
-            previousSteps = uiState.previousCardio?.steps,
-            previousStepsTimestamp = uiState.previousCardio?.stepsTimestamp,
-            distance = uiState.cardio.distance,
-            previousDistance = uiState.previousCardio?.distance,
+            previousSteps = uiState.previousCardio?.steps?.value,
+            previousStepsTimestamp = uiState.previousCardio?.steps?.timestamp,
+            distance = uiState.cardio?.distance?.value,
+            previousDistance = uiState.previousCardio?.distance?.value,
             onDistanceChange = viewModel::onDistanceChange,
-            previousDistanceTimestamp = uiState.previousCardio?.distanceTimestamp,
-            previousDuration = uiState.previousCardio?.duration,
-            previousDurationTimestamp = uiState.previousCardio?.durationTimestamp,
+            previousDistanceTimestamp = uiState.previousCardio?.distance?.timestamp,
+            previousDuration = uiState.previousCardio?.duration?.value,
+            previousDurationTimestamp = uiState.previousCardio?.duration?.timestamp,
             onDurationChange = viewModel::onDurationChange
         )
     }
