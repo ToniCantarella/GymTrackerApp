@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.cardio.createcardio
+package com.example.gymtracker.ui.cardio.createcardioworkout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,7 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CreateCardioWorkoutScreen(
     onNavigateBack: () -> Unit,
-    viewModel: CreateCardioViewModel = koinViewModel()
+    viewModel: CreateCardioWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

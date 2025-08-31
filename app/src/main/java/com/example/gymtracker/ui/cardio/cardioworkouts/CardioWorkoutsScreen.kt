@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.cardio.cardiolist
+package com.example.gymtracker.ui.cardio.cardioworkouts
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ import org.koin.androidx.compose.koinViewModel
 fun CardioWorkoutsScreen(
     onNavigateToWorkout: (id: Int) -> Unit,
     onNavigateToCreateCardio: () -> Unit,
-    viewModel: CardioListViewModel = koinViewModel()
+    viewModel: CardioWorkoutsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }

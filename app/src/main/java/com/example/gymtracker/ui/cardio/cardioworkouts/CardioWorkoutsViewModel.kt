@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.cardio.cardiolist
+package com.example.gymtracker.ui.cardio.cardioworkouts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,17 +9,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class CardioListUiState(
+data class CardioWorkoutsUiState(
     val loading: Boolean = true,
     val workouts: List<WorkoutWithTimestamp> = emptyList(),
     val selectedItems: List<WorkoutWithTimestamp> = emptyList(),
     val selectingItems: Boolean = false
 )
 
-class CardioListViewModel(
+class CardioWorkoutsViewModel(
     private val workoutRepository: CardioWorkoutRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CardioListUiState())
+    private val _uiState = MutableStateFlow(CardioWorkoutsUiState())
     val uiState = _uiState.asStateFlow()
 
     fun getWorkouts() {

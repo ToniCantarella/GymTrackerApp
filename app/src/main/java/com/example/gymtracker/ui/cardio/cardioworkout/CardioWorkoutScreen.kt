@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.cardio.cardioitem
+package com.example.gymtracker.ui.cardio.cardioworkout
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -29,7 +29,7 @@ fun CardioWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
     onNavigateToStats: (id: Int) -> Unit,
-    viewModel: CardioItemViewModel = koinViewModel()
+    viewModel: CardioWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val hasUnsavedChanges =

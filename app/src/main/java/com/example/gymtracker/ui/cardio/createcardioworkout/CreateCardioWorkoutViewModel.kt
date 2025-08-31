@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.cardio.createcardio
+package com.example.gymtracker.ui.cardio.createcardioworkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class CreateCardioUiState(
+data class CreateCardioWorkoutUiState(
     val name: String = ""
 )
 
-class CreateCardioViewModel(
+class CreateCardioWorkoutViewModel(
     private val workoutRepository: CardioWorkoutRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CreateCardioUiState())
+    private val _uiState = MutableStateFlow(CreateCardioWorkoutUiState())
     val uiState = _uiState.asStateFlow()
 
     fun onChangeName(name: String) {

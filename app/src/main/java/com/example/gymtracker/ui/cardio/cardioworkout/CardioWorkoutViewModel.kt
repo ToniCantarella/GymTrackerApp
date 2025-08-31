@@ -1,4 +1,4 @@
-package com.example.gymtracker.ui.cardio.cardioitem
+package com.example.gymtracker.ui.cardio.cardioworkout
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 
-data class CardioItemUiState(
+data class CardioWorkoutUiState(
     val loading: Boolean = true,
     val previousCardio: WorkoutWithMetrics? = null,
     val cardioId: Int = 0,
@@ -28,14 +28,14 @@ data class CardioItemUiState(
     val selectedTimestamp: Instant? = null
 )
 
-class CardioItemViewModel(
+class CardioWorkoutViewModel(
     savedStateHandle: SavedStateHandle,
     private val workoutRepository: CardioWorkoutRepository,
     private val sessionRepository: CardioSessionRepository
 ) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.CardioWorkout>()
 
-    private val _uiState = MutableStateFlow(CardioItemUiState())
+    private val _uiState = MutableStateFlow(CardioWorkoutUiState())
     val uiState = _uiState.asStateFlow()
 
     init {

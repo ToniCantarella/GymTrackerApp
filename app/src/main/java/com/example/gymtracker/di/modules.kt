@@ -20,9 +20,9 @@ import com.example.gymtracker.repository.gym.GymStatsRepository
 import com.example.gymtracker.repository.gym.GymStatsRepositoryImpl
 import com.example.gymtracker.repository.gym.GymWorkoutRepository
 import com.example.gymtracker.repository.gym.GymWorkoutRepositoryImpl
-import com.example.gymtracker.ui.cardio.cardioitem.CardioItemViewModel
-import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
-import com.example.gymtracker.ui.cardio.createcardio.CreateCardioViewModel
+import com.example.gymtracker.ui.cardio.cardioworkout.CardioWorkoutViewModel
+import com.example.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsViewModel
+import com.example.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutViewModel
 import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutViewModel
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutViewModel
 import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsViewModel
@@ -118,11 +118,11 @@ val repositoryModule = module {
 val viewModelModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::GymWorkoutsViewModel)
-    viewModelOf(::CardioListViewModel)
-    viewModelOf(::CardioItemViewModel)
+    viewModelOf(::CardioWorkoutsViewModel)
+    viewModelOf(::CardioWorkoutViewModel)
     viewModelOf(::GymWorkoutViewModel)
     viewModelOf(::CreateGymWorkoutViewModel)
-    viewModelOf(::CreateCardioViewModel)
+    viewModelOf(::CreateCardioWorkoutViewModel)
     viewModelOf(::StatsOverviewViewModel)
     viewModelOf(::GymSessionViewModel)
     viewModelOf(::CardioSessionViewModel)

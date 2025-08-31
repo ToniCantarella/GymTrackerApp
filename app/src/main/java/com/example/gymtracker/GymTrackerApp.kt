@@ -25,9 +25,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.gymtracker.ui.cardio.cardioitem.CardioWorkoutScreen
-import com.example.gymtracker.ui.cardio.cardiolist.CardioWorkoutsScreen
-import com.example.gymtracker.ui.cardio.createcardio.CreateCardioWorkoutScreen
+import com.example.gymtracker.ui.cardio.cardioworkout.CardioWorkoutScreen
+import com.example.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsScreen
+import com.example.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutScreen
 import com.example.gymtracker.ui.common.UnsavedChangesDialog
 import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
@@ -92,7 +92,7 @@ fun GymTrackerApp(
     )
 
     var isNavigationGuarded by remember { mutableStateOf(false) }
-    var navigationGuardDialogOpen by remember { mutableStateOf(false) }
+    var unsavedChangesDialogOpen by remember { mutableStateOf(false) }
     var pendingNavigationAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     fun onNavigationGuardChange(guard: Boolean) {
@@ -102,18 +102,18 @@ fun GymTrackerApp(
     fun releaseNavigationGuard() {
         pendingNavigationAction?.invoke()
         pendingNavigationAction = null
-        navigationGuardDialogOpen = false
+        unsavedChangesDialogOpen = false
         isNavigationGuarded = false
     }
 
     fun navigateGuarded(navigationAction: () -> Unit) {
         if (isNavigationGuarded) {
             pendingNavigationAction = navigationAction
-            navigationGuardDialogOpen = true
+            unsavedChangesDialogOpen = true
         } else {
             navigationAction()
             pendingNavigationAction = null
-            navigationGuardDialogOpen = false
+            unsavedChangesDialogOpen = false
         }
     }
 
@@ -263,7 +263,7 @@ fun GymTrackerApp(
         }
     }
 
-    if (navigationGuardDialogOpen) {
+    if (unsavedChangesDialogOpen) {
         UnsavedChangesDialog(
             onConfirm = { doNotAskAgain ->
                 if (doNotAskAgain) {
@@ -271,7 +271,7 @@ fun GymTrackerApp(
                 }
                 releaseNavigationGuard()
             },
-            onCancel = { navigationGuardDialogOpen = false }
+            onCancel = { unsavedChangesDialogOpen = false }
         )
     }
 }
