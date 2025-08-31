@@ -30,7 +30,7 @@ fun CardioItemScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
     showNavigationGuard: Boolean,
-    onShowNavigationGuardChange: (Boolean) -> Unit,
+    onNavigationGuardDialogDismiss: () -> Unit,
     onGuardReleased: () -> Unit,
     onNavigateToStats: (id: Int) -> Unit,
     viewModel: CardioItemViewModel = koinViewModel()
@@ -115,8 +115,8 @@ fun CardioItemScreen(
 
     if (showNavigationGuard) {
         UnsavedChangesDialog(
-            onConfirm = { onGuardReleased() },
-            onCancel = { onShowNavigationGuardChange(false) }
+            onConfirm = onGuardReleased,
+            onCancel = onNavigationGuardDialogDismiss
         )
     }
 }

@@ -60,8 +60,8 @@ import java.util.UUID
 fun GymWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
-    showNavigationGuard: Boolean,
-    onShowNavigationGuardChange: (Boolean) -> Unit,
+    navigationGuardDialogOpen: Boolean,
+    onNavigationGuardDialogDismiss: () -> Unit,
     releaseNavigationGuard: () -> Unit,
     viewModel: GymWorkoutViewModel = koinViewModel()
 ) {
@@ -206,10 +206,10 @@ fun GymWorkoutScreen(
         }
     }
 
-    if (showNavigationGuard) {
+    if (navigationGuardDialogOpen) {
         UnsavedChangesDialog(
-            onConfirm = { releaseNavigationGuard() },
-            onCancel = { onShowNavigationGuardChange(false) }
+            onConfirm = releaseNavigationGuard,
+            onCancel = onNavigationGuardDialogDismiss
         )
     }
 

@@ -99,9 +99,7 @@ class MainActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsState()
             GymTrackerTheme {
                 if (!uiState.loading)
-                    GymTrackerApp(
-                        viewModel = viewModel
-                    )
+                    GymTrackerApp(viewModel = viewModel)
             }
         }
     }
@@ -126,13 +124,18 @@ fun GymTrackerApp(
     val isKeyboardOpen by keyboardAsState()
 
     val navigationAnimationMoveInt = 1500
-
     val enter = if (isLandscape) fadeIn() else slideInHorizontally { navigationAnimationMoveInt }
     val exit = if (isLandscape) fadeOut() else slideOutHorizontally { -navigationAnimationMoveInt }
     val popEnter =
-        if (isLandscape) fadeIn() else slideInHorizontally { -navigationAnimationMoveInt }
+        if (isLandscape)
+            fadeIn()
+        else
+            slideInHorizontally { -navigationAnimationMoveInt }
     val popExit =
-        if (isLandscape) fadeOut() else slideOutHorizontally { navigationAnimationMoveInt }
+        if (isLandscape)
+            fadeOut()
+        else
+            slideOutHorizontally { navigationAnimationMoveInt }
 
     LaunchedEffect(isKeyboardOpen) {
         if (!isKeyboardOpen) {
@@ -141,7 +144,7 @@ fun GymTrackerApp(
     }
 
     var isNavigationGuarded by remember { mutableStateOf(false) }
-    var showNavigationGuard by remember { mutableStateOf(false) }
+    var navigationGuardDialogOpen by remember { mutableStateOf(false) }
     var pendingNavigationAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     fun onNavigationGuardChange(guard: Boolean) {
@@ -151,18 +154,18 @@ fun GymTrackerApp(
     fun releaseNavigationGuard() {
         pendingNavigationAction?.invoke()
         pendingNavigationAction = null
-        showNavigationGuard = false
+        navigationGuardDialogOpen = false
         isNavigationGuarded = false
     }
 
     fun navigateGuarded(navigationAction: () -> Unit) {
         if (isNavigationGuarded) {
             pendingNavigationAction = navigationAction
-            showNavigationGuard = true
+            navigationGuardDialogOpen = true
         } else {
             navigationAction()
             pendingNavigationAction = null
-            showNavigationGuard = false
+            navigationGuardDialogOpen = false
         }
     }
 
@@ -206,7 +209,7 @@ fun GymTrackerApp(
                 composable<Route.GymWorkoutPlans> {
                     GymWorkoutsScreen(
                         onNavigateToWorkout = { navigate(Route.GymWorkout(it)) },
-                        onNavigateToCreateWorkout = { navigate(Route.CreateSplit) }
+                        onCreateWorkoutClicked = { navigate(Route.CreateSplit) }
                     )
                 }
             }
@@ -216,8 +219,8 @@ fun GymTrackerApp(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
                     releaseNavigationGuard = ::releaseNavigationGuard,
-                    showNavigationGuard = showNavigationGuard,
-                    onShowNavigationGuardChange = { showNavigationGuard = it }
+                    navigationGuardDialogOpen = navigationGuardDialogOpen,
+                    onNavigationGuardDialogDismiss = { navigationGuardDialogOpen = false }
                 )
             }
 
@@ -226,8 +229,8 @@ fun GymTrackerApp(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
                     onGuardReleased = ::releaseNavigationGuard,
-                    showNavigationGuard = showNavigationGuard,
-                    onShowNavigationGuardChange = { showNavigationGuard = it }
+                    showNavigationGuard = navigationGuardDialogOpen,
+                    onNavigationGuardDialogDismiss = { navigationGuardDialogOpen = false }
                 )
             }
 
@@ -245,8 +248,8 @@ fun GymTrackerApp(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
                     onGuardReleased = ::releaseNavigationGuard,
-                    showNavigationGuard = showNavigationGuard,
-                    onShowNavigationGuardChange = { showNavigationGuard = it },
+                    showNavigationGuard = navigationGuardDialogOpen,
+                    onNavigationGuardDialogDismiss = { navigationGuardDialogOpen = false },
                     onNavigateToStats = { navigate(Route.CardioStats(it)) }
                 )
             }
@@ -260,14 +263,14 @@ fun GymTrackerApp(
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
                         onNavigateBack = ::popBackStack,
-                        onSessionNavigate = { id,  ->
+                        onSessionNavigate = { id ->
                             /*if (type == WorkoutType.GYM) {
                                 navigate(Route.GymSession(id))
                             } else {
                                 navigate(Route.CardioSession(id))
                             }*/
                         },
-                        onAddSessionNavigate = {_, type ->
+                        onAddSessionNavigate = { _, type ->
                         },
                         onWorkoutStatsNavigate = {
                             // TODO

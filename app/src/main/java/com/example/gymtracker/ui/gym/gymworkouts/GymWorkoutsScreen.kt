@@ -44,7 +44,7 @@ import java.time.Instant
 @Composable
 fun GymWorkoutsScreen(
     onNavigateToWorkout: (id: Int) -> Unit,
-    onNavigateToCreateWorkout: () -> Unit,
+    onCreateWorkoutClicked: () -> Unit,
     viewModel: GymWorkoutsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -91,7 +91,7 @@ fun GymWorkoutsScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = onNavigateToCreateWorkout,
+        onClick = onCreateWorkoutClicked,
         visible = !uiState.selectingItems && uiState.workouts.size < MAX_GYM_WORKOUTS
     ) {
         Icon(

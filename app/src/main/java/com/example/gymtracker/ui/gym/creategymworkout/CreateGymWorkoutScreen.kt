@@ -28,7 +28,7 @@ fun CreateGymWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
     showNavigationGuard: Boolean,
-    onShowNavigationGuardChange: (Boolean) -> Unit,
+    onNavigationGuardDialogDismiss: () -> Unit,
     onGuardReleased: () -> Unit,
     viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
@@ -94,8 +94,8 @@ fun CreateGymWorkoutScreen(
 
     if (showNavigationGuard) {
         UnsavedChangesDialog(
-            onConfirm = { onGuardReleased() },
-            onCancel = { onShowNavigationGuardChange(false) }
+            onConfirm = onGuardReleased,
+            onCancel = onNavigationGuardDialogDismiss
         )
     }
 }

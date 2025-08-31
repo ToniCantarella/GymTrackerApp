@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 private val USER_HAS_BEEN_WELCOMED = booleanPreferencesKey("user_has_been_welcomed")
 
-data class AppUiState(
+data class MainUiState(
     val loading: Boolean = true,
     val userHasBeenWelcomed: Boolean = false,
     val initialRoute: Route = Route.Welcome
@@ -25,7 +25,7 @@ data class AppUiState(
 class MainViewModel(
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AppUiState())
+    private val _uiState = MutableStateFlow(MainUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
