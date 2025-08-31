@@ -22,10 +22,6 @@ class GymWorkoutsViewModel(
     private val _uiState = MutableStateFlow(GymWorkoutsUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getWorkouts()
-    }
-
     fun getWorkouts() {
         viewModelScope.launch {
             val workouts = workoutRepository.getAllWorkouts()
