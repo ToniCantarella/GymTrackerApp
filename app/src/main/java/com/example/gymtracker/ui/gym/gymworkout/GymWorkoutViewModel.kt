@@ -7,12 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.gymtracker.GymPreferences
 import com.example.gymtracker.repository.gym.GymSessionRepository
 import com.example.gymtracker.repository.gym.GymStatsRepository
 import com.example.gymtracker.repository.gym.GymWorkoutRepository
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.GymWorkoutStats
-import com.example.gymtracker.ui.info.SHOW_FINISH_WORKOUT_DIALOG
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.utility.GymWorkoutUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,13 +28,12 @@ data class GymWorkoutUiState(
     val loading: Boolean = false,
     val workoutId: Int = 0,
     val workoutName: String = "",
+    val initialWorkoutName: String = "",
     val latestTimestamp: Instant? = null,
     val exercises: List<Exercise> = emptyList(),
-    val initialWorkoutName: String = "",
     val initialExercises: List<Exercise> = emptyList(),
-    val guardFinishWorkout: Boolean = true,
-    val doNotAskAgain: Boolean = false,
-    val selectedTimestamp: Instant? = null,
+    val showFinishWorkoutDialog: Boolean = true,
+    val sessionTimestamp: Instant? = null,
     val stats: GymWorkoutStats? = null
 )
 
@@ -56,22 +55,22 @@ class GymWorkoutViewModel(
             val latestWorkout = workoutRepository.getLatestWorkoutWithExercises(navParams.id)
             val workoutName = latestWorkout?.name ?: ""
             val exercises = latestWorkout?.exercises ?: emptyList()
-            val selectedTimestamp = navParams.timestampString?.let{ Instant.parse(it) }
+            val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
             val showFinishWorkoutDialog = dataStore.data
-                .map { it[SHOW_FINISH_WORKOUT_DIALOG] ?: true }
+                .map { it[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] ?: true }
                 .first()
 
             _uiState.update {
                 it.copy(
                     workoutId = navParams.id,
                     workoutName = workoutName,
-                    latestTimestamp = latestWorkout?.timestamp,
-                    selectedTimestamp = selectedTimestamp,
-                    exercises = exercises,
                     initialWorkoutName = workoutName,
+                    latestTimestamp = latestWorkout?.timestamp,
+                    exercises = exercises,
                     initialExercises = exercises,
-                    guardFinishWorkout = showFinishWorkoutDialog,
+                    showFinishWorkoutDialog = showFinishWorkoutDialog,
+                    sessionTimestamp = sessionTimestamp,
                     loading = false
                 )
             }
@@ -171,14 +170,6 @@ class GymWorkoutViewModel(
         }
     }
 
-    fun onShowFinishDialogChecked(checked: Boolean) {
-        _uiState.update {
-            it.copy(
-                doNotAskAgain = checked
-            )
-        }
-    }
-
     fun saveChanges() {
         viewModelScope.launch {
             workoutRepository.updateWorkout(
@@ -189,19 +180,24 @@ class GymWorkoutViewModel(
         }
     }
 
-    fun onFinishWorkoutPressed(onFinish: () -> Unit) {
-        saveChanges()
+    fun stopAskingFinishConfirm() {
         viewModelScope.launch {
+            if (uiState.value.showFinishWorkoutDialog) {
+                dataStore.edit { preferences ->
+                    preferences[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] = false
+                }
+            }
+        }
+    }
+
+    fun onFinishWorkoutPressed(onFinish: () -> Unit) {
+        viewModelScope.launch {
+            saveChanges()
+
             sessionRepository.markSessionDone(
                 workoutId = navParams.id,
                 exercises = uiState.value.exercises,
             )
-
-            if (uiState.value.guardFinishWorkout && uiState.value.doNotAskAgain) {
-                dataStore.edit { preferences ->
-                    preferences[SHOW_FINISH_WORKOUT_DIALOG] = false
-                }
-            }
 
             onFinish()
         }

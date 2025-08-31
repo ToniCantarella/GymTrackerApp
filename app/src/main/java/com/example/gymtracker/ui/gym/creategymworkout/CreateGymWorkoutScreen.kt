@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
-import com.example.gymtracker.ui.common.UnsavedChangesDialog
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.gym.common.ExerciseListCreate
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
@@ -27,9 +26,7 @@ import java.util.UUID
 fun CreateGymWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
-    showNavigationGuard: Boolean,
-    onNavigationGuardDialogDismiss: () -> Unit,
-    onGuardReleased: () -> Unit,
+    releaseNavigationGuard: () -> Unit,
     viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,7 +66,7 @@ fun CreateGymWorkoutScreen(
 
     ProvideFloatingActionButton(
         onClick = {
-            onGuardReleased()
+            releaseNavigationGuard()
             viewModel.onCreateWorkoutPressed { onNavigateBack() }
         },
         enabled = uiState.exercises.last().name.isNotEmpty() && uiState.workoutName.isNotEmpty()
@@ -91,13 +88,6 @@ fun CreateGymWorkoutScreen(
         onChangeRepetitions = viewModel::onChangeRepetitions,
         onRemoveSet = viewModel::onRemoveSet
     )
-
-    if (showNavigationGuard) {
-        UnsavedChangesDialog(
-            onConfirm = onGuardReleased,
-            onCancel = onNavigationGuardDialogDismiss
-        )
-    }
 }
 
 @Composable

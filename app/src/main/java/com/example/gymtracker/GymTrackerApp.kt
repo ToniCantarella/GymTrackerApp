@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gymtracker.ui.cardio.cardioitem.CardioWorkoutScreen
 import com.example.gymtracker.ui.cardio.cardiolist.CardioWorkoutsScreen
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioWorkoutScreen
+import com.example.gymtracker.ui.common.UnsavedChangesDialog
 import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
@@ -173,9 +174,7 @@ fun GymTrackerApp(
                 GymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
-                    releaseNavigationGuard = ::releaseNavigationGuard,
-                    navigationGuardDialogOpen = navigationGuardDialogOpen,
-                    onNavigationGuardDialogDismiss = { navigationGuardDialogOpen = false }
+                    releaseNavigationGuard = ::releaseNavigationGuard
                 )
             }
 
@@ -183,9 +182,7 @@ fun GymTrackerApp(
                 CreateGymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
-                    onGuardReleased = ::releaseNavigationGuard,
-                    showNavigationGuard = navigationGuardDialogOpen,
-                    onNavigationGuardDialogDismiss = { navigationGuardDialogOpen = false }
+                    releaseNavigationGuard = ::releaseNavigationGuard,
                 )
             }
 
@@ -202,9 +199,6 @@ fun GymTrackerApp(
                 CardioWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
-                    onGuardReleased = ::releaseNavigationGuard,
-                    showNavigationGuard = navigationGuardDialogOpen,
-                    onNavigationGuardDialogDismiss = { navigationGuardDialogOpen = false },
                     onNavigateToStats = { navigate(Route.CardioWorkoutStats(it)) }
                 )
             }
@@ -219,6 +213,7 @@ fun GymTrackerApp(
                     StatsOverviewScreen(
                         onNavigateBack = ::popBackStack,
                         onSessionNavigate = { id ->
+                            // TODO
                             /*if (type == WorkoutType.GYM) {
                                 navigate(Route.GymSession(id))
                             } else {
@@ -266,6 +261,18 @@ fun GymTrackerApp(
                 )
             }
         }
+    }
+
+    if (navigationGuardDialogOpen) {
+        UnsavedChangesDialog(
+            onConfirm = { doNotAskAgain ->
+                if (doNotAskAgain) {
+                    viewModel.stopAskingUnsavedChanges()
+                }
+                releaseNavigationGuard()
+            },
+            onCancel = { navigationGuardDialogOpen = false }
+        )
     }
 }
 

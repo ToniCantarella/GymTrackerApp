@@ -18,7 +18,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.cardio.common.CardioContent
-import com.example.gymtracker.ui.common.UnsavedChangesDialog
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.navigation.TopBarTextField
@@ -29,9 +28,6 @@ import org.koin.androidx.compose.koinViewModel
 fun CardioWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
-    showNavigationGuard: Boolean,
-    onNavigationGuardDialogDismiss: () -> Unit,
-    onGuardReleased: () -> Unit,
     onNavigateToStats: (id: Int) -> Unit,
     viewModel: CardioItemViewModel = koinViewModel()
 ) {
@@ -70,6 +66,7 @@ fun CardioWorkoutScreen(
             }
         },
         actions = {
+            // TODO this should not navigate, but instead show a modal
             IconButton(
                 onClick = { onNavigateToStats(uiState.cardioId) }
             ) {
@@ -110,13 +107,6 @@ fun CardioWorkoutScreen(
             previousDuration = uiState.previousCardio?.duration?.value,
             previousDurationTimestamp = uiState.previousCardio?.duration?.timestamp,
             onDurationChange = viewModel::onDurationChange
-        )
-    }
-
-    if (showNavigationGuard) {
-        UnsavedChangesDialog(
-            onConfirm = onGuardReleased,
-            onCancel = onNavigationGuardDialogDismiss
         )
     }
 }

@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.common.UnsavedChangesDialog
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.gym.common.ExerciseListEdit
@@ -60,8 +59,6 @@ import java.util.UUID
 fun GymWorkoutScreen(
     onNavigateBack: () -> Unit,
     onNavigationGuardChange: (Boolean) -> Unit,
-    navigationGuardDialogOpen: Boolean,
-    onNavigationGuardDialogDismiss: () -> Unit,
     releaseNavigationGuard: () -> Unit,
     viewModel: GymWorkoutViewModel = koinViewModel()
 ) {
@@ -94,14 +91,14 @@ fun GymWorkoutScreen(
     }
 
     fun finishWorkoutCheck() {
-        if (hasPerformedSets && uiState.guardFinishWorkout) {
+        if (hasPerformedSets && uiState.showFinishWorkoutDialog) {
             finishWorkoutDialogOpen = true
         } else {
             onFinishWorkout()
         }
     }
 
-    fun saveChanges(){
+    fun saveChanges() {
         releaseNavigationGuard()
         viewModel.saveChanges()
         onNavigateBack()
@@ -159,7 +156,7 @@ fun GymWorkoutScreen(
     GymWorkoutScreen(
         loading = uiState.loading,
         latestTimestamp = uiState.latestTimestamp,
-        addingTimestamp = uiState.selectedTimestamp,
+        addingTimestamp = uiState.sessionTimestamp,
         exercises = uiState.exercises,
         addExercise = viewModel::addExercise,
         onRemoveExercise = viewModel::onRemoveExercise,
@@ -185,15 +182,19 @@ fun GymWorkoutScreen(
                         BasicLineChart(
                             title = {
                                 Text(
-                                    text = exercise.name.ifEmpty { "${stringResource(id = R.string.exercise)} ${index + 1}" }
+                                    text = exercise.name.ifEmpty {
+                                        "${stringResource(id = R.string.exercise)} ${index + 1}"
+                                    }
                                 )
                             },
-                            bottomLabels = if (exercise.setHistory.isNotEmpty()) {
-                                listOf(
-                                    exercise.setHistory.first().timestamp.toDateString(),
-                                    exercise.setHistory.last().timestamp.toDateString()
-                                )
-                            } else emptyList(),
+                            bottomLabels =
+                                if (exercise.setHistory.isNotEmpty()) {
+                                    listOf(
+                                        exercise.setHistory.first().timestamp.toDateString(),
+                                        exercise.setHistory.last().timestamp.toDateString()
+                                    )
+                                } else
+                                    emptyList(),
                             dataValues = exercise.setHistory.map { it.maxWeight },
                             popupContentBuilder = { dataIndex, valueIndex, value ->
                                 "${exercise.setHistory[valueIndex].maxWeight} ${weightUnitString}\n ${exercise.setHistory[valueIndex].timestamp.toDateString()}"
@@ -206,14 +207,9 @@ fun GymWorkoutScreen(
         }
     }
 
-    if (navigationGuardDialogOpen) {
-        UnsavedChangesDialog(
-            onConfirm = releaseNavigationGuard,
-            onCancel = onNavigationGuardDialogDismiss
-        )
-    }
-
     if (finishWorkoutDialogOpen) {
+        var doNotAskAgain by remember { mutableStateOf(false) }
+
         ConfirmDialog(
             subtitle = {
                 Column {
@@ -223,8 +219,8 @@ fun GymWorkoutScreen(
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
-                            uiState.doNotAskAgain,
-                            onCheckedChange = viewModel::onShowFinishDialogChecked
+                            doNotAskAgain,
+                            onCheckedChange = { doNotAskAgain = it }
                         )
                         Text(
                             text = stringResource(id = R.string.do_not_ask_again)
@@ -245,6 +241,9 @@ fun GymWorkoutScreen(
                 Button(
                     onClick = {
                         finishWorkoutDialogOpen = false
+                        if (doNotAskAgain) {
+                            viewModel.stopAskingFinishConfirm()
+                        }
                         onFinishWorkout()
                     }
                 ) {

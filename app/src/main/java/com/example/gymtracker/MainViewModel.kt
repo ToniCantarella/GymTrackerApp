@@ -14,11 +14,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-private val USER_HAS_BEEN_WELCOMED = booleanPreferencesKey("user_has_been_welcomed")
+object GymPreferences{
+    val USER_HAS_BEEN_WELCOMED = booleanPreferencesKey("user_has_been_welcomed")
+    val SHOW_UNSAVED_CHANGES_DIALOG = booleanPreferencesKey("show_unsaved_changes_dialog")
+    val SHOW_FINISH_WORKOUT_CONFIRM_DIALOG =
+        booleanPreferencesKey("show_finish_workout_confirm_dialog")
+}
 
 data class MainUiState(
     val loading: Boolean = true,
     val userHasBeenWelcomed: Boolean = false,
+    val confirmUnsavedChanges: Boolean = true,
     val initialRoute: Route = Route.Welcome
 )
 
@@ -35,7 +41,7 @@ class MainViewModel(
     fun checkUserPreferences() {
         viewModelScope.launch {
             val hasBeenWelcomed = dataStore.data
-                .map { it[USER_HAS_BEEN_WELCOMED] ?: false }
+                .map { it[GymPreferences.USER_HAS_BEEN_WELCOMED] ?: false }
                 .first()
 
             _uiState.update {
@@ -51,7 +57,15 @@ class MainViewModel(
     fun onUserWelcomed() {
         viewModelScope.launch {
             dataStore.edit { preferences ->
-                preferences[USER_HAS_BEEN_WELCOMED] = true
+                preferences[GymPreferences.USER_HAS_BEEN_WELCOMED] = true
+            }
+        }
+    }
+
+    fun stopAskingUnsavedChanges() {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] = false
             }
         }
     }
