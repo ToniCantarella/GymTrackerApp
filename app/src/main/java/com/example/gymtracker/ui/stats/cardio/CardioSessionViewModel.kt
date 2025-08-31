@@ -21,7 +21,7 @@ class CardioSessionViewModel(
     savedStateHandle: SavedStateHandle,
     private val sessionRepository: CardioSessionRepository
 ) : ViewModel() {
-    private val navParams = savedStateHandle.toRoute<Route.CardioSession>()
+    private val navParams = savedStateHandle.toRoute<Route.CardioWorkoutSession>()
 
     private val _uiState = MutableStateFlow(CardioSessionUiState())
     val uiState = _uiState.asStateFlow()

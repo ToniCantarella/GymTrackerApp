@@ -22,7 +22,7 @@ class SplitStatsViewModel(
     savedStateHandle: SavedStateHandle,
     private val statRepository: GymStatsRepository
 ) : ViewModel() {
-    private val navParams = savedStateHandle.toRoute<Route.SplitStats>()
+    private val navParams = savedStateHandle.toRoute<Route.GymWorkoutStats>()
 
     private val _uiState = MutableStateFlow(SplitStatsUiState())
     val uiState = _uiState.asStateFlow()

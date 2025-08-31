@@ -1,6 +1,5 @@
 package com.example.gymtracker.ui.navigation
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,15 +28,18 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 
+data class NavigationBarRoute(val titleResInt: Int, val route: Route, val iconResInt: Int)
+
 @Composable
 fun GymScaffold(
     navController: NavController,
+    isLandscape: Boolean,
     navigate: (Route) -> Unit,
+    navigationBarRoutes: List<NavigationBarRoute>,
     content: @Composable (innerPadding: PaddingValues) -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val matchesNavigationBarRoute = navigationBarRoutes.any { navigationBarRoute ->
         currentDestination?.hierarchy?.any { it.hasRoute(navigationBarRoute.route::class) } == true

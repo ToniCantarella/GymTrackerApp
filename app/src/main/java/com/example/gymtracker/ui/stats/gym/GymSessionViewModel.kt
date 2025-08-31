@@ -21,7 +21,7 @@ class GymSessionViewModel(
     savedStateHandle: SavedStateHandle,
     private val sessionRepository: GymSessionRepository
 ) : ViewModel() {
-    private val navParams = savedStateHandle.toRoute<Route.GymSession>()
+    private val navParams = savedStateHandle.toRoute<Route.GymWorkoutSession>()
 
     init {
         viewModelScope.launch {

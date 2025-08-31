@@ -27,7 +27,7 @@ import com.example.gymtracker.utility.CARDIO_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CreateCardioScreen(
+fun CreateCardioWorkoutScreen(
     onNavigateBack: () -> Unit,
     viewModel: CreateCardioViewModel = koinViewModel()
 ) {

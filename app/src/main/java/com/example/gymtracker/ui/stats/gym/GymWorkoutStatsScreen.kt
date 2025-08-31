@@ -26,7 +26,7 @@ import com.example.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SplitStatsScreen(
+fun GymWorkoutStatsScreen(
     onNavigateBack: () -> Unit,
     viewModel: SplitStatsViewModel = koinViewModel()
 ) {
@@ -58,14 +58,14 @@ fun SplitStatsScreen(
             CircularProgressIndicator()
         }
     } else if (uiState.stats != null) {
-        SplitStatsScreen(
+        GymWorkoutStatsScreen(
             stats = uiState.stats!!
         )
     }
 }
 
 @Composable
-private fun SplitStatsScreen(
+private fun GymWorkoutStatsScreen(
     stats: GymWorkoutStats,
     modifier: Modifier = Modifier
 ) {

@@ -38,7 +38,7 @@ import com.example.gymtracker.utility.MAX_CARDIO
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CardioListScreen(
+fun CardioWorkoutsScreen(
     onNavigateToWorkout: (id: Int) -> Unit,
     onNavigateToCreateCardio: () -> Unit,
     viewModel: CardioListViewModel = koinViewModel()
@@ -135,7 +135,7 @@ fun CardioListScreen(
         )
     }
 
-    CardioListScreen(
+    CardioWorkoutsScreen(
         loading = uiState.loading,
         workouts = uiState.workouts,
         selectingItems = uiState.selectingItems,
@@ -147,7 +147,7 @@ fun CardioListScreen(
 }
 
 @Composable
-private fun CardioListScreen(
+private fun CardioWorkoutsScreen(
     loading: Boolean,
     workouts: List<WorkoutWithTimestamp>,
     selectingItems: Boolean,

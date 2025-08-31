@@ -29,7 +29,7 @@ import com.example.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CardioStatsScreen(
+fun CardioWorkoutStatsScreen(
     onNavigateBack: () -> Unit,
     viewModel: CardioStatsViewModel = koinViewModel()
 ) {
@@ -61,14 +61,14 @@ fun CardioStatsScreen(
             CircularProgressIndicator()
         }
     } else if (uiState.stats != null) {
-        CardioStatsScreen(
+        CardioWorkoutStatsScreen(
             stats = uiState.stats!!
         )
     }
 }
 
 @Composable
-private fun CardioStatsScreen(
+private fun CardioWorkoutStatsScreen(
     stats: CardioWorkoutStats,
     modifier: Modifier = Modifier
 ) {
