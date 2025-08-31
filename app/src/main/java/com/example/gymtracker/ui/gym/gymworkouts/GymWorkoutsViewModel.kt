@@ -1,33 +1,37 @@
-package com.example.gymtracker.ui.cardio.cardiolist
+package com.example.gymtracker.ui.gym.gymworkouts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymtracker.repository.cardio.CardioWorkoutRepository
+import com.example.gymtracker.repository.gym.GymWorkoutRepository
 import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class CardioListUiState(
+data class GymWorkoutsUiState(
     val loading: Boolean = true,
     val workouts: List<WorkoutWithTimestamp> = emptyList(),
     val selectedItems: List<WorkoutWithTimestamp> = emptyList(),
     val selectingItems: Boolean = false
 )
 
-class CardioListViewModel(
-    private val workoutRepository: CardioWorkoutRepository
+class GymWorkoutsViewModel(
+    private val workoutRepository: GymWorkoutRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CardioListUiState())
+    private val _uiState = MutableStateFlow(GymWorkoutsUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        getWorkouts()
+    }
 
     fun getWorkouts() {
         viewModelScope.launch {
-            val cardioList = workoutRepository.getAllWorkouts()
+            val workouts = workoutRepository.getAllWorkouts()
             _uiState.update {
                 it.copy(
-                    workouts = cardioList,
+                    workouts = workouts,
                     loading = false
                 )
             }
@@ -69,7 +73,7 @@ class CardioListViewModel(
         }
     }
 
-    fun onDeleteWorkouts(onDeletionDone: () -> Unit) {
+    fun onDeleteWorkoutPlans() {
         val itemsToDelete = uiState.value.selectedItems
 
         viewModelScope.launch {
@@ -78,7 +82,6 @@ class CardioListViewModel(
             }
             stopSelectingItems()
             getWorkouts()
-            onDeletionDone()
         }
     }
 }

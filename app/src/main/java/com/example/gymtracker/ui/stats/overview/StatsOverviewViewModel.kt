@@ -7,7 +7,7 @@ import com.example.gymtracker.repository.cardio.CardioWorkoutRepository
 import com.example.gymtracker.repository.gym.GymSessionRepository
 import com.example.gymtracker.repository.gym.GymWorkoutRepository
 import com.example.gymtracker.ui.entity.WorkoutSession
-import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
+import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -25,8 +25,8 @@ fun firstDayOfMonthInstant(zoneId: ZoneId = ZoneId.systemDefault()): Instant {
 
 data class StatsOverviewUiState(
     val loading: Boolean = true,
-    val gymWorkouts: List<WorkoutWithLatestTimestamp> = emptyList(),
-    val cardioWorkouts: List<WorkoutWithLatestTimestamp> = emptyList(),
+    val gymWorkouts: List<WorkoutWithTimestamp> = emptyList(),
+    val cardioWorkouts: List<WorkoutWithTimestamp> = emptyList(),
     val gymSessions: List<WorkoutSession> = emptyList(),
     val cardioSessions: List<WorkoutSession> = emptyList(),
     val workoutSessionsBetween: List<WorkoutSession> = emptyList(),

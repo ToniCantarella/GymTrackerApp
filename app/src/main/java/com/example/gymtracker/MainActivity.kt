@@ -69,7 +69,7 @@ import com.example.gymtracker.ui.cardio.cardiolist.CardioListScreen
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioScreen
 import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
-import com.example.gymtracker.ui.gym.gymworkoutplans.GymWorkoutPlansScreen
+import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.Route
@@ -204,7 +204,7 @@ fun GymTrackerApp(
 
             navigation<Route.Gym>(startDestination = Route.GymWorkoutPlans) {
                 composable<Route.GymWorkoutPlans> {
-                    GymWorkoutPlansScreen(
+                    GymWorkoutsScreen(
                         onNavigateToWorkout = { navigate(Route.GymWorkout(it)) },
                         onNavigateToCreateWorkout = { navigate(Route.CreateSplit) }
                     )
@@ -234,7 +234,7 @@ fun GymTrackerApp(
             navigation<Route.Cardio>(startDestination = Route.CardioList) {
                 composable<Route.CardioList> {
                     CardioListScreen(
-                        onNavigateToCardioItem = { navigate(Route.CardioItem(it)) },
+                        onNavigateToWorkout = { navigate(Route.CardioItem(it)) },
                         onNavigateToCreateCardio = { navigate(Route.CreateCardio) }
                     )
                 }

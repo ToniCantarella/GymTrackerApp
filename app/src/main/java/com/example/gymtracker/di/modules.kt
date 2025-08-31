@@ -25,7 +25,7 @@ import com.example.gymtracker.ui.cardio.cardiolist.CardioListViewModel
 import com.example.gymtracker.ui.cardio.createcardio.CreateCardioViewModel
 import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutViewModel
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutViewModel
-import com.example.gymtracker.ui.gym.gymworkoutplans.GymWorkoutPlansViewModel
+import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsViewModel
 import com.example.gymtracker.ui.info.InfoViewModel
 import com.example.gymtracker.ui.stats.cardio.CardioSessionViewModel
 import com.example.gymtracker.ui.stats.cardio.CardioStatsViewModel
@@ -118,7 +118,7 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     viewModelOf(::MainViewModel)
-    viewModelOf(::GymWorkoutPlansViewModel)
+    viewModelOf(::GymWorkoutsViewModel)
     viewModelOf(::CardioListViewModel)
     viewModelOf(::CardioItemViewModel)
     viewModelOf(::GymWorkoutViewModel)

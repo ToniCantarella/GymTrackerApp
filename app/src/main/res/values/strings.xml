@@ -21,7 +21,7 @@
     <string name="welcome_text">Everything you create with this app is saved only on your device. We do not track any of your data. You can delete all data at any time and start from the beginning.</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
-    <string name="delete_are_you_sure">Are you sure you want to delete %s items?</string>
+    <string name="delete_are_you_sure_multiple_items">Are you sure you want to delete %s items?</string>
     <string name="name">Name</string>
     <string name="exercise">Exercise</string>
     <string name="done">Done</string>
@@ -70,4 +70,5 @@
     <string name="show_finish_workout_dialog">Confirm finishing workout</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
+    <string name="delete_are_you_sure_singular_item">Are you sure you want to delete %s?</string>
 </resources>

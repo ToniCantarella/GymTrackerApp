@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +31,7 @@ import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.common.WorkoutList
-import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
+import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.utility.MAX_CARDIO
@@ -40,18 +39,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CardioListScreen(
-    onNavigateToCardioItem: (id: Int) -> Unit,
+    onNavigateToWorkout: (id: Int) -> Unit,
     onNavigateToCreateCardio: () -> Unit,
     viewModel: CardioListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val selectedItemsCount by remember(uiState.cardioList) {
-        derivedStateOf { uiState.cardioList.count { it.selected } }
-    }
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.getCardioList()
+        viewModel.getWorkouts()
     }
 
     ProvideTopAppBar(
@@ -67,7 +63,7 @@ fun CardioListScreen(
                 }
                 IconButton(
                     onClick = { deletionDialogOpen = true },
-                    enabled = selectedItemsCount > 0
+                    enabled = uiState.selectedItems.isNotEmpty()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -78,7 +74,7 @@ fun CardioListScreen(
             } else {
                 IconButton(
                     onClick = viewModel::startSelectingItems,
-                    enabled = uiState.cardioList.isNotEmpty()
+                    enabled = uiState.workouts.isNotEmpty()
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.checklist),
@@ -91,7 +87,7 @@ fun CardioListScreen(
 
     ProvideFloatingActionButton(
         onClick = onNavigateToCreateCardio,
-        visible = uiState.cardioList.size < MAX_CARDIO
+        visible = uiState.workouts.size < MAX_CARDIO
     ) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -104,8 +100,8 @@ fun CardioListScreen(
             subtitle = {
                 Text(
                     text = stringResource(
-                        id = R.string.delete_are_you_sure,
-                        selectedItemsCount
+                        id = R.string.delete_are_you_sure_multiple_items,
+                        uiState.selectedItems.size
                     ),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
@@ -115,7 +111,7 @@ fun CardioListScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.onDeleteCardioList { deletionDialogOpen = false }
+                        viewModel.onDeleteWorkouts { deletionDialogOpen = false }
                     }
                 ) {
                     Text(
@@ -141,22 +137,24 @@ fun CardioListScreen(
 
     CardioListScreen(
         loading = uiState.loading,
-        cardioList = uiState.cardioList,
+        workouts = uiState.workouts,
         selectingItems = uiState.selectingItems,
-        onSelect = viewModel::onSelectItem,
-        onCardioClick = onNavigateToCardioItem,
-        onCardioHold = viewModel::startSelectingItems
+        selectedItems = uiState.selectedItems,
+        onSelectWorkout = viewModel::onSelectItem,
+        onWorkoutClick = { onNavigateToWorkout(it.id) },
+        onWorkoutHold = viewModel::startSelectingItems
     )
 }
 
 @Composable
 private fun CardioListScreen(
     loading: Boolean,
-    cardioList: List<WorkoutWithLatestTimestamp>,
+    workouts: List<WorkoutWithTimestamp>,
     selectingItems: Boolean,
-    onSelect: (id: Int, selected: Boolean) -> Unit,
-    onCardioHold: (id: Int) -> Unit,
-    onCardioClick: (id: Int) -> Unit
+    selectedItems: List<WorkoutWithTimestamp>,
+    onSelectWorkout: (workout: WorkoutWithTimestamp) -> Unit,
+    onWorkoutClick: (workout: WorkoutWithTimestamp) -> Unit,
+    onWorkoutHold: (workout: WorkoutWithTimestamp) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -164,7 +162,7 @@ private fun CardioListScreen(
     ) {
         if (loading) {
             CircularProgressIndicator()
-        } else if (cardioList.isEmpty()) {
+        } else if (workouts.isEmpty()) {
             EmptyListCard(
                 iconPainter = painterResource(id = R.drawable.run),
                 subtitle = {
@@ -176,11 +174,12 @@ private fun CardioListScreen(
             )
         } else {
             WorkoutList(
-                workouts = cardioList,
+                workouts = workouts,
                 selectingItems = selectingItems,
-                onSelect = onSelect,
-                onHold = onCardioHold,
-                onClick = onCardioClick
+                selectedItems = selectedItems,
+                onSelect = onSelectWorkout,
+                onHold = onWorkoutHold,
+                onClick = onWorkoutClick
             )
         }
     }

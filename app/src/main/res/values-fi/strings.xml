@@ -14,7 +14,7 @@
     <string name="welcome_text">Kaikki mitä luot tällä sovelluksella tallennetaan vain ja ainoastaan laitteellesi. Emme seuraa dataasi ollenkaan. Voit poistaa kaikki tiedot koska tahansa ja aloittaa alusta.</string>
     <string name="cancel">Peruuta</string>
     <string name="delete">Poista</string>
-    <string name="delete_are_you_sure">Oletko varma että haluat poistaa %s kohdetta?</string>
+    <string name="delete_are_you_sure_multiple_items">Oletko varma että haluat poistaa %s kohdetta?</string>
     <string name="name">Nimi</string>
     <string name="exercise">Liike</string>
     <string name="done">Valmis</string>
@@ -62,4 +62,5 @@
     <string name="show_finish_workout_dialog">Varmista treenin lopettaminen</string>
     <string name="previous">Edellinen</string>
     <string name="next">Seuraava</string>
+    <string name="delete_are_you_sure_singular_item">Oletko varma, että tahdot poistaa %s?</string>
 </resources>

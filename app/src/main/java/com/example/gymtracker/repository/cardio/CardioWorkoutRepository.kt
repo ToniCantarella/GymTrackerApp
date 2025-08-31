@@ -4,14 +4,14 @@ import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
-import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
+import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.DistanceWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.DurationWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.StepsWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 
 interface CardioWorkoutRepository {
-    suspend fun getAllWorkouts(): List<WorkoutWithLatestTimestamp>
+    suspend fun getAllWorkouts(): List<WorkoutWithTimestamp>
     suspend fun addWorkout(workoutName: String)
     suspend fun updateWorkout(workoutId: Int, workoutName: String)
     suspend fun getLatestWorkoutWithMetrics(workoutId: Int): WorkoutWithMetrics?
@@ -23,17 +23,17 @@ class CardioWorkoutRepositoryImpl(
     private val metricsDao: CardioMetricsDao,
     private val sessionDao: CardioSessionDao
 ) : CardioWorkoutRepository {
-    override suspend fun getAllWorkouts(): List<WorkoutWithLatestTimestamp> {
+    override suspend fun getAllWorkouts(): List<WorkoutWithTimestamp> {
         val workouts = workoutDao.getAll()
 
         return workouts.map {
             val cardio = metricsDao.getCardioByWorkoutId(it.id)
             val session = sessionDao.getLastSession(cardio.id)
 
-            WorkoutWithLatestTimestamp(
+            WorkoutWithTimestamp(
                 id = it.id,
                 name = it.name,
-                latestTimestamp = session?.timestamp
+                timestamp = session?.timestamp
             )
         }
     }

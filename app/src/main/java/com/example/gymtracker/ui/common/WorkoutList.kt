@@ -38,18 +38,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
-import com.example.gymtracker.ui.entity.WorkoutWithLatestTimestamp
+import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.toDateString
 import kotlinx.coroutines.delay
 
 @Composable
 fun WorkoutList(
-    workouts: List<WorkoutWithLatestTimestamp>,
+    workouts: List<WorkoutWithTimestamp>,
     selectingItems: Boolean,
-    onSelect: (id: Int, selected: Boolean) -> Unit,
-    onHold: (id: Int) -> Unit,
-    onClick: (id: Int) -> Unit,
+    selectedItems: List<WorkoutWithTimestamp>,
+    onSelect: (workout: WorkoutWithTimestamp) -> Unit,
+    onHold: (workout: WorkoutWithTimestamp) -> Unit,
+    onClick: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -71,8 +72,8 @@ fun WorkoutList(
                 WorkoutListItem(
                     workout = workout,
                     selectingItems = selectingItems,
-                    selected = workout.selected,
-                    onSelect = { onSelect(workout.id, it) },
+                    selected = workout in selectedItems,
+                    onSelect = onSelect,
                     onHold = onHold,
                     onClick = onClick
                 )
@@ -86,21 +87,21 @@ fun WorkoutList(
 
 @Composable
 fun WorkoutListItem(
-    workout: WorkoutWithLatestTimestamp,
-    onClick: (id: Int) -> Unit,
+    workout: WorkoutWithTimestamp,
+    onClick: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier,
     selectingItems: Boolean = false,
     selected: Boolean = false,
-    onHold: (id: Int) -> Unit = {},
-    onSelect: (selected: Boolean) -> Unit = {}
+    onHold: (workout: WorkoutWithTimestamp) -> Unit = {},
+    onSelect: (workout: WorkoutWithTimestamp) -> Unit = {}
 ) {
     Surface(
         color = Color.Transparent,
         modifier = modifier
             .combinedClickable(
-                onClick = { if (!selectingItems) onClick(workout.id) },
+                onClick = { if (!selectingItems) onClick(workout) },
                 enabled = !selectingItems,
-                onLongClick = { onHold(workout.id) }
+                onLongClick = { onHold(workout) }
             )
     ) {
         Row(
@@ -128,7 +129,7 @@ fun WorkoutListItem(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = workout.latestTimestamp?.toDateString() ?: "-",
+                        text = workout.timestamp?.toDateString() ?: "-",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -146,7 +147,7 @@ fun WorkoutListItem(
                 ) {
                     Checkbox(
                         checked = selected,
-                        onCheckedChange = onSelect
+                        onCheckedChange = { onSelect(workout) }
                     )
                 }
 
@@ -173,10 +174,10 @@ private fun WorkoutListItemPreview() {
     GymTrackerTheme {
         Surface {
             WorkoutListItem(
-                workout = WorkoutWithLatestTimestamp(
+                workout = WorkoutWithTimestamp(
                     id = 0,
                     name = "Workout 1",
-                    latestTimestamp = null
+                    timestamp = null
                 ),
                 selectingItems = false,
                 selected = false,
@@ -194,10 +195,10 @@ private fun WorkoutListItemPreviewDark() {
     GymTrackerTheme(darkTheme = true) {
         Surface {
             WorkoutListItem(
-                workout = WorkoutWithLatestTimestamp(
+                workout = WorkoutWithTimestamp(
                     id = 0,
                     name = "Workout 1",
-                    latestTimestamp = null
+                    timestamp = null
                 ),
                 selectingItems = false,
                 selected = false,
