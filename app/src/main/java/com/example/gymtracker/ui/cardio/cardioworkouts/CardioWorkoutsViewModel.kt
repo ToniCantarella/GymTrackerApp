@@ -69,7 +69,7 @@ class CardioWorkoutsViewModel(
         }
     }
 
-    fun onDeleteWorkouts(onDeletionDone: () -> Unit) {
+    fun onDeleteWorkouts() {
         val itemsToDelete = uiState.value.selectedItems
 
         viewModelScope.launch {
@@ -78,7 +78,6 @@ class CardioWorkoutsViewModel(
             }
             stopSelectingItems()
             getWorkouts()
-            onDeletionDone()
         }
     }
 }

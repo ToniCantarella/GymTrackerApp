@@ -111,7 +111,8 @@ fun CardioWorkoutsScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.onDeleteWorkouts { deletionDialogOpen = false }
+                        deletionDialogOpen = false
+                        viewModel.onDeleteWorkouts()
                     }
                 ) {
                     Text(
