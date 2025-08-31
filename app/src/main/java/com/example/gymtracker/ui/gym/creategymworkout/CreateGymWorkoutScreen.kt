@@ -30,7 +30,7 @@ fun CreateGymWorkoutScreen(
     viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val hasUnsavedChanges = uiState.workoutName != "" || uiState.exercises != uiState.initialExercises
+    val hasUnsavedChanges = uiState.workoutName.isNotEmpty() || uiState.exercises != uiState.initialExercises
 
     BackHandler {
         onNavigateBack()
@@ -69,7 +69,7 @@ fun CreateGymWorkoutScreen(
             releaseNavigationGuard()
             viewModel.onCreateWorkoutPressed { onNavigateBack() }
         },
-        enabled = uiState.exercises.last().name.isNotEmpty() && uiState.workoutName.isNotEmpty()
+        enabled = uiState.workoutName.isNotEmpty()
     ) {
         Icon(
             painter = painterResource(id = R.drawable.save),

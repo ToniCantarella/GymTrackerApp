@@ -98,7 +98,6 @@ val repositoryModule = module {
     single<CardioWorkoutRepository> {
         CardioWorkoutRepositoryImpl(
             get(),
-            get(),
             get()
         )
     }
