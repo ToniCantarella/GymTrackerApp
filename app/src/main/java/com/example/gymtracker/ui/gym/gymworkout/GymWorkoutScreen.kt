@@ -62,7 +62,7 @@ fun GymWorkoutScreen(
     onNavigationGuardChange: (Boolean) -> Unit,
     showNavigationGuard: Boolean,
     onShowNavigationGuardChange: (Boolean) -> Unit,
-    onGuardReleased: () -> Unit,
+    releaseNavigationGuard: () -> Unit,
     viewModel: GymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -87,18 +87,24 @@ fun GymWorkoutScreen(
     }
 
     fun onFinishWorkout() {
-        onGuardReleased()
+        releaseNavigationGuard()
         viewModel.onFinishWorkoutPressed {
             onNavigateBack()
         }
     }
 
     fun finishWorkoutCheck() {
-        if (hasPerformedSets && uiState.showConfirmOnFinishWorkout) {
+        if (hasPerformedSets && uiState.guardFinishWorkout) {
             finishWorkoutDialogOpen = true
         } else {
             onFinishWorkout()
         }
+    }
+
+    fun saveChanges(){
+        releaseNavigationGuard()
+        viewModel.saveChanges()
+        onNavigateBack()
     }
 
     ProvideTopAppBar(
@@ -133,7 +139,13 @@ fun GymWorkoutScreen(
     )
 
     ProvideFloatingActionButton(
-        onClick = { finishWorkoutCheck() },
+        onClick = {
+            if (hasPerformedSets) {
+                finishWorkoutCheck()
+            } else {
+                saveChanges()
+            }
+        },
         enabled = hasUnsavedChanges || hasPerformedSets
     ) {
         Icon(
@@ -196,7 +208,7 @@ fun GymWorkoutScreen(
 
     if (showNavigationGuard) {
         UnsavedChangesDialog(
-            onConfirm = { onGuardReleased() },
+            onConfirm = { releaseNavigationGuard() },
             onCancel = { onShowNavigationGuardChange(false) }
         )
     }

@@ -74,7 +74,6 @@ class GymWorkoutRepositoryImpl(
         }
     }
 
-    // TODO this tie to the save button
     override suspend fun updateWorkout(
         workoutId: Int,
         workoutName: String,

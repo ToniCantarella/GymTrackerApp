@@ -215,7 +215,7 @@ fun GymTrackerApp(
                 GymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
-                    onGuardReleased = ::releaseNavigationGuard,
+                    releaseNavigationGuard = ::releaseNavigationGuard,
                     showNavigationGuard = showNavigationGuard,
                     onShowNavigationGuardChange = { showNavigationGuard = it }
                 )

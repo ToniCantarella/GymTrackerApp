@@ -32,7 +32,7 @@ data class GymWorkoutUiState(
     val exercises: List<Exercise> = emptyList(),
     val initialWorkoutName: String = "",
     val initialExercises: List<Exercise> = emptyList(),
-    val showConfirmOnFinishWorkout: Boolean = true,
+    val guardFinishWorkout: Boolean = true,
     val doNotAskAgain: Boolean = false,
     val selectedTimestamp: Instant? = null,
     val stats: GymWorkoutStats? = null
@@ -71,7 +71,7 @@ class GymWorkoutViewModel(
                     exercises = exercises,
                     initialWorkoutName = workoutName,
                     initialExercises = exercises,
-                    showConfirmOnFinishWorkout = showFinishWorkoutDialog,
+                    guardFinishWorkout = showFinishWorkoutDialog,
                     loading = false
                 )
             }
@@ -179,14 +179,25 @@ class GymWorkoutViewModel(
         }
     }
 
+    fun saveChanges() {
+        viewModelScope.launch {
+            workoutRepository.updateWorkout(
+                workoutId = navParams.id,
+                workoutName = uiState.value.workoutName,
+                exercises = uiState.value.exercises
+            )
+        }
+    }
+
     fun onFinishWorkoutPressed(onFinish: () -> Unit) {
+        saveChanges()
         viewModelScope.launch {
             sessionRepository.markSessionDone(
                 workoutId = navParams.id,
                 exercises = uiState.value.exercises,
             )
 
-            if (uiState.value.showConfirmOnFinishWorkout && uiState.value.doNotAskAgain) {
+            if (uiState.value.guardFinishWorkout && uiState.value.doNotAskAgain) {
                 dataStore.edit { preferences ->
                     preferences[SHOW_FINISH_WORKOUT_DIALOG] = false
                 }
