@@ -1,6 +1,5 @@
 package com.example.gymtracker.repository.cardio
 
-import com.example.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
@@ -20,19 +19,17 @@ interface CardioWorkoutRepository {
 
 class CardioWorkoutRepositoryImpl(
     private val workoutDao: CardioWorkoutDao,
-    private val metricsDao: CardioMetricsDao,
     private val sessionDao: CardioSessionDao
 ) : CardioWorkoutRepository {
     override suspend fun getAllWorkouts(): List<WorkoutWithTimestamp> {
         val workouts = workoutDao.getAll()
 
-        return workouts.map {
-            val cardio = metricsDao.getCardioByWorkoutId(it.id)
-            val session = sessionDao.getLastSession(cardio.id)
+        return workouts.map { workout ->
+            val session = sessionDao.getLastSession(workout.id)
 
             WorkoutWithTimestamp(
-                id = it.id,
-                name = it.name,
+                id = workout.id,
+                name = workout.name,
                 timestamp = session?.timestamp
             )
         }
