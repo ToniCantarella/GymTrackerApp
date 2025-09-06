@@ -7,10 +7,11 @@ import com.example.gymtracker.database.dao.gym.SetDao
 import com.example.gymtracker.database.dao.gym.SetSessionDao
 import com.example.gymtracker.database.entity.gym.GymSessionEntity
 import com.example.gymtracker.database.entity.gym.SetSessionEntity
-import com.example.gymtracker.ui.entity.WorkoutSession
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutSession
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutType
 import java.time.Instant
 
 interface GymSessionRepository {
@@ -25,43 +26,45 @@ interface GymSessionRepository {
 
 class GymSessionRepositoryImpl(
     private val workoutDao: GymWorkoutDao,
-    private val workoutSessionDao: GymSessionDao,
+    private val sessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
     private val setSessionDao: SetSessionDao
 ) : GymSessionRepository {
 
     override suspend fun getAllSessions(): List<WorkoutSession> {
-        val sessions = workoutSessionDao.getAllSessions()
-        return sessions.mapNotNull { session ->
-            if (session != null) {
+        return sessionDao.getAllSessions()?.mapNotNull { session ->
+            workoutDao.getById(session.workoutId)?.let { workout ->
                 WorkoutSession(
-                    id = session.id,
+                    sessionId = session.id,
                     workoutId = session.workoutId,
-                    timestamp = session.timestamp
+                    workoutName = workout.name,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.CARDIO
                 )
-            } else null
-        }
+            }
+        }.orEmpty()
     }
 
     override suspend fun getSessionsForTimespan(
         start: Instant,
         end: Instant
     ): List<WorkoutSession> {
-        val sessions = workoutSessionDao.getSessionsForTimespan(start, end)
-        return sessions.mapNotNull { session ->
-            if (session != null) {
+        return sessionDao.getSessionsForTimespan(start, end)?.mapNotNull { session ->
+            workoutDao.getById(session.workoutId)?.let { workout ->
                 WorkoutSession(
-                    id = session.id,
+                    sessionId = session.id,
                     workoutId = session.workoutId,
-                    timestamp = session.timestamp
+                    workoutName = workout.name,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.CARDIO
                 )
-            } else null
-        }
+            }
+        }.orEmpty()
     }
 
     override suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithExercises? {
-        val gymSession = workoutSessionDao.getById(sessionId)
+        val gymSession = sessionDao.getById(sessionId)
         val workout = workoutDao.getById(gymSession.workoutId)
         if (workout == null) {
             return null
@@ -99,14 +102,15 @@ class GymSessionRepositoryImpl(
         exercises: List<Exercise>
     ) {
         val timestamp = Instant.now()
-        val sessionId = workoutSessionDao.insert(
+        val sessionId = sessionDao.insert(
             GymSessionEntity(
                 workoutId = workoutId,
                 timestamp = timestamp
             )
         ).toInt()
 
-        val currentExercises = exerciseDao.getExercisesByWorkoutId(workoutId).associateBy { it.uuid }
+        val currentExercises =
+            exerciseDao.getExercisesByWorkoutId(workoutId).associateBy { it.uuid }
 
         exercises.forEach { exercise ->
             val currentExercise = currentExercises[exercise.uuid] ?: return

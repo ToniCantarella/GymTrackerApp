@@ -18,11 +18,11 @@ interface GymSessionDao {
     suspend fun getByWorkoutId(workoutId: Int): List<GymSessionEntity>
 
     @Query("SELECT * FROM gym_sessions")
-    suspend fun getAllSessions(): List<GymSessionEntity?>
+    suspend fun getAllSessions(): List<GymSessionEntity>?
 
     @Query("SELECT * FROM gym_sessions WHERE workoutId = :workoutId ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastSession(workoutId: Int): GymSessionEntity?
 
     @Query("SELECT * FROM gym_sessions WHERE timestamp BETWEEN :start AND :end")
-    suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<GymSessionEntity?>
+    suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<GymSessionEntity>?
 }

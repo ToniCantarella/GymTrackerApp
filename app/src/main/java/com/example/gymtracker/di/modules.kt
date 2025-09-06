@@ -8,6 +8,8 @@ import com.example.gymtracker.MainViewModel
 import com.example.gymtracker.database.GymDatabase
 import com.example.gymtracker.repository.AppRepository
 import com.example.gymtracker.repository.AppRepositoryImpl
+import com.example.gymtracker.repository.StatsOverviewRepository
+import com.example.gymtracker.repository.StatsOverviewRepositoryImpl
 import com.example.gymtracker.repository.cardio.CardioSessionRepository
 import com.example.gymtracker.repository.cardio.CardioSessionRepositoryImpl
 import com.example.gymtracker.repository.cardio.CardioStatsRepository
@@ -109,6 +111,14 @@ val repositoryModule = module {
     }
     single<CardioStatsRepository> {
         CardioStatsRepositoryImpl(
+            get(),
+            get()
+        )
+    }
+    single<StatsOverviewRepository> {
+        StatsOverviewRepositoryImpl(
+            get(),
+            get(),
             get(),
             get()
         )

@@ -3,9 +3,10 @@ package com.example.gymtracker.repository.cardio
 import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
-import com.example.gymtracker.ui.entity.WorkoutSession
 import com.example.gymtracker.ui.entity.cardio.CardioMetrics
 import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutSession
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutType
 import java.time.Instant
 
 interface CardioSessionRepository {
@@ -20,33 +21,34 @@ class CardioSessionRepositoryImpl(
     private val workoutDao: CardioWorkoutDao
 ) : CardioSessionRepository {
     override suspend fun getAllSessions(): List<WorkoutSession> {
-        val sessions = sessionDao.getAllSessions()
-        return sessions.mapNotNull { session ->
-            if (session != null) {
+        return sessionDao.getAllSessions()?.mapNotNull { session ->
+            workoutDao.getById(session.workoutId)?.let { workout ->
                 WorkoutSession(
-                    id = session.id,
+                    sessionId = session.id,
                     workoutId = session.workoutId,
-                    timestamp = session.timestamp
+                    workoutName = workout.name,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.CARDIO
                 )
-            } else null
-        }
+            }
+        }.orEmpty()
     }
 
     override suspend fun getSessionsForTimespan(
         start: Instant,
         end: Instant
     ): List<WorkoutSession> {
-        val sessions = sessionDao.getSessionsForTimespan(start, end)
-
-        return sessions.mapNotNull { session ->
-            if (session != null) {
+        return sessionDao.getSessionsForTimespan(start,end)?.mapNotNull { session ->
+            workoutDao.getById(session.workoutId)?.let { workout ->
                 WorkoutSession(
-                    id = session.id,
+                    sessionId = session.id,
                     workoutId = session.workoutId,
-                    timestamp = session.timestamp
+                    workoutName = workout.name,
+                    timestamp = session.timestamp,
+                    type = WorkoutType.CARDIO
                 )
-            } else null
-        }
+            }
+        }.orEmpty()
     }
 
     override suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithMetrics? {

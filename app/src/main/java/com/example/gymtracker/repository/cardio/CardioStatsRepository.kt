@@ -23,24 +23,24 @@ class CardioStatsRepositoryImpl(
         return CardioWorkoutStats(
             id = workoutId,
             name = workout.name,
-            stepsHistory = sessions.mapNotNull {
+            stepsHistory = sessions?.map {
                 StepsWithTimestamp(
-                    value = it?.steps,
-                    timestamp = it?.timestamp
+                    value = it.steps,
+                    timestamp = it.timestamp
                 )
-            },
-            distanceHistory = sessions.mapNotNull {
+            }.orEmpty(),
+            distanceHistory = sessions?.map {
                 DistanceWithTimestamp(
-                    value = it?.distance,
-                    timestamp = it?.timestamp
+                    value = it.distance,
+                    timestamp = it.timestamp
                 )
-            },
-            durationHistory = sessions.mapNotNull {
+            }.orEmpty(),
+            durationHistory = sessions?.map {
                 DurationWithTimestamp(
-                    value = it?.duration,
-                    timestamp = it?.timestamp
+                    value = it.duration,
+                    timestamp = it.timestamp
                 )
-            }
+            }.orEmpty()
         )
     }
 }
