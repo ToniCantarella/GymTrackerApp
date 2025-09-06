@@ -182,7 +182,7 @@ fun GymTrackerApp(
                 CreateGymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
-                    releaseNavigationGuard = ::releaseNavigationGuard,
+                    releaseNavigationGuard = ::releaseNavigationGuard
                 )
             }
 
@@ -204,7 +204,9 @@ fun GymTrackerApp(
             }
             composable<Route.CreateCardioWorkout> {
                 CreateCardioWorkoutScreen(
-                    onNavigateBack = ::popBackStack
+                    onNavigateBack = ::popBackStack,
+                    onNavigationGuardChange = ::onNavigationGuardChange,
+                    releaseNavigationGuard = ::releaseNavigationGuard
                 )
             }
 

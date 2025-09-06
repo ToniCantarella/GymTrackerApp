@@ -135,7 +135,6 @@ fun CardioWorkoutScreen(
         )
     }
 
-    // TODO since this is in both gym and here, make it more generic, maybe it should hold datastore somehow?
     if (finishWorkoutDialogOpen) {
         var doNotAskAgain by remember { mutableStateOf(false) }
 

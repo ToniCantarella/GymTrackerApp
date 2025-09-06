@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.cardio.createcardioworkout
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -29,9 +31,24 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CreateCardioWorkoutScreen(
     onNavigateBack: () -> Unit,
+    onNavigationGuardChange: (Boolean) -> Unit,
+    releaseNavigationGuard: () -> Unit,
     viewModel: CreateCardioWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val hasUnsavedChanges = uiState.name.isNotEmpty()
+
+    BackHandler {
+        onNavigateBack()
+    }
+
+    LaunchedEffect(hasUnsavedChanges) {
+        if (hasUnsavedChanges) {
+            onNavigationGuardChange(true)
+        } else {
+            onNavigationGuardChange(false)
+        }
+    }
 
     ProvideTopAppBar(
         title = {
@@ -55,6 +72,7 @@ fun CreateCardioWorkoutScreen(
 
     ProvideFloatingActionButton(
         onClick = {
+            releaseNavigationGuard()
             viewModel.onSavePressed { onNavigateBack() }
         },
         enabled = uiState.name.isNotEmpty()
@@ -65,7 +83,7 @@ fun CreateCardioWorkoutScreen(
         )
     }
 
-    Box{
+    Box {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,10 +103,7 @@ private fun CreateCardioPreview() {
     GymTrackerTheme {
         CardioContent(
             steps = 0,
-            onStepsChange = {},
-            distance = 0.0,
-            onDistanceChange = {},
-            onDurationChange = {}
+            distance = 0.0
         )
     }
 }
