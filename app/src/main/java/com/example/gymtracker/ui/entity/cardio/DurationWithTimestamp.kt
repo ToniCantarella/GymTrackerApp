@@ -5,5 +5,5 @@ import java.time.Instant
 
 data class DurationWithTimestamp(
     val value: Duration?,
-    val timestamp: Instant?
+    val timestamp: Instant? = null
 )

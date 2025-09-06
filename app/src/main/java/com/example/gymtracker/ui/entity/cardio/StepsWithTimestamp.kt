@@ -4,5 +4,5 @@ import java.time.Instant
 
 data class StepsWithTimestamp(
     val value: Int?,
-    val timestamp: Instant?
+    val timestamp: Instant? = null
 )

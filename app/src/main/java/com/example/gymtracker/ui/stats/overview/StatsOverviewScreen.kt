@@ -363,6 +363,9 @@ val highlightColors = listOf(
     Color(0xFF16A144)
 )
 
+// TODO when you get here, just take in the ready data as a parameter, rather than parsing here make it the responsibility of the repository
+// TODO something like getCalendarData()...
+// TODO also maybe color indexing should be done there too
 @OptIn(ExperimentalTime::class)
 @Composable
 private fun StatCalendar(

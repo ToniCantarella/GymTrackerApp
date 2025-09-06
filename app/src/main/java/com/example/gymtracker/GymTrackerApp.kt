@@ -199,7 +199,7 @@ fun GymTrackerApp(
                 CardioWorkoutScreen(
                     onNavigateBack = ::popBackStack,
                     onNavigationGuardChange = ::onNavigationGuardChange,
-                    onNavigateToStats = { navigate(Route.CardioWorkoutStats(it)) }
+                    releaseNavigationGuard = ::releaseNavigationGuard
                 )
             }
             composable<Route.CreateCardioWorkout> {

@@ -6,7 +6,5 @@ data class WorkoutWithMetrics (
     val id: Int,
     val name: String,
     val timestamp: Instant?,
-    val steps: StepsWithTimestamp,
-    val distance: DistanceWithTimestamp,
-    val duration: DurationWithTimestamp
+    val metrics: CardioMetrics
 )

@@ -92,9 +92,9 @@ private fun CardioWorkoutSessionScreen(
                         )
                     }
                     CardioContent(
-                        steps = cardio.steps.value,
-                        distance = cardio.distance.value,
-                        displayDuration = cardio.duration.value
+                        steps = cardio.metrics.steps,
+                        distance = cardio.metrics.distance,
+                        displayDuration = cardio.metrics.duration
                     )
                 }
             }

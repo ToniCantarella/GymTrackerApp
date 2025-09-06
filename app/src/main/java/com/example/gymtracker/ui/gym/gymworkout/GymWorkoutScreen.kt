@@ -76,11 +76,7 @@ fun GymWorkoutScreen(
     }
 
     LaunchedEffect(hasUnsavedChanges, hasPerformedSets) {
-        if (hasUnsavedChanges || hasPerformedSets) {
-            onNavigationGuardChange(true)
-        } else {
-            onNavigationGuardChange(false)
-        }
+        onNavigationGuardChange(hasUnsavedChanges || hasPerformedSets)
     }
 
     fun onFinishWorkout() {

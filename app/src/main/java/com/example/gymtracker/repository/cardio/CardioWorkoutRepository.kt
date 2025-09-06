@@ -4,10 +4,9 @@ import com.example.gymtracker.database.dao.cardio.CardioSessionDao
 import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
 import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
-import com.example.gymtracker.ui.entity.cardio.DistanceWithTimestamp
-import com.example.gymtracker.ui.entity.cardio.DurationWithTimestamp
-import com.example.gymtracker.ui.entity.cardio.StepsWithTimestamp
+import com.example.gymtracker.ui.entity.cardio.CardioMetrics
 import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
+import java.time.Duration
 
 interface CardioWorkoutRepository {
     suspend fun getAllWorkouts(): List<WorkoutWithTimestamp>
@@ -53,40 +52,16 @@ class CardioWorkoutRepositoryImpl(
 
     override suspend fun getLatestWorkoutWithMetrics(workoutId: Int): WorkoutWithMetrics? {
         val workout = workoutDao.getById(workoutId)
-        val sessions = sessionDao.getAllSessionsForCardio(workoutId)
-        val session = sessions.firstOrNull()
-
-        val stepsSession = if (session?.steps == null) {
-            sessions.firstOrNull { it?.steps != null }
-        } else {
-            session
-        }
-        val distanceSession = if (session?.distance == null) {
-            sessions.firstOrNull { it?.distance != null }
-        } else {
-            session
-        }
-        val durationSession = if (session?.duration == null) {
-            sessions.firstOrNull { it?.duration != null }
-        } else {
-            session
-        }
+        val session = sessionDao.getLastSession(workoutId)
 
         return WorkoutWithMetrics(
             id = workoutId,
             name = workout?.name ?: "",
             timestamp = session?.timestamp,
-            steps = StepsWithTimestamp(
-                value = stepsSession?.steps,
-                timestamp = stepsSession?.timestamp
-            ),
-            distance = DistanceWithTimestamp(
-                value = distanceSession?.distance,
-                timestamp = distanceSession?.timestamp
-            ),
-            duration = DurationWithTimestamp(
-                value = durationSession?.duration,
-                timestamp = durationSession?.timestamp
+            metrics = CardioMetrics(
+                steps = session?.steps ?: 0,
+                distance = session?.distance ?: 0.0,
+                duration = session?.duration ?: Duration.ZERO
             )
         )
     }

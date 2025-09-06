@@ -4,5 +4,5 @@ import java.time.Instant
 
 data class DistanceWithTimestamp(
     val value: Double?,
-    val timestamp: Instant?
+    val timestamp: Instant? = null
 )

@@ -17,12 +17,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -38,25 +35,16 @@ import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.NumericTextField
 import com.example.gymtracker.utility.UnitUtil
-import com.example.gymtracker.utility.toDateAndTimeString
-import com.example.gymtracker.utility.toReadableString
 import kotlinx.coroutines.delay
 import java.time.Duration
-import java.time.Instant
 
 @Composable
 fun CardioContent(
-    previousSteps: Int? = null,
-    previousStepsTimestamp: Instant? = null,
     steps: Int? = 0,
     onStepsChange: (steps: Int) -> Unit = {},
-    previousDistance: Double? = null,
-    previousDistanceTimestamp: Instant? = null,
     distance: Double? = 0.0,
     onDistanceChange: (distance: Double) -> Unit = {},
-    displayDuration: Duration?= null,
-    previousDuration: Duration? = null,
-    previousDurationTimestamp: Instant? = null,
+    displayDuration: Duration? = null,
     onDurationChange: (duration: Duration) -> Unit = {}
 ) {
     Column(
@@ -72,22 +60,6 @@ fun CardioContent(
                 Text(
                     text = stringResource(id = R.string.steps)
                 )
-            },
-            lastTimeInfo = {
-                if (previousSteps != null && previousStepsTimestamp != null) {
-                    LastTimeRow(
-                        valueText = {
-                            Text(
-                                text = previousSteps.toString()
-                            )
-                        },
-                        dateText = {
-                            Text(
-                                text = previousStepsTimestamp.toDateAndTimeString()
-                            )
-                        }
-                    )
-                }
             }
         ) {
             Row(
@@ -114,22 +86,6 @@ fun CardioContent(
                 Text(
                     text = stringResource(id = R.string.distance)
                 )
-            },
-            lastTimeInfo = {
-                if (previousDistance != null && previousDistanceTimestamp != null) {
-                    LastTimeRow(
-                        valueText = {
-                            Text(
-                                text = "${previousDistance}${stringResource(UnitUtil.distanceUnitStringId)}"
-                            )
-                        },
-                        dateText = {
-                            Text(
-                                text = previousDistanceTimestamp.toDateAndTimeString()
-                            )
-                        }
-                    )
-                }
             }
         ) {
             Row(
@@ -156,27 +112,11 @@ fun CardioContent(
                 Text(
                     text = stringResource(id = R.string.time)
                 )
-            },
-            lastTimeInfo = {
-                if (previousDuration != null && previousDurationTimestamp != null) {
-                    LastTimeRow(
-                        valueText = {
-                            Text(
-                                text = previousDuration.toReadableString()
-                            )
-                        },
-                        dateText = {
-                            Text(
-                                text = previousDurationTimestamp.toDateAndTimeString()
-                            )
-                        }
-                    )
-                }
             }
         ) {
             Box(
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.timer),
                     contentDescription = stringResource(id = R.string.time),
@@ -284,7 +224,6 @@ private fun StopWatch(
 @Composable
 fun CardioCard(
     title: @Composable () -> Unit,
-    lastTimeInfo: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -302,33 +241,9 @@ fun CardioCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 title()
-                lastTimeInfo()
             }
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
             content()
-        }
-    }
-}
-
-@Composable
-private fun LastTimeRow(
-    valueText: @Composable () -> Unit,
-    dateText: @Composable () -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
-    ) {
-        CompositionLocalProvider(
-            LocalTextStyle provides MaterialTheme.typography.labelMedium,
-            LocalContentColor provides MaterialTheme.colorScheme.onSurface.copy(alpha = .6f)
-        ) {
-            valueText()
-            Icon(
-                painter = painterResource(id = R.drawable.history),
-                contentDescription = stringResource(id = R.string.last_time)
-            )
-            dateText()
         }
     }
 }

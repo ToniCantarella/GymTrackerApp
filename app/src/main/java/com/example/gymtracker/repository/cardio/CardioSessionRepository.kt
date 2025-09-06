@@ -5,9 +5,6 @@ import com.example.gymtracker.database.dao.cardio.CardioWorkoutDao
 import com.example.gymtracker.database.entity.cardio.CardioSessionEntity
 import com.example.gymtracker.ui.entity.WorkoutSession
 import com.example.gymtracker.ui.entity.cardio.CardioMetrics
-import com.example.gymtracker.ui.entity.cardio.DistanceWithTimestamp
-import com.example.gymtracker.ui.entity.cardio.DurationWithTimestamp
-import com.example.gymtracker.ui.entity.cardio.StepsWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import java.time.Instant
 
@@ -63,17 +60,10 @@ class CardioSessionRepositoryImpl(
             id = workout.id,
             name = workout.name,
             timestamp = session.timestamp,
-            steps = StepsWithTimestamp(
-                value = session.steps,
-                timestamp = session.timestamp
-            ),
-            distance = DistanceWithTimestamp(
-                value = session.distance,
-                timestamp = session.timestamp
-            ),
-            duration = DurationWithTimestamp(
-                value = session.duration,
-                timestamp = session.timestamp
+            metrics = CardioMetrics(
+                steps = session.steps,
+                distance = session.distance,
+                duration = session.duration
             )
         )
     }
