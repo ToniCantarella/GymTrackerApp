@@ -36,7 +36,7 @@ data class StatsOverviewUiState(
     val cardioWorkouts: List<WorkoutWithTimestamp> = emptyList(),
     val gymSessions: List<WorkoutSession> = emptyList(),
     val cardioSessions: List<WorkoutSession> = emptyList(),
-    val calendarWorkouts: Map<LocalDate, List<WorkoutSession>> = emptyMap(),
+    val calendarSessions: Map<LocalDate, List<WorkoutSession>> = emptyMap(),
     val calendarLegends: List<CalendarLegend> = emptyList(),
     val startDate: Instant = firstDayOfMonthInstant(),
     val endDate: Instant = Instant.now(),
@@ -78,12 +78,12 @@ class StatsOverviewViewModel(
         val gymWorkouts = statsOverviewRepository.getAllGymWorkouts()
         val cardioWorkouts = statsOverviewRepository.getAllCardioWorkouts()
 
-        val gymColorIndexMap = gymWorkouts.mapIndexed { index, workout ->
-            workout.id to index
-        }.toMap()
-        val cardioColorIndexMap = cardioWorkouts.mapIndexed { index, workout ->
-            workout.id to index
-        }.toMap()
+        val gymColorIndexMap = gymWorkouts
+            .mapIndexed { index, workout -> workout.id to index }
+            .toMap()
+        val cardioColorIndexMap = cardioWorkouts
+            .mapIndexed { index, workout -> workout.id to index }
+            .toMap()
 
         _uiState.update {
             it.copy(
@@ -123,7 +123,7 @@ class StatsOverviewViewModel(
                 )
             }
 
-        val calendarWorkouts = sessionsForMonth
+        val calendarSessions = sessionsForMonth
             .groupBy { session ->
                 session.timestamp
                     .toKotlinInstant()
@@ -135,7 +135,7 @@ class StatsOverviewViewModel(
             it.copy(
                 startDate = startDate,
                 endDate = endDate,
-                calendarWorkouts = calendarWorkouts,
+                calendarSessions = calendarSessions,
                 calendarLegends = calendarLegends
             )
         }

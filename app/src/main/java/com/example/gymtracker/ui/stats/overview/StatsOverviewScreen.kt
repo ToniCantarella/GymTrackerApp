@@ -1,6 +1,5 @@
 package com.example.gymtracker.ui.stats.overview
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,24 +26,26 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ripple
@@ -72,19 +72,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import com.example.gymtracker.R
-import com.example.gymtracker.ui.common.WorkoutListItem
 import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
+import com.example.gymtracker.ui.entity.statsoverview.CalendarLegend
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutSession
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutType
 import com.example.gymtracker.ui.navigation.ProvideTopAppBar
-import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.utility.MAX_GYM_WORKOUTS
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -98,21 +95,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Month
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaYearMonth
-import kotlinx.datetime.toKotlinLocalDate
-import kotlinx.datetime.toKotlinMonth
 import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toKotlinYearMonth
 import kotlinx.datetime.todayIn
 import org.koin.androidx.compose.koinViewModel
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.TextStyle
@@ -155,11 +149,13 @@ fun StatsOverviewScreen(
         cardioWorkouts = uiState.cardioWorkouts,
         gymSessions = uiState.gymSessions,
         cardioSessions = uiState.cardioSessions,
-        workoutSessionsForMonth = uiState.workoutSessionsBetween,
+        calendarSessions = uiState.calendarSessions,
+        calendarLegends = uiState.calendarLegends,
         getMonthData = viewModel::getMonthData,
         onSessionNavigate = onSessionNavigate,
         onAddSessionNavigate = onAddSessionNavigate,
-        onWorkoutStatsNavigate = onWorkoutStatsNavigate
+        onWorkoutStatsNavigate = onWorkoutStatsNavigate,
+        colorIndexMap = uiState.colorIndexMap
     )
 }
 
@@ -170,11 +166,13 @@ private fun StatsOverviewScreen(
     cardioWorkouts: List<WorkoutWithTimestamp>,
     gymSessions: List<WorkoutSession>,
     cardioSessions: List<WorkoutSession>,
-    workoutSessionsForMonth: List<WorkoutSession>,
+    calendarSessions: Map<LocalDate, List<WorkoutSession>>,
+    calendarLegends: List<CalendarLegend>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
     onSessionNavigate: (id: Int) -> Unit,
     onAddSessionNavigate: (workout: WorkoutWithTimestamp, timestamp: Instant) -> Unit,
-    onWorkoutStatsNavigate: (workout: WorkoutWithTimestamp) -> Unit
+    onWorkoutStatsNavigate: (workout: WorkoutWithTimestamp) -> Unit,
+    colorIndexMap: Map<Int, Int>
 ) {
     if (loading) {
         Box(
@@ -192,12 +190,12 @@ private fun StatsOverviewScreen(
         ) {
             item {
                 StatCalendar(
-                    gymWorkouts = gymWorkouts,
-                    cardioWorkouts = cardioWorkouts,
-                    sessionsForMonth = workoutSessionsForMonth,
+                    sessionsForMonth = calendarSessions,
+                    legends = calendarLegends,
                     getMonthData = getMonthData,
                     onSessionClick = onSessionNavigate,
                     onAddSessionClick = onAddSessionNavigate,
+                    colorIndexMap = colorIndexMap,
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large))
                 )
             }
@@ -362,18 +360,19 @@ val highlightColors = listOf(
     Color(0xFF16A144)
 )
 
-// TODO when you get here, just take in the ready data as a parameter, rather than parsing here make it the responsibility of the repository
-// TODO something like getCalendarData()...
-// TODO also maybe color indexing should be done there too
+/* TODO
+    Split into smaller composables, unreadable now
+    when you do, order everything below and above in some sane order
+* */
 @OptIn(ExperimentalTime::class)
 @Composable
 private fun StatCalendar(
-    gymWorkouts: List<WorkoutWithTimestamp>,
-    cardioWorkouts: List<WorkoutWithTimestamp>,
-    sessionsForMonth: List<WorkoutSession>,
+    sessionsForMonth: Map<LocalDate, List<WorkoutSession>>,
     getMonthData: (startDate: Instant, endDate: Instant) -> Unit,
     onSessionClick: (id: Int) -> Unit,
     onAddSessionClick: (workout: WorkoutWithTimestamp, timestamp: Instant) -> Unit,
+    legends: List<CalendarLegend>,
+    colorIndexMap: Map<Int, Int>,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -400,35 +399,27 @@ private fun StatCalendar(
             TextStyle.FULL_STANDALONE,
             Locale.getDefault()
         )
-    val yearString = state.firstVisibleMonth.yearMonth.year
+    val yearString = state.firstVisibleMonth.yearMonth.year.toString()
 
     var sessionDialogOpen by remember { mutableStateOf(false) }
-    val todayButtonVisible =
-        currentMonth != state.firstVisibleMonth.yearMonth
+    val todayButtonVisible = currentMonth != state.firstVisibleMonth.yearMonth
 
-    val allWorkouts = gymWorkouts + cardioWorkouts
+    // TODO needed?
+    /*val allWorkouts = gymWorkouts + cardioWorkouts
     var sessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
     val sessionsByDate: Map<LocalDate, List<WorkoutSession>> = remember(sessionsForMonth) {
         sessionsForMonth.groupBy {
             it.timestamp.atZone(zoneId).toLocalDate().toKotlinLocalDate()
         }
-    }
-    val sessionsForMonth = remember(sessionsForMonth, state) {
-        sessionsForMonth.filter {
-            val sessionDate = it.timestamp.atZone(zoneId).toLocalDate()
-            val yearMatches = sessionDate.year == state.firstVisibleMonth.yearMonth.year
-            val monthMatches =
-                sessionDate.month.toKotlinMonth() == state.firstVisibleMonth.yearMonth.month
-            yearMatches && monthMatches
-        }
-    }
+    }*/
 
-    var monthPickerOpen by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(state) {
         snapshotFlow { state.firstVisibleMonth }
             .distinctUntilChanged()
             .collect { visibleMonth ->
+                // TODO ew
                 val firstVisibleDate = visibleMonth.weekDays.first().first().date.toJavaLocalDate()
                 val lastVisibleDate = visibleMonth.weekDays.last().last().date.toJavaLocalDate()
 
@@ -447,68 +438,25 @@ private fun StatCalendar(
     }
 
     Column(modifier = modifier) {
-        Box(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_medium)))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = ripple(),
-                        onClick = { monthPickerOpen = true }
-                    )
-                    .padding(
-                        vertical = dimensionResource(id = R.dimen.padding_small),
-                        horizontal = dimensionResource(id = R.dimen.padding_medium)
-                    )
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "$monthString $yearString"
-                    )
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null
+        CalendarHeader(
+            monthString = monthString,
+            yearInt = currentMonth.year,
+            todayButtonVisible = todayButtonVisible,
+            startMonth = startMonth,
+            endMonth = endMonth,
+            onTodayClick = {
+                coroutineScope.launch {
+                    state.animateScrollToMonth(
+                        currentMonth
                     )
                 }
-                if (monthPickerOpen) {
-                    MonthPicker(
-                        onDismissRequest = { monthPickerOpen = false },
-                        year = currentMonth.year,
-                        onMonthClick = {
-                            coroutineScope.launch {
-                                state.animateScrollToMonth(it)
-                            }
-                        },
-                        startMonth = startMonth,
-                        endMonth = endMonth
-                    )
+            },
+            onMonthClick = {
+                coroutineScope.launch {
+                    state.animateScrollToMonth(it)
                 }
             }
-            TextButton(
-                onClick = {
-                    coroutineScope.launch {
-                        state.animateScrollToMonth(
-                            currentMonth
-                        )
-                    }
-                },
-                enabled = todayButtonVisible,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            ) {
-                AnimatedVisibility(
-                    visible = todayButtonVisible
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.today)
-                    )
-                }
-            }
-        }
+        )
         HorizontalCalendar(
             state = state,
             monthHeader = {
@@ -531,17 +479,16 @@ private fun StatCalendar(
                 }
             },
             dayContent = { day ->
-                val sessionsOnDay = sessionsByDate[day.date]
+                val sessionsOnDay = sessionsForMonth[day.date]
                 val hasSessions = sessionsOnDay?.isNotEmpty() == true
 
                 fun onClick() {
                     if (sessionsOnDay?.size!! == 1) {
                         val session = sessionsOnDay.first()
-                        val workout = allWorkouts.find { it.id == session.workoutId }
-                        onSessionClick(session.id)
+                        onSessionClick(session.sessionId)
                     } else {
                         sessionDialogOpen = true
-                        sessionsForDialog = sessionsOnDay
+                        //sessionsForDialog = sessionsOnDay
                     }
                 }
 
@@ -559,6 +506,7 @@ private fun StatCalendar(
                                         indication = ripple(color = MaterialTheme.colorScheme.primary),
                                         interactionSource = remember { MutableInteractionSource() }
                                     ) {
+                                        // TODO ew
                                         timestamp = day.date
                                             .atStartOfDayIn(zoneId.toKotlinTimeZone())
                                             .toJavaInstant()
@@ -578,35 +526,37 @@ private fun StatCalendar(
                             Box(
                                 modifier = Modifier.align(Alignment.BottomStart)
                             ) {
-                                sessionsOnDay.take(3).forEachIndexed { index, session ->
-                                    val workout = allWorkouts.find { it.id == session.workoutId }
-                                    var visible by remember { mutableStateOf(false) }
-                                    // TODO
-                                    val workoutIndex = gymWorkouts.indexOf(workout)
+                                sessionsOnDay.distinctBy { it.workoutId }.take(3)
+                                    .forEachIndexed { index, session ->
+                                        var visible by remember { mutableStateOf(false) }
+                                        val colorIndex = colorIndexMap[session.workoutId] ?: 0
 
-                                    LaunchedEffect(Unit) {
-                                        delay(200 * index.toLong())
-                                        visible = true
-                                    }
+                                        LaunchedEffect(Unit) {
+                                            delay(200 * index.toLong())
+                                            visible = true
+                                        }
 
-                                    androidx.compose.animation.AnimatedVisibility(
-                                        visible = visible,
-                                        enter = slideInHorizontally(
-                                            initialOffsetX = { -it / 2 },
-                                        ) + fadeIn(),
-                                        exit = fadeOut()
-                                    ) {
-                                        Icon(
-                                            //TODO
-                                            painter = painterResource(id = R.drawable.weight),
-                                            tint = highlightColors[workoutIndex % highlightColors.size],
-                                            contentDescription = stringResource(id = R.string.icon),
-                                            modifier = Modifier
-                                                .padding(start = dimensionResource(id = R.dimen.padding_medium) * index)
-                                                .alpha(1f - index.toFloat() / 3)
-                                        )
+                                        androidx.compose.animation.AnimatedVisibility(
+                                            visible = visible,
+                                            enter = slideInHorizontally(
+                                                initialOffsetX = { -it / 2 },
+                                            ) + fadeIn(),
+                                            exit = fadeOut()
+                                        ) {
+                                            Icon(
+                                                painter =
+                                                    if (session.type == WorkoutType.GYM)
+                                                        painterResource(id = R.drawable.weight)
+                                                    else
+                                                        painterResource(id = R.drawable.run),
+                                                tint = highlightColors[colorIndex],
+                                                contentDescription = stringResource(id = R.string.icon),
+                                                modifier = Modifier
+                                                    .padding(start = dimensionResource(id = R.dimen.padding_medium) * index)
+                                                    .alpha(1f - index.toFloat() / 3)
+                                            )
+                                        }
                                     }
-                                }
                             }
                         }
                     }
@@ -614,18 +564,20 @@ private fun StatCalendar(
             }
         )
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
-        CalendarFooter(
+        //TODO
+        /*CalendarFooter(
             gymWorkouts = gymWorkouts,
             cardioWorkouts = cardioWorkouts,
             workoutSessions = sessionsForMonth,
             addingSessions = addingSessions,
             onAddSessionsClick = { addingSessions = !addingSessions },
             addingSessionsEnabled = allWorkouts.isNotEmpty()
-        )
+        )*/
     }
 
     if (sessionDialogOpen) {
-        Dialog(
+        //TODO
+        /*Dialog(
             onDismissRequest = { sessionDialogOpen = false }
         ) {
             ElevatedCard {
@@ -651,10 +603,11 @@ private fun StatCalendar(
                     }
                 }
             }
-        }
+        }*/
     }
 
     if (addSessionDialogOpen) {
+        /* TODO
         Dialog(
             onDismissRequest = { addSessionDialogOpen = false }
         ) {
@@ -696,13 +649,82 @@ private fun StatCalendar(
                     }
                 }
             }
+        }*/
+    }
+}
+
+@Composable
+fun CalendarHeader(
+    monthString: String,
+    todayButtonVisible: Boolean,
+    startMonth: kotlinx.datetime.YearMonth,
+    endMonth: kotlinx.datetime.YearMonth,
+    yearInt: Int,
+    onTodayClick: () -> Unit,
+    onMonthClick: (kotlinx.datetime.YearMonth) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var monthPickerOpen by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            val monthPickerButtonWidth = 160.dp
+            TextButton(
+                onClick = { monthPickerOpen = true },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                modifier = Modifier.width(monthPickerButtonWidth)
+            ) {
+                Text(
+                    text = "$monthString $yearInt"
+                )
+
+                val arrowRotation by animateFloatAsState(
+                    targetValue = if (monthPickerOpen) 180f else 0f,
+                    label = "Icon Rotation"
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.rotate(arrowRotation)
+                )
+            }
+            MonthPicker(
+                expanded = monthPickerOpen,
+                onDismissRequest = { monthPickerOpen = false },
+                anchorButtonWidth = monthPickerButtonWidth,
+                year = yearInt,
+                onMonthClick = onMonthClick,
+                startMonth = startMonth,
+                endMonth = endMonth
+            )
+        }
+        TextButton(
+            onClick = onTodayClick,
+            enabled = todayButtonVisible,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            AnimatedVisibility(
+                visible = todayButtonVisible
+            ) {
+                Text(
+                    text = stringResource(id = R.string.today)
+                )
+            }
         }
     }
 }
 
 @Composable
 fun MonthPicker(
+    expanded: Boolean,
     onDismissRequest: () -> Unit,
+    anchorButtonWidth: Dp,
     year: Int,
     startMonth: kotlinx.datetime.YearMonth,
     endMonth: kotlinx.datetime.YearMonth,
@@ -713,87 +735,95 @@ fun MonthPicker(
     val calendarStartYear = startMonth.year
     val calendarEndYear = endMonth.year
 
-    Popup(
-        alignment = Alignment.TopCenter,
-        offset = IntOffset(0, 80),
-        onDismissRequest = { onDismissRequest() }
+    val menuWidth = 300.dp
+    val horizontalOffSetDp = -(anchorButtonWidth / 2 - menuWidth / 2)
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        offset = DpOffset(horizontalOffSetDp, 0.dp),
+        modifier = modifier
+            .width(menuWidth)
+            .heightIn(max = 400.dp)
     ) {
-        Card(
-            modifier = modifier
-                .fillMaxWidth(0.8f)
-                .heightIn(max = 400.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(id = R.dimen.padding_medium)
-            )
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Column(
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_medium))
+                    .fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                IconButton(
+                    onClick = { if (monthPickerYear > calendarStartYear) monthPickerYear-- },
+                    enabled = monthPickerYear > calendarStartYear
                 ) {
-                    IconButton(
-                        onClick = { if (monthPickerYear > calendarStartYear) monthPickerYear-- },
-                        enabled = monthPickerYear > calendarStartYear
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = stringResource(id = R.string.previous)
-                        )
-                    }
-                    Text(
-                        text = monthPickerYear.toString(),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = stringResource(id = R.string.previous)
                     )
-                    IconButton(
-                        onClick = { if (monthPickerYear < calendarEndYear) monthPickerYear++ },
-                        enabled = monthPickerYear < calendarEndYear
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = stringResource(id = R.string.next)
-                        )
-                    }
                 }
-                HorizontalDivider()
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = monthPickerYear.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                IconButton(
+                    onClick = { if (monthPickerYear < calendarEndYear) monthPickerYear++ },
+                    enabled = monthPickerYear < calendarEndYear
                 ) {
-                    val monthsInPickerYear = Month.entries
-                    items(monthsInPickerYear) { month ->
-                        val targetYearMonth = YearMonth
-                            .of(monthPickerYear, month)
-                            .toKotlinYearMonth()
-                        val isEnabled = targetYearMonth >= startMonth && targetYearMonth <= endMonth
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = stringResource(id = R.string.next)
+                    )
+                }
+            }
+            HorizontalDivider()
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 300.dp)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                val monthsInPickerYear = java.time.Month.entries
+                monthsInPickerYear.forEach { month ->
+                    val targetYearMonth = java.time.YearMonth
+                        .of(monthPickerYear, month)
+                        .toKotlinYearMonth()
 
-                        TextButton(
-                            onClick = {
-                                onMonthClick(targetYearMonth)
-                                onDismissRequest()
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = isEnabled,
-                        ) {
-                            Text(
-                                text = month.getDisplayName(
-                                    TextStyle.FULL_STANDALONE,
-                                    Locale.getDefault()
-                                ),
-                                color =
-                                    if (isEnabled) MaterialTheme.colorScheme.onSurface
-                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = .5f)
-                            )
-                        }
-                    }
+                    val isEnabled = targetYearMonth in startMonth..endMonth
+
+                    DropdownMenuItem(
+                        text = {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = month.getDisplayName(
+                                        TextStyle.FULL_STANDALONE,
+                                        Locale.getDefault()
+                                    ),
+                                    color =
+                                        if (isEnabled) MaterialTheme.colorScheme.onSurface
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = .5f)
+                                )
+                            }
+                        },
+                        onClick = {
+                            onMonthClick(targetYearMonth)
+                            onDismissRequest()
+                        },
+                        enabled = isEnabled
+                    )
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun CalendarFooter(
@@ -1054,6 +1084,7 @@ private fun PieChartCard(
     }
 }
 
+/* TODO
 @Composable
 private fun StatsScreenForPreview() {
     val gymWorkouts = List(MAX_GYM_WORKOUTS) {
@@ -1145,4 +1176,4 @@ private fun StatsOverviewPreviewDark() {
             StatsScreenForPreview()
         }
     }
-}
+}*/
