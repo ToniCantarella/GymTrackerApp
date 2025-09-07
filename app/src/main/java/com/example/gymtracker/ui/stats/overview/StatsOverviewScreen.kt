@@ -440,6 +440,7 @@ private fun StatCalendar(
     Column(modifier = modifier) {
         CalendarHeader(
             monthString = monthString,
+            yearString = yearString,
             yearInt = currentMonth.year,
             todayButtonVisible = todayButtonVisible,
             startMonth = startMonth,
@@ -656,6 +657,7 @@ private fun StatCalendar(
 @Composable
 fun CalendarHeader(
     monthString: String,
+    yearString: String,
     todayButtonVisible: Boolean,
     startMonth: kotlinx.datetime.YearMonth,
     endMonth: kotlinx.datetime.YearMonth,
@@ -681,7 +683,7 @@ fun CalendarHeader(
                 modifier = Modifier.width(monthPickerButtonWidth)
             ) {
                 Text(
-                    text = "$monthString $yearInt"
+                    text = "$monthString $yearString"
                 )
 
                 val arrowRotation by animateFloatAsState(
@@ -731,7 +733,7 @@ fun MonthPicker(
     onMonthClick: (month: kotlinx.datetime.YearMonth) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var monthPickerYear by remember(year) { mutableIntStateOf(year) }
+    var monthPickerYear by remember(year, expanded) { mutableIntStateOf(year) }
     val calendarStartYear = startMonth.year
     val calendarEndYear = endMonth.year
 
@@ -766,7 +768,7 @@ fun MonthPicker(
                     )
                 }
                 Text(
-                    text = monthPickerYear.toString(),
+                    text = "$monthPickerYear",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -789,7 +791,7 @@ fun MonthPicker(
             ) {
                 val monthsInPickerYear = java.time.Month.entries
                 monthsInPickerYear.forEach { month ->
-                    val targetYearMonth = java.time.YearMonth
+                    val targetYearMonth = YearMonth
                         .of(monthPickerYear, month)
                         .toKotlinYearMonth()
 
