@@ -1,6 +1,6 @@
 package com.example.gymtracker.ui.entity.statsoverview
 
-data class CalendarLegend(
+data class WorkoutLegend(
     val sessionCount: Int,
     val workout: Workout
 )

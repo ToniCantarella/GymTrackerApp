@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymtracker.repository.StatsOverviewRepository
 import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
-import com.example.gymtracker.ui.entity.statsoverview.CalendarLegend
 import com.example.gymtracker.ui.entity.statsoverview.Workout
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutSession
+import com.example.gymtracker.ui.entity.statsoverview.WorkoutType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,13 +35,15 @@ data class StatsOverviewUiState(
     val loading: Boolean = true,
     val gymWorkouts: List<WorkoutWithTimestamp> = emptyList(),
     val cardioWorkouts: List<WorkoutWithTimestamp> = emptyList(),
-    val gymSessions: List<WorkoutSession> = emptyList(),
-    val cardioSessions: List<WorkoutSession> = emptyList(),
+    val gymLegends: List<WorkoutLegend> = emptyList(),
+    val cardioLegends: List<WorkoutLegend> = emptyList(),
     val calendarSessions: Map<LocalDate, List<WorkoutSession>> = emptyMap(),
-    val calendarLegends: List<CalendarLegend> = emptyList(),
+    val calendarGymLegends: List<WorkoutLegend> = emptyList(),
+    val calendarCardioLegends: List<WorkoutLegend> = emptyList(),
     val startDate: Instant = firstDayOfMonthInstant(),
     val endDate: Instant = Instant.now(),
-    val colorIndexMap: Map<Int, Int> = emptyMap()
+    val gymColorIndexMap: Map<Int, Int> = emptyMap(),
+    val cardioColorIndexMap: Map<Int, Int> = emptyMap()
 )
 
 class StatsOverviewViewModel(
@@ -84,24 +87,47 @@ class StatsOverviewViewModel(
         val cardioColorIndexMap = cardioWorkouts
             .mapIndexed { index, workout -> workout.id to index }
             .toMap()
-
         _uiState.update {
             it.copy(
                 gymWorkouts = gymWorkouts,
                 cardioWorkouts = cardioWorkouts,
-                colorIndexMap = gymColorIndexMap + cardioColorIndexMap
+                gymColorIndexMap = gymColorIndexMap,
+                cardioColorIndexMap = cardioColorIndexMap
             )
         }
-
     }
 
     private suspend fun fetchAllWorkoutSessions() {
         val gymSessions = statsOverviewRepository.getAllGymSessions()
+        val gymSessionsGrouped = gymSessions.groupBy { session -> session.workoutId }
+        val gymLegends = uiState.value.gymWorkouts
+            .map { workout ->
+                WorkoutLegend(
+                    sessionCount = gymSessionsGrouped[workout.id]?.size ?: 0,
+                    workout = Workout(
+                        id = workout.id,
+                        name = workout.name,
+                        type = WorkoutType.GYM
+                    )
+                )
+            }
         val cardioSessions = statsOverviewRepository.getAllCardioSessions()
+        val cardioSessionsGrouped = cardioSessions.groupBy { session -> session.workoutId }
+        val cardioLegends = uiState.value.cardioWorkouts
+            .map { workout ->
+                WorkoutLegend(
+                    sessionCount = cardioSessionsGrouped[workout.id]?.size ?: 0,
+                    workout = Workout(
+                        id = workout.id,
+                        name = workout.name,
+                        type = WorkoutType.CARDIO
+                    )
+                )
+            }
         _uiState.update {
             it.copy(
-                gymSessions = gymSessions,
-                cardioSessions = cardioSessions
+                gymLegends = gymLegends,
+                cardioLegends = cardioLegends
             )
         }
     }
@@ -111,14 +137,31 @@ class StatsOverviewViewModel(
         val sessionsForMonth =
             statsOverviewRepository.getWorkoutSessionsForTimespan(startDate, endDate)
 
-        val calendarLegends = sessionsForMonth
-            .groupBy { session -> session.sessionId }
-            .map { (_, sessions) ->
-                CalendarLegend(
-                    sessionCount = sessions.size,
+        val gymSessionsGrouped =
+            sessionsForMonth.filter { it.type == WorkoutType.GYM }.groupBy { it.workoutId }
+        val cardioSessionsGrouped =
+            sessionsForMonth.filter { it.type == WorkoutType.CARDIO }.groupBy { it.workoutId }
+
+        val calendarGymLegends = uiState.value.gymWorkouts
+            .map { workout ->
+                WorkoutLegend(
+                    sessionCount = gymSessionsGrouped[workout.id]?.size ?: 0,
                     workout = Workout(
-                        name = sessions.first().workoutName,
-                        type = sessions.first().type
+                        id = workout.id,
+                        name = workout.name,
+                        type = WorkoutType.GYM
+                    )
+                )
+            }
+
+        val calendarCardioLegends = uiState.value.cardioWorkouts
+            .map { workout ->
+                WorkoutLegend(
+                    sessionCount = cardioSessionsGrouped[workout.id]?.size ?: 0,
+                    workout = Workout(
+                        id = workout.id,
+                        name = workout.name,
+                        type = WorkoutType.CARDIO
                     )
                 )
             }
@@ -136,7 +179,8 @@ class StatsOverviewViewModel(
                 startDate = startDate,
                 endDate = endDate,
                 calendarSessions = calendarSessions,
-                calendarLegends = calendarLegends
+                calendarGymLegends = calendarGymLegends,
+                calendarCardioLegends = calendarCardioLegends
             )
         }
     }

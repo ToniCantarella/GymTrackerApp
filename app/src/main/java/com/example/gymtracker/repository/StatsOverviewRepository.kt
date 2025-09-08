@@ -60,7 +60,7 @@ class StatsOverviewRepositoryImpl(
                     workoutId = session.workoutId,
                     workoutName = workout.name,
                     timestamp = session.timestamp,
-                    type = WorkoutType.CARDIO
+                    type = WorkoutType.GYM
                 )
             }
         }.orEmpty()

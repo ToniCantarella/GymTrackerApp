@@ -214,23 +214,33 @@ fun GymTrackerApp(
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
                         onNavigateBack = ::popBackStack,
-                        onSessionNavigate = { id ->
-                            // TODO
-                            /*if (type == WorkoutType.GYM) {
-                                navigate(Route.GymSession(id))
-                            } else {
-                                navigate(Route.CardioSession(id))
-                            }*/
+                        onGymSessionNavigate = { id ->
+                            navController.navigate(Route.GymWorkoutSession(id))
                         },
-                        onAddSessionNavigate = { _, type ->
+                        onCardioSessionNavigate = { id ->
+                            navController.navigate(Route.CardioWorkoutSession(id))
                         },
-                        onWorkoutStatsNavigate = {
-                            // TODO
-                            /*if (it.type == WorkoutType.GYM) {
-                                navigate(Route.SplitStats(it.id))
-                            } else {
-                                navigate(Route.CardioStats(it.id))
-                            }*/
+                        onAddGymSessionNavigate = { workoutId, timestamp ->
+                            navController.navigate(
+                                Route.GymWorkout(
+                                    workoutId,
+                                    timestamp.toString()
+                                )
+                            )
+                        },
+                        onAddCardioSessionNavigate = { workoutId, timestamp ->
+                            navController.navigate(
+                                Route.CardioWorkout(
+                                    workoutId,
+                                    timestamp.toString()
+                                )
+                            )
+                        },
+                        onGymWorkoutStatsNavigate = { id ->
+                            navController.navigate(Route.GymWorkoutStats(id))
+                        },
+                        onCardioWorkoutStatsNavigate = { id ->
+                            navController.navigate(Route.CardioWorkoutStats(id))
                         }
                     )
                 }
