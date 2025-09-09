@@ -7,6 +7,8 @@ import com.example.gymtracker.ui.entity.cardio.CardioMetrics
 import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutType
+import com.example.gymtracker.utility.UnitUtil.convertDistanceFromDatabase
+import com.example.gymtracker.utility.UnitUtil.convertDistanceToDatabase
 import java.time.Instant
 
 interface CardioSessionRepository {
@@ -64,7 +66,7 @@ class CardioSessionRepositoryImpl(
             timestamp = session.timestamp,
             metrics = CardioMetrics(
                 steps = session.steps,
-                distance = session.distance,
+                distance = session.distance?.convertDistanceFromDatabase(),
                 duration = session.duration
             )
         )
@@ -81,7 +83,7 @@ class CardioSessionRepositoryImpl(
                 workoutId = workoutId,
                 timestamp = timestamp,
                 steps = metrics.steps,
-                distance = metrics.distance,
+                distance = metrics.distance?.convertDistanceToDatabase(),
                 duration = metrics.duration
             )
         )

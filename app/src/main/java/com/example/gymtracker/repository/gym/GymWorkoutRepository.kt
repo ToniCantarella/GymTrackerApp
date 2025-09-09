@@ -11,9 +11,8 @@ import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
-import com.example.gymtracker.utility.UnitUtil
-import com.example.gymtracker.utility.UnitUtil.roundToDisplay
-import com.example.gymtracker.utility.WeightUnit
+import com.example.gymtracker.utility.UnitUtil.convertWeightFromDatabase
+import com.example.gymtracker.utility.UnitUtil.convertWeightToDatabase
 
 interface GymWorkoutRepository {
     suspend fun getAllWorkouts(): List<WorkoutWithTimestamp>
@@ -197,16 +196,4 @@ class GymWorkoutRepositoryImpl(
     override suspend fun deleteWorkout(splitId: Int) {
         workoutDao.deleteById(splitId)
     }
-
-    private fun Double.convertWeightToDatabase(): Double =
-        if (UnitUtil.weightUnit == WeightUnit.KILOGRAM)
-            this
-        else
-            UnitUtil.lbToKg(this)
-
-    private fun Double.convertWeightFromDatabase(): Double =
-        if (UnitUtil.weightUnit == WeightUnit.KILOGRAM)
-            this
-        else
-            UnitUtil.kgToLb(this).roundToDisplay()
 }

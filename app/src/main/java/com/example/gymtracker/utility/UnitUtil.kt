@@ -40,4 +40,28 @@ object UnitUtil {
 
     fun Double.roundToDisplay(decimals: Int = 2): Double =
         "%.${decimals}f".format(this).toDouble()
+
+    fun Double.convertWeightToDatabase(): Double =
+        if (weightUnit == WeightUnit.KILOGRAM)
+            this
+        else
+            lbToKg(this)
+
+    fun Double.convertWeightFromDatabase(): Double =
+        if (weightUnit == WeightUnit.KILOGRAM)
+            this
+        else
+            kgToLb(this).roundToDisplay()
+
+    fun Double.convertDistanceToDatabase(): Double =
+        if (distanceUnit == DistanceUnit.KILOMETER)
+            this
+        else
+            miToKm(this)
+
+    fun Double.convertDistanceFromDatabase(): Double =
+        if (distanceUnit == DistanceUnit.KILOMETER)
+            this
+        else
+            kmToMi(this).roundToDisplay()
 }

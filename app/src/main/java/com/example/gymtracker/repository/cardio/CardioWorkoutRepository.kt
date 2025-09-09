@@ -6,6 +6,7 @@ import com.example.gymtracker.database.entity.cardio.CardioWorkoutEntity
 import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.example.gymtracker.ui.entity.cardio.CardioMetrics
 import com.example.gymtracker.ui.entity.cardio.WorkoutWithMetrics
+import com.example.gymtracker.utility.UnitUtil.convertDistanceFromDatabase
 import java.time.Duration
 
 interface CardioWorkoutRepository {
@@ -54,13 +55,15 @@ class CardioWorkoutRepositoryImpl(
         val workout = workoutDao.getById(workoutId)
         val session = sessionDao.getLastSession(workoutId)
 
+        val distance = session?.distance?.convertDistanceFromDatabase() ?: 0.0
+
         return WorkoutWithMetrics(
             id = workoutId,
             name = workout?.name ?: "",
             timestamp = session?.timestamp,
             metrics = CardioMetrics(
                 steps = session?.steps ?: 0,
-                distance = session?.distance ?: 0.0,
+                distance = distance,
                 duration = session?.duration ?: Duration.ZERO
             )
         )
