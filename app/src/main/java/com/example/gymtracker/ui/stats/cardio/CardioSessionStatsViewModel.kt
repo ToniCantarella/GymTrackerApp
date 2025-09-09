@@ -12,18 +12,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class CardioSessionUiState(
+data class CardioSessionStatsUiState(
     val loading: Boolean = true,
     val cardio: WorkoutWithMetrics? = null
 )
 
-class CardioSessionViewModel(
+class CardioSessionStatsViewModel(
     savedStateHandle: SavedStateHandle,
     private val sessionRepository: CardioSessionRepository
 ) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.CardioWorkoutSession>()
 
-    private val _uiState = MutableStateFlow(CardioSessionUiState())
+    private val _uiState = MutableStateFlow(CardioSessionStatsUiState())
     val uiState = _uiState.asStateFlow()
 
     init {

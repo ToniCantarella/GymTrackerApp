@@ -29,10 +29,10 @@ import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutViewModel
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutViewModel
 import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsViewModel
 import com.example.gymtracker.ui.info.InfoViewModel
-import com.example.gymtracker.ui.stats.cardio.CardioSessionViewModel
-import com.example.gymtracker.ui.stats.cardio.CardioStatsViewModel
-import com.example.gymtracker.ui.stats.gym.GymSessionViewModel
-import com.example.gymtracker.ui.stats.gym.SplitStatsViewModel
+import com.example.gymtracker.ui.stats.cardio.CardioSessionStatsViewModel
+import com.example.gymtracker.ui.stats.cardio.CardioWorkoutStatsViewModel
+import com.example.gymtracker.ui.stats.gym.GymSessionStatsViewModel
+import com.example.gymtracker.ui.stats.gym.GymWorkoutStatsViewModel
 import com.example.gymtracker.ui.stats.overview.StatsOverviewViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
@@ -134,9 +134,9 @@ val viewModelModule = module {
     viewModelOf(::CreateGymWorkoutViewModel)
     viewModelOf(::CreateCardioWorkoutViewModel)
     viewModelOf(::StatsOverviewViewModel)
-    viewModelOf(::GymSessionViewModel)
-    viewModelOf(::CardioSessionViewModel)
-    viewModelOf(::SplitStatsViewModel)
-    viewModelOf(::CardioStatsViewModel)
+    viewModelOf(::GymSessionStatsViewModel)
+    viewModelOf(::CardioSessionStatsViewModel)
+    viewModelOf(::GymWorkoutStatsViewModel)
+    viewModelOf(::CardioWorkoutStatsViewModel)
     viewModelOf(::InfoViewModel)
 }

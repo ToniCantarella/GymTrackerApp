@@ -1,40 +1,40 @@
-package com.example.gymtracker.ui.stats.cardio
+package com.example.gymtracker.ui.stats.gym
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.gymtracker.repository.cardio.CardioStatsRepository
-import com.example.gymtracker.ui.entity.cardio.CardioWorkoutStats
+import com.example.gymtracker.repository.gym.GymSessionRepository
+import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
 import com.example.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class CardioStatsUiState(
+data class GymSessionUiState(
     val loading: Boolean = true,
-    val stats: CardioWorkoutStats? = null
+    val split: WorkoutWithExercises? = null
 )
 
-class CardioStatsViewModel(
+class GymSessionStatsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val statRepository: CardioStatsRepository
+    private val sessionRepository: GymSessionRepository
 ) : ViewModel() {
-    private val navParams = savedStateHandle.toRoute<Route.CardioWorkoutStats>()
-
-    private val _uiState = MutableStateFlow(CardioStatsUiState())
-    val uiState = _uiState.asStateFlow()
+    private val navParams = savedStateHandle.toRoute<Route.GymWorkoutSession>()
 
     init {
         viewModelScope.launch {
-            val stats = statRepository.getWorkoutStats(navParams.id)
+            val split = sessionRepository.getWorkoutForSession(navParams.id)
             _uiState.update {
                 it.copy(
-                    stats = stats,
+                    split = split,
                     loading = false
                 )
             }
         }
     }
+
+    private val _uiState = MutableStateFlow(GymSessionUiState())
+    val uiState = _uiState.asStateFlow()
 }

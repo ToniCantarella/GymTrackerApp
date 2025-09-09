@@ -36,9 +36,9 @@ import com.example.gymtracker.ui.info.InfoScreen
 import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.NavigationBarRoute
 import com.example.gymtracker.ui.navigation.Route
-import com.example.gymtracker.ui.stats.cardio.CardioWorkoutSessionScreen
+import com.example.gymtracker.ui.stats.cardio.CardioSessionStatsScreen
 import com.example.gymtracker.ui.stats.cardio.CardioWorkoutStatsScreen
-import com.example.gymtracker.ui.stats.gym.GymWorkoutSessionStatsScreen
+import com.example.gymtracker.ui.stats.gym.GymSessionStatsScreen
 import com.example.gymtracker.ui.stats.gym.GymWorkoutStatsScreen
 import com.example.gymtracker.ui.stats.overview.StatsOverviewScreen
 import com.example.gymtracker.ui.welcome.WelcomeScreen
@@ -245,12 +245,12 @@ fun GymTrackerApp(
                     )
                 }
                 composable<Route.GymWorkoutSession> {
-                    GymWorkoutSessionStatsScreen(
+                    GymSessionStatsScreen(
                         onNavigateBack = ::popBackStack
                     )
                 }
                 composable<Route.CardioWorkoutSession> {
-                    CardioWorkoutSessionScreen(
+                    CardioSessionStatsScreen(
                         onNavigateBack = ::popBackStack
                     )
                 }

@@ -28,9 +28,9 @@ import com.example.gymtracker.utility.toDateAndTimeString
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CardioWorkoutSessionScreen(
+fun CardioSessionStatsScreen(
     onNavigateBack: () -> Unit,
-    viewModel: CardioSessionViewModel = koinViewModel()
+    viewModel: CardioSessionStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -52,14 +52,14 @@ fun CardioWorkoutSessionScreen(
         }
     )
 
-    CardioWorkoutSessionScreen(
+    CardioSessionStatsScreen(
         loading = uiState.loading,
         cardio = uiState.cardio
     )
 }
 
 @Composable
-private fun CardioWorkoutSessionScreen(
+private fun CardioSessionStatsScreen(
     loading: Boolean,
     cardio: WorkoutWithMetrics?,
     modifier: Modifier = Modifier

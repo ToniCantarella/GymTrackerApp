@@ -28,7 +28,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun GymWorkoutStatsScreen(
     onNavigateBack: () -> Unit,
-    viewModel: SplitStatsViewModel = koinViewModel()
+    viewModel: GymWorkoutStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

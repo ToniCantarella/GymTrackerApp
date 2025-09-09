@@ -41,9 +41,9 @@ import java.time.Instant
 import java.util.UUID
 
 @Composable
-fun GymWorkoutSessionStatsScreen(
+fun GymSessionStatsScreen(
     onNavigateBack: () -> Unit,
-    viewModel: GymSessionViewModel = koinViewModel()
+    viewModel: GymSessionStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -65,14 +65,14 @@ fun GymWorkoutSessionStatsScreen(
         }
     )
 
-    GymWorkoutSessionStatsScreen(
+    GymSessionStatsScreen(
         loading = uiState.loading,
         split = uiState.split
     )
 }
 
 @Composable
-fun GymWorkoutSessionStatsScreen(
+fun GymSessionStatsScreen(
     loading: Boolean,
     split: WorkoutWithExercises?,
     modifier: Modifier = Modifier
@@ -157,7 +157,7 @@ fun GymWorkoutSessionStatsScreen(
 private fun GymSessionPreview() {
     GymTrackerTheme {
         Surface {
-            GymWorkoutSessionStatsScreen(
+            GymSessionStatsScreen(
                 loading = false,
                 split = WorkoutWithExercises(
                     id = 0,
