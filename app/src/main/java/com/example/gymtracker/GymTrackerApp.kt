@@ -5,9 +5,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -33,7 +39,6 @@ import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.example.gymtracker.ui.info.InfoScreen
-import com.example.gymtracker.ui.navigation.GymScaffold
 import com.example.gymtracker.ui.navigation.NavigationBarRoute
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.stats.cardio.CardioSessionStatsScreen
@@ -47,12 +52,46 @@ import com.example.gymtracker.ui.welcome.WelcomeScreen
 fun GymTrackerApp(
     viewModel: MainViewModel
 ) {
-    val mainUiState by viewModel.uiState.collectAsState()
-    val navController = rememberNavController()
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
 
     val focusManager = LocalFocusManager.current
     val isKeyboardOpen by keyboardAsState()
+
+
+
+    LaunchedEffect(isKeyboardOpen) {
+        if (!isKeyboardOpen) {
+            focusManager.clearFocus()
+        }
+    }
+
+    Surface(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+    ) {
+        GymAppNavHost(
+            viewModel = viewModel,
+            modifier = Modifier
+        )
+    }
+}
+
+@Composable
+private fun keyboardAsState(): State<Boolean> {
+    val ime = WindowInsets.ime
+    val isOpen = ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isOpen)
+}
+
+@Composable
+fun GymAppNavHost(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
+) {
+    val mainUiState by viewModel.uiState.collectAsState()
+    val navController = rememberNavController()
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val navigationAnimationMoveInt = 1500
     val enter = if (isLandscape) fadeIn() else slideInHorizontally { navigationAnimationMoveInt }
@@ -131,18 +170,10 @@ fun GymTrackerApp(
         }
     }
 
-    LaunchedEffect(isKeyboardOpen) {
-        if (!isKeyboardOpen) {
-            focusManager.clearFocus()
-        }
-    }
-
-    GymScaffold(
-        navController = navController,
-        isLandscape = isLandscape,
-        navigate = ::navigate,
-        navigationBarRoutes = navigationBarRoutes
-    ) { innerPadding ->
+    NavigationSuiteScaffold(
+        layoutType = NavigationSuiteType.None, // TODO this state changes what app bar is shown
+        navigationSuiteItems = {}
+    ) {
         NavHost(
             enterTransition = { enter },
             exitTransition = { exit },
@@ -150,7 +181,7 @@ fun GymTrackerApp(
             popExitTransition = { popExit },
             navController = navController,
             startDestination = mainUiState.initialRoute,
-            modifier = Modifier.padding(innerPadding)
+            modifier = modifier
         ) {
             composable<Route.Welcome> {
                 WelcomeScreen(
@@ -273,24 +304,17 @@ fun GymTrackerApp(
                 )
             }
         }
-    }
 
-    if (unsavedChangesDialogOpen) {
-        UnsavedChangesDialog(
-            onConfirm = { doNotAskAgain ->
-                if (doNotAskAgain) {
-                    viewModel.stopAskingUnsavedChanges()
-                }
-                releaseNavigationGuard()
-            },
-            onCancel = { unsavedChangesDialogOpen = false }
-        )
+        if (unsavedChangesDialogOpen) {
+            UnsavedChangesDialog(
+                onConfirm = { doNotAskAgain ->
+                    if (doNotAskAgain) {
+                        viewModel.stopAskingUnsavedChanges()
+                    }
+                    releaseNavigationGuard()
+                },
+                onCancel = { unsavedChangesDialogOpen = false }
+            )
+        }
     }
-}
-
-@Composable
-private fun keyboardAsState(): State<Boolean> {
-    val ime = WindowInsets.ime
-    val isOpen = ime.getBottom(LocalDensity.current) > 0
-    return rememberUpdatedState(isOpen)
 }
