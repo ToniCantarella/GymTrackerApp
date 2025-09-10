@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.compose.charts)
+    implementation(libs.compose.calendar)
     implementation(libs.datastore.preferences)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
@@ -70,8 +72,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.room)
     implementation(libs.room.runtime)
-    implementation(libs.compose.charts)
-    implementation(libs.compose.calendar)
+    implementation(libs.material3.adaptive.navigation.suite)
+
     annotationProcessor(libs.room.compiler)
 
     ksp(libs.room.compiler)
