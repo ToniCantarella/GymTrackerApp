@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +39,7 @@ import kotlinx.datetime.LocalDate
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsOverviewScreen(
     onNavigateBack: () -> Unit,
@@ -49,25 +53,38 @@ fun StatsOverviewScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    StatsOverviewScreen(
-        loading = uiState.loading,
-        gymWorkouts = uiState.gymWorkouts,
-        cardioWorkouts = uiState.cardioWorkouts,
-        gymLegends = uiState.gymLegends,
-        cardioLegends = uiState.cardioLegends,
-        calendarSessions = uiState.calendarSessions,
-        calendarGymLegends = uiState.calendarGymLegends,
-        calendarCardioLegends = uiState.calendarCardioLegends,
-        getMonthData = viewModel::getMonthData,
-        onGymSessionNavigate = onGymSessionNavigate,
-        onCardioSessionNavigate = onCardioSessionNavigate,
-        onAddGymSessionNavigate = onAddGymSessionNavigate,
-        onAddCardioSessionNavigate = onAddCardioSessionNavigate,
-        onGymWorkoutStatsNavigate = onGymWorkoutStatsNavigate,
-        onCardioWorkoutStatsNavigate = onCardioWorkoutStatsNavigate,
-        gymColorIndexMap = uiState.gymColorIndexMap,
-        cardioColorIndexMap = uiState.cardioColorIndexMap
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.stats),
+                    )
+                }
+            )
+        }
+    ) {innerPadding ->
+        StatsOverviewScreen(
+            loading = uiState.loading,
+            gymWorkouts = uiState.gymWorkouts,
+            cardioWorkouts = uiState.cardioWorkouts,
+            gymLegends = uiState.gymLegends,
+            cardioLegends = uiState.cardioLegends,
+            calendarSessions = uiState.calendarSessions,
+            calendarGymLegends = uiState.calendarGymLegends,
+            calendarCardioLegends = uiState.calendarCardioLegends,
+            getMonthData = viewModel::getMonthData,
+            onGymSessionNavigate = onGymSessionNavigate,
+            onCardioSessionNavigate = onCardioSessionNavigate,
+            onAddGymSessionNavigate = onAddGymSessionNavigate,
+            onAddCardioSessionNavigate = onAddCardioSessionNavigate,
+            onGymWorkoutStatsNavigate = onGymWorkoutStatsNavigate,
+            onCardioWorkoutStatsNavigate = onCardioWorkoutStatsNavigate,
+            gymColorIndexMap = uiState.gymColorIndexMap,
+            cardioColorIndexMap = uiState.cardioColorIndexMap,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 @Composable
@@ -88,107 +105,110 @@ private fun StatsOverviewScreen(
     onGymWorkoutStatsNavigate: (workoutId: Int) -> Unit,
     onCardioWorkoutStatsNavigate: (workoutId: Int) -> Unit,
     gymColorIndexMap: Map<Int, Int>,
-    cardioColorIndexMap: Map<Int, Int>
+    cardioColorIndexMap: Map<Int, Int>,
+    modifier : Modifier = Modifier
 ) {
-    if (loading) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(1f)
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        LazyColumn(
-            contentPadding = PaddingValues(vertical = dimensionResource(id = R.dimen.padding_large)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
-        ) {
-            item {
-                WorkoutCalendar(
-                    sessionsForMonth = calendarSessions,
-                    gymLegends = calendarGymLegends,
-                    cardioLegends = calendarCardioLegends,
-                    getMonthSessions = getMonthData,
-                    onGymSessionClick = onGymSessionNavigate,
-                    onCardioSessionClick = onCardioSessionNavigate,
-                    onAddGymSessionClick = onAddGymSessionNavigate,
-                    onAddCardioSessionClick = onAddCardioSessionNavigate,
-                    gymColorIndexMap = gymColorIndexMap,
-                    cardioColorIndexMap = cardioColorIndexMap,
-                    gymWorkouts = gymWorkouts,
-                    cardioWorkouts = cardioWorkouts,
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large))
-                )
+    Box(modifier = modifier){
+        if (loading) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(1f)
+            ) {
+                CircularProgressIndicator()
             }
-
-            item {
-                val itemWidth = 300.dp
-
-                Text(
-                    text = stringResource(id = R.string.all_time),
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_large))
-                )
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_large)),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(350.dp)
-                ) {
-                    item {
-                        WorkoutPieChart(
-                            legends = gymLegends,
-                            workoutType = WorkoutType.GYM,
-                            colorIndexMap = gymColorIndexMap,
-                            modifier = Modifier
-                                .width(itemWidth)
-                        )
-                    }
-                    item {
-                        WorkoutPieChart(
-                            legends = cardioLegends,
-                            workoutType = WorkoutType.CARDIO,
-                            colorIndexMap = cardioColorIndexMap,
-                            modifier = Modifier
-                                .width(itemWidth)
-                        )
-                    }
-                }
-            }
-
-
-            item {
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                Row(
-                    modifier = Modifier
-                        .padding(start = dimensionResource(id = R.dimen.padding_large))
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.timeline),
-                        contentDescription = stringResource(id = R.string.stats),
-                        modifier = Modifier.size(40.dp)
-                    )
-                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
-                    Text(
-                        text = stringResource(id = R.string.stats),
-                        style = MaterialTheme.typography.headlineLarge,
-
-                        )
-                }
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-
-                if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
-                    WorkoutListing(
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = dimensionResource(id = R.dimen.padding_large)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
+            ) {
+                item {
+                    WorkoutCalendar(
+                        sessionsForMonth = calendarSessions,
+                        gymLegends = calendarGymLegends,
+                        cardioLegends = calendarCardioLegends,
+                        getMonthSessions = getMonthData,
+                        onGymSessionClick = onGymSessionNavigate,
+                        onCardioSessionClick = onCardioSessionNavigate,
+                        onAddGymSessionClick = onAddGymSessionNavigate,
+                        onAddCardioSessionClick = onAddCardioSessionNavigate,
+                        gymColorIndexMap = gymColorIndexMap,
+                        cardioColorIndexMap = cardioColorIndexMap,
                         gymWorkouts = gymWorkouts,
                         cardioWorkouts = cardioWorkouts,
-                        onGymWorkoutStatsNavigate = onGymWorkoutStatsNavigate,
-                        onCardioWorkoutStatsNavigate = onCardioWorkoutStatsNavigate,
-                        gymColorIndexMap = gymColorIndexMap,
-                        cardioColorIndexMap = cardioColorIndexMap
+                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large))
                     )
+                }
+
+                item {
+                    val itemWidth = 300.dp
+
+                    Text(
+                        text = stringResource(id = R.string.all_time),
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_large))
+                    )
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_large)),
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp)
+                    ) {
+                        item {
+                            WorkoutPieChart(
+                                legends = gymLegends,
+                                workoutType = WorkoutType.GYM,
+                                colorIndexMap = gymColorIndexMap,
+                                modifier = Modifier
+                                    .width(itemWidth)
+                            )
+                        }
+                        item {
+                            WorkoutPieChart(
+                                legends = cardioLegends,
+                                workoutType = WorkoutType.CARDIO,
+                                colorIndexMap = cardioColorIndexMap,
+                                modifier = Modifier
+                                    .width(itemWidth)
+                            )
+                        }
+                    }
+                }
+
+
+                item {
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                    Row(
+                        modifier = Modifier
+                            .padding(start = dimensionResource(id = R.dimen.padding_large))
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.timeline),
+                            contentDescription = stringResource(id = R.string.stats),
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                        Text(
+                            text = stringResource(id = R.string.stats),
+                            style = MaterialTheme.typography.headlineLarge,
+
+                            )
+                    }
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+
+                    if (gymWorkouts.isNotEmpty() || cardioWorkouts.isNotEmpty()) {
+                        WorkoutListing(
+                            gymWorkouts = gymWorkouts,
+                            cardioWorkouts = cardioWorkouts,
+                            onGymWorkoutStatsNavigate = onGymWorkoutStatsNavigate,
+                            onCardioWorkoutStatsNavigate = onCardioWorkoutStatsNavigate,
+                            gymColorIndexMap = gymColorIndexMap,
+                            cardioColorIndexMap = cardioColorIndexMap
+                        )
+                    }
                 }
             }
         }
