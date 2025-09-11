@@ -72,13 +72,14 @@ fun GymWorkoutScreen(
     val hasUnsavedChanges =
         uiState.initialWorkoutName != uiState.workoutName || uiState.initialExercises != uiState.exercises
     val hasPerformedSets = uiState.exercises.any { it.sets.any { set -> set.checked } }
+    val hasChanges = hasUnsavedChanges || hasPerformedSets
 
     BackHandler {
         onNavigateBack()
     }
 
-    LaunchedEffect(hasUnsavedChanges, hasPerformedSets) {
-        onNavigationGuardChange(hasUnsavedChanges || hasPerformedSets)
+    LaunchedEffect(hasChanges) {
+        onNavigationGuardChange(hasChanges)
     }
 
     fun onFinishWorkout() {
@@ -124,7 +125,7 @@ fun GymWorkoutScreen(
             )
         },
         floatingActionButton = {
-            val enabled = hasPerformedSets || hasUnsavedChanges
+            val enabled = hasChanges
             FloatingActionButton(
                 onClick = {
                     if (enabled) {
