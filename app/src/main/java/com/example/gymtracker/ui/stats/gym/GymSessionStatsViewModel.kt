@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 data class GymSessionUiState(
     val loading: Boolean = true,
-    val split: WorkoutWithExercises? = null
+    val workout: WorkoutWithExercises? = null
 )
 
 class GymSessionStatsViewModel(
@@ -25,10 +25,10 @@ class GymSessionStatsViewModel(
 
     init {
         viewModelScope.launch {
-            val split = sessionRepository.getWorkoutForSession(navParams.id)
+            val workout = sessionRepository.getWorkoutForSession(navParams.id)
             _uiState.update {
                 it.copy(
-                    split = split,
+                    workout = workout,
                     loading = false
                 )
             }
