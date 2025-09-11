@@ -1,5 +1,6 @@
 package com.example.gymtracker.ui.gym.gymworkouts
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -7,11 +8,12 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
@@ -73,45 +74,59 @@ fun GymWorkoutsScreen(
                     )
                 },
                 actions = {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        androidx.compose.animation.AnimatedVisibility(
+                    Row {
+                        AnimatedVisibility(
                             visible = uiState.selectingItems,
                             enter = scaleIn() + fadeIn(),
                             exit = scaleOut() + fadeOut()
                         ) {
                             IconButton(
-                                enabled = uiState.selectedItems.isNotEmpty(),
-                                onClick = { deletionDialogOpen = true },
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.error,
-                                    disabledContentColor = MaterialTheme.colorScheme.error.copy(
-                                        alpha = .5f
-                                    )
-                                )
+                                onClick = viewModel::stopSelectingItems
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = stringResource(id = R.string.delete)
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.cancel)
                                 )
                             }
                         }
-
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = !uiState.selectingItems,
-                            enter = scaleIn() + fadeIn(),
-                            exit = scaleOut() + fadeOut()
+                        Box(
+                            contentAlignment = Alignment.Center
                         ) {
-                            IconButton(
-                                onClick = viewModel::startSelectingItems
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = !uiState.selectingItems && uiState.workouts.isNotEmpty(),
+                                enter = scaleIn() + fadeIn(),
+                                exit = scaleOut() + fadeOut()
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.checklist),
-                                    contentDescription = stringResource(R.string.select),
-                                )
+                                IconButton(
+                                    onClick = viewModel::startSelectingItems
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.checklist),
+                                        contentDescription = stringResource(R.string.select),
+                                    )
+                                }
+                            }
+
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = uiState.selectingItems,
+                                enter = scaleIn() + fadeIn(),
+                                exit = scaleOut() + fadeOut()
+                            ) {
+                                IconButton(
+                                    enabled = uiState.selectedItems.isNotEmpty(),
+                                    onClick = { deletionDialogOpen = true },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error,
+                                        disabledContentColor = MaterialTheme.colorScheme.error.copy(
+                                            alpha = .5f
+                                        )
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = stringResource(id = R.string.delete)
+                                    )
+                                }
                             }
                         }
                     }
