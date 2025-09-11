@@ -357,7 +357,6 @@ fun GymAppNavHost(
 
             composable<Route.Info> {
                 InfoScreen(
-                    onNavigateBack = ::popBackStack,
                     onDeleteFinished = { navigate(Route.Welcome) }
                 )
             }

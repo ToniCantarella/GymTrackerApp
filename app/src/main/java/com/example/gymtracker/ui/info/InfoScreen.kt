@@ -16,12 +16,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,20 +47,33 @@ import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoScreen(
-    onNavigateBack: () -> Unit,
     onDeleteFinished: () -> Unit,
     viewModel: InfoViewModel = koinViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
-    InfoScreen(
-        showFinishWorkoutDialog = uiState.value.showConfirmOnFinishWorkout,
-        onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
-        onDeleteAllData = { deletionDialogOpen = true }
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.info)
+                    )
+                }
+            )
+        }
+    ) {innerPadding ->
+        InfoScreen(
+            showFinishWorkoutDialog = uiState.value.showConfirmOnFinishWorkout,
+            onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
+            onDeleteAllData = { deletionDialogOpen = true },
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 
     if (deletionDialogOpen) {
         ConfirmDialog(
