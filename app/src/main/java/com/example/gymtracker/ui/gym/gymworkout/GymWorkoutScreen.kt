@@ -129,7 +129,7 @@ fun GymWorkoutScreen(
             FloatingActionButton(
                 onClick = {
                     if (enabled) {
-                        if (hasPerformedSets) ::finishWorkoutCheck else ::saveChanges
+                        if (hasPerformedSets) finishWorkoutCheck() else saveChanges()
                     }
                 },
                 containerColor = if (enabled) MaterialTheme.colorScheme.primary else Color.Gray,

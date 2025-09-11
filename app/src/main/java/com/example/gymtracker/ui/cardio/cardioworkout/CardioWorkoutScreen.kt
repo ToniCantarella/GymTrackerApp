@@ -109,7 +109,7 @@ fun CardioWorkoutScreen(
             FloatingActionButton(
                 onClick = {
                     if (enabled) {
-                        if (hasMarkedMetrics) ::finishWorkoutCheck else ::saveChanges
+                        if (hasMarkedMetrics) finishWorkoutCheck() else saveChanges()
                     }
                 },
                 containerColor = if (enabled) MaterialTheme.colorScheme.primary else Color.Gray,
