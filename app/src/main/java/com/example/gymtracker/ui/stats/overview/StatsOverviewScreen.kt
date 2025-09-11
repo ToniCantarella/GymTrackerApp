@@ -13,11 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +32,6 @@ import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.example.gymtracker.ui.entity.statsoverview.WorkoutType
-import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import kotlinx.datetime.LocalDate
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
@@ -52,24 +48,6 @@ fun StatsOverviewScreen(
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    ProvideTopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.overview)
-            )
-        },
-        navigationItem = {
-            IconButton(
-                onClick = onNavigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back)
-                )
-            }
-        }
-    )
 
     StatsOverviewScreen(
         loading = uiState.loading,

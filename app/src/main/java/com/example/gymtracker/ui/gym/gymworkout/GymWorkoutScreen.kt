@@ -9,15 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -32,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,13 +36,9 @@ import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.gym.common.ExerciseListEdit
-import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
-import com.example.gymtracker.ui.navigation.ProvideTopAppBar
-import com.example.gymtracker.ui.navigation.TopBarTextField
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.UnitUtil
-import com.example.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import com.example.gymtracker.utility.toDateAndTimeString
 import com.example.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
@@ -98,55 +89,6 @@ fun GymWorkoutScreen(
         releaseNavigationGuard()
         viewModel.saveChanges()
         onNavigateBack()
-    }
-
-    ProvideTopAppBar(
-        title = {
-            TopBarTextField(
-                value = uiState.workoutName,
-                onValueChange = viewModel::onWorkoutNameChange,
-                maxSize = WORKOUT_NAME_MAX_SIZE
-            )
-        },
-        navigationItem = {
-            IconButton(
-                onClick = { onNavigateBack() }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                )
-            }
-        },
-        actions = {
-            IconButton(
-                onClick = { statsBottomSheetOpen = true },
-                enabled = uiState.stats != null && uiState.stats!!.exercises.isNotEmpty()
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.timeline),
-                    contentDescription = stringResource(R.string.stats)
-                )
-            }
-        }
-    )
-
-    ProvideFloatingActionButton(
-        onClick = {
-            if (hasPerformedSets) {
-                finishWorkoutCheck()
-            } else {
-                saveChanges()
-            }
-        },
-        enabled = hasUnsavedChanges || hasPerformedSets
-    ) {
-        Icon(
-            painter =
-                if (hasPerformedSets) painterResource(id = R.drawable.goal)
-                else painterResource(id = R.drawable.save),
-            contentDescription = stringResource(id = R.string.done)
-        )
     }
 
     GymWorkoutScreen(

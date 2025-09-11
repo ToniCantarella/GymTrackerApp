@@ -5,12 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.entity.cardio.CardioWorkoutStats
-import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.stats.BasicLineChart
 import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.toDateString
@@ -35,23 +31,6 @@ fun CardioWorkoutStatsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    ProvideTopAppBar(
-        title = {
-            Text(
-                text = uiState.stats?.name ?: ""
-            )
-        },
-        navigationItem = {
-            IconButton(
-                onClick = onNavigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                )
-            }
-        }
-    )
 
     if (uiState.loading) {
         Box(

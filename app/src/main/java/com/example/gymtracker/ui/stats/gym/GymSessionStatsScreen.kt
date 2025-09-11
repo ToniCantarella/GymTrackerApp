@@ -11,12 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,7 +27,6 @@ import com.example.gymtracker.R
 import com.example.gymtracker.ui.entity.gym.Exercise
 import com.example.gymtracker.ui.entity.gym.WorkoutSet
 import com.example.gymtracker.ui.entity.gym.WorkoutWithExercises
-import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
 import com.example.gymtracker.utility.UnitUtil
 import com.example.gymtracker.utility.toDateAndTimeString
@@ -46,24 +41,6 @@ fun GymSessionStatsScreen(
     viewModel: GymSessionStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    ProvideTopAppBar(
-        title = {
-            Text(
-                text = uiState.split?.name ?: ""
-            )
-        },
-        navigationItem = {
-            IconButton(
-                onClick = onNavigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                )
-            }
-        }
-    )
 
     GymSessionStatsScreen(
         loading = uiState.loading,

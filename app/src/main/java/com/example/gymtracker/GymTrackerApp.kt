@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,10 +31,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.example.gymtracker.ui.cardio.cardioworkout.CardioWorkoutScreen
 import com.example.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsScreen
 import com.example.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutScreen
@@ -39,7 +49,6 @@ import com.example.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.example.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.example.gymtracker.ui.info.InfoScreen
-import com.example.gymtracker.ui.navigation.NavigationBarRoute
 import com.example.gymtracker.ui.navigation.Route
 import com.example.gymtracker.ui.stats.cardio.CardioSessionStatsScreen
 import com.example.gymtracker.ui.stats.cardio.CardioWorkoutStatsScreen
@@ -52,12 +61,8 @@ import com.example.gymtracker.ui.welcome.WelcomeScreen
 fun GymTrackerApp(
     viewModel: MainViewModel
 ) {
-
-
     val focusManager = LocalFocusManager.current
     val isKeyboardOpen by keyboardAsState()
-
-
 
     LaunchedEffect(isKeyboardOpen) {
         if (!isKeyboardOpen) {
@@ -84,6 +89,8 @@ private fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isOpen)
 }
 
+data class NavigationBarItem(val titleResInt: Int, val route: Route, val iconResInt: Int)
+
 @Composable
 fun GymAppNavHost(
     viewModel: MainViewModel,
@@ -91,44 +98,31 @@ fun GymAppNavHost(
 ) {
     val mainUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
+    val adaptiveInfo = currentWindowAdaptiveInfo()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isWideScreen = adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
     val navigationAnimationMoveInt = 1500
-    val enter = if (isLandscape) fadeIn() else slideInHorizontally { navigationAnimationMoveInt }
-    val exit = if (isLandscape) fadeOut() else slideOutHorizontally { -navigationAnimationMoveInt }
+    val enter =
+        if (isLandscape|| isWideScreen)
+            fadeIn()
+        else
+            slideInHorizontally { navigationAnimationMoveInt }
+    val exit =
+        if (isLandscape|| isWideScreen)
+            fadeOut()
+        else
+            slideOutHorizontally { -navigationAnimationMoveInt }
     val popEnter =
-        if (isLandscape)
+        if (isLandscape || isWideScreen)
             fadeIn()
         else
             slideInHorizontally { -navigationAnimationMoveInt }
     val popExit =
-        if (isLandscape)
+        if (isLandscape|| isWideScreen)
             fadeOut()
         else
             slideOutHorizontally { navigationAnimationMoveInt }
-
-    val navigationBarRoutes = listOf(
-        NavigationBarRoute(
-            titleResInt = R.string.gym,
-            route = Route.GymMain,
-            iconResInt = R.drawable.weight
-        ),
-        NavigationBarRoute(
-            titleResInt = R.string.cardio,
-            route = Route.CardioMain,
-            iconResInt = R.drawable.run
-        ),
-        NavigationBarRoute(
-            titleResInt = R.string.stats,
-            route = Route.StatsMain,
-            iconResInt = R.drawable.stats
-        ),
-        NavigationBarRoute(
-            titleResInt = R.string.info,
-            route = Route.Info,
-            iconResInt = R.drawable.info
-        )
-    )
 
     var isNavigationGuarded by remember { mutableStateOf(false) }
     var unsavedChangesDialogOpen by remember { mutableStateOf(false) }
@@ -170,9 +164,73 @@ fun GymAppNavHost(
         }
     }
 
+    val navigationBarItems = listOf(
+        NavigationBarItem(
+            titleResInt = R.string.gym,
+            route = Route.GymMain,
+            iconResInt = R.drawable.weight
+        ),
+        NavigationBarItem(
+            titleResInt = R.string.cardio,
+            route = Route.CardioMain,
+            iconResInt = R.drawable.run
+        ),
+        NavigationBarItem(
+            titleResInt = R.string.stats,
+            route = Route.StatsMain,
+            iconResInt = R.drawable.stats
+        ),
+        NavigationBarItem(
+            titleResInt = R.string.info,
+            route = Route.Info,
+            iconResInt = R.drawable.info
+        )
+    )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val matchesNavigationItemRoute = navigationBarItems.any { navigationBarRoute ->
+        currentDestination?.hierarchy?.any { it.hasRoute(navigationBarRoute.route::class) } == true
+    }
+
+    val defaultLayoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+
+    val layoutType = if (matchesNavigationItemRoute) {
+        if (isLandscape) {
+            NavigationSuiteType.NavigationRail
+        } else {
+            defaultLayoutType
+        }
+    } else {
+        NavigationSuiteType.None
+    }
+
     NavigationSuiteScaffold(
-        layoutType = NavigationSuiteType.None, // TODO this state changes what app bar is shown
-        navigationSuiteItems = {}
+        layoutType = layoutType,
+        navigationSuiteItems = {
+            navigationBarItems.map { item ->
+                val selected = currentDestination?.hierarchy?.any {
+                    it.hasRoute(item.route::class)
+                } ?: false
+
+                item(
+                    selected = selected,
+                    onClick = { navigate(item.route) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = item.iconResInt),
+                            contentDescription = stringResource(id = item.titleResInt)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(id = item.titleResInt)
+                        )
+                    }
+                )
+            }
+        }
     ) {
         NavHost(
             enterTransition = { enter },

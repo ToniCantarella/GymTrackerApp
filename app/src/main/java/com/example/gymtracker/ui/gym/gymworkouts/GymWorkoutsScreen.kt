@@ -4,14 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -35,10 +29,7 @@ import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
 import com.example.gymtracker.ui.common.WorkoutList
 import com.example.gymtracker.ui.entity.WorkoutWithTimestamp
-import com.example.gymtracker.ui.navigation.ProvideFloatingActionButton
-import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import com.example.gymtracker.ui.theme.GymTrackerTheme
-import com.example.gymtracker.utility.MAX_GYM_WORKOUTS
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 
@@ -53,56 +44,6 @@ fun GymWorkoutsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getWorkouts()
-    }
-
-    ProvideTopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.gym_workouts)
-            )
-        },
-        actions = {
-            if (uiState.selectingItems) {
-                IconButton(
-                    onClick = viewModel::stopSelectingItems
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(id = R.string.close)
-                    )
-                }
-                IconButton(
-                    onClick = { deletionDialogOpen = true },
-                    enabled = uiState.selectedItems.isNotEmpty()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        tint = MaterialTheme.colorScheme.error,
-                        contentDescription = stringResource(id = R.string.delete)
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = viewModel::startSelectingItems,
-                    enabled = uiState.workouts.isNotEmpty()
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.checklist),
-                        contentDescription = stringResource(id = R.string.select)
-                    )
-                }
-            }
-        }
-    )
-
-    ProvideFloatingActionButton(
-        onClick = onCreateWorkoutClicked,
-        visible = !uiState.selectingItems && uiState.workouts.size < MAX_GYM_WORKOUTS
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = stringResource(id = R.string.add)
-        )
     }
 
     if (deletionDialogOpen) {

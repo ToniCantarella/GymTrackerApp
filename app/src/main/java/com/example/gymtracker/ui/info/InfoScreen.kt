@@ -13,13 +13,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -44,7 +42,6 @@ import androidx.core.net.toUri
 import com.example.gymtracker.BuildConfig
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
-import com.example.gymtracker.ui.navigation.ProvideTopAppBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,24 +52,6 @@ fun InfoScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }
-
-    ProvideTopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.info)
-            )
-        },
-        navigationItem = {
-            IconButton(
-                onClick = onNavigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back)
-                )
-            }
-        }
-    )
 
     InfoScreen(
         showFinishWorkoutDialog = uiState.value.showConfirmOnFinishWorkout,
