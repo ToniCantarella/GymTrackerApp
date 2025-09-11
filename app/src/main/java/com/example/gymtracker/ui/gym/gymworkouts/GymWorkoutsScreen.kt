@@ -1,15 +1,31 @@
 package com.example.gymtracker.ui.gym.gymworkouts
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.gymtracker.R
 import com.example.gymtracker.ui.common.ConfirmDialog
 import com.example.gymtracker.ui.common.EmptyListCard
@@ -33,6 +50,7 @@ import com.example.gymtracker.ui.theme.GymTrackerTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GymWorkoutsScreen(
     onNavigateToWorkout: (id: Int) -> Unit,
@@ -44,6 +62,83 @@ fun GymWorkoutsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getWorkouts()
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.gym_workouts)
+                    )
+                },
+                actions = {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = uiState.selectingItems,
+                            enter = scaleIn() + fadeIn(),
+                            exit = scaleOut() + fadeOut()
+                        ) {
+                            IconButton(
+                                enabled = uiState.selectedItems.isNotEmpty(),
+                                onClick = { deletionDialogOpen = true },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error,
+                                    disabledContentColor = MaterialTheme.colorScheme.error.copy(
+                                        alpha = .5f
+                                    )
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(id = R.string.delete)
+                                )
+                            }
+                        }
+
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = !uiState.selectingItems,
+                            enter = scaleIn() + fadeIn(),
+                            exit = scaleOut() + fadeOut()
+                        ) {
+                            IconButton(
+                                onClick = viewModel::startSelectingItems
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.checklist),
+                                    contentDescription = stringResource(R.string.select),
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onCreateWorkoutClicked
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add)
+                )
+            }
+        }
+    ) { innerPadding ->
+        GymWorkoutsScreen(
+            loading = uiState.loading,
+            workouts = uiState.workouts,
+            selectingItems = uiState.selectingItems,
+            selectedItems = uiState.selectedItems,
+            onSelectWorkout = viewModel::onSelectItem,
+            onWorkoutClick = { onNavigateToWorkout(it.id) },
+            onWorkoutHold = viewModel::startSelectingItems,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 
     if (deletionDialogOpen) {
@@ -95,16 +190,6 @@ fun GymWorkoutsScreen(
             onDismissRequest = { deletionDialogOpen = false }
         )
     }
-
-    GymWorkoutsScreen(
-        loading = uiState.loading,
-        workouts = uiState.workouts,
-        selectingItems = uiState.selectingItems,
-        selectedItems = uiState.selectedItems,
-        onSelectWorkout = viewModel::onSelectItem,
-        onWorkoutClick = { onNavigateToWorkout(it.id) },
-        onWorkoutHold = viewModel::startSelectingItems
-    )
 }
 
 @Composable
@@ -115,12 +200,13 @@ fun GymWorkoutsScreen(
     selectedItems: List<WorkoutWithTimestamp>,
     onSelectWorkout: (workout: WorkoutWithTimestamp) -> Unit,
     onWorkoutClick: (workout: WorkoutWithTimestamp) -> Unit,
-    onWorkoutHold: (workout: WorkoutWithTimestamp) -> Unit
+    onWorkoutHold: (workout: WorkoutWithTimestamp) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         if (loading) {
             CircularProgressIndicator()
