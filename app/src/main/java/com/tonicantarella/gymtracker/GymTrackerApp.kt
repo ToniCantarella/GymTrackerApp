@@ -23,10 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -50,6 +47,7 @@ import com.tonicantarella.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.tonicantarella.gymtracker.ui.info.InfoScreen
 import com.tonicantarella.gymtracker.ui.navigation.Route
+import com.tonicantarella.gymtracker.ui.navigation.rememberNavigationGuard
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioSessionStatsScreen
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsScreen
 import com.tonicantarella.gymtracker.ui.stats.gym.GymSessionStatsScreen
@@ -124,34 +122,10 @@ fun GymAppNavHost(
         else
             slideOutHorizontally { navigationAnimationMoveInt }
 
-    var isNavigationGuarded by remember { mutableStateOf(false) }
-    var unsavedChangesDialogOpen by remember { mutableStateOf(false) }
-    var pendingNavigationAction by remember { mutableStateOf<(() -> Unit)?>(null) }
-
-    fun onNavigationGuardChange(guard: Boolean) {
-        isNavigationGuarded = guard
-    }
-
-    fun releaseNavigationGuard() {
-        pendingNavigationAction?.invoke()
-        pendingNavigationAction = null
-        unsavedChangesDialogOpen = false
-        isNavigationGuarded = false
-    }
-
-    fun navigateGuarded(navigationAction: () -> Unit) {
-        if (isNavigationGuarded) {
-            pendingNavigationAction = navigationAction
-            unsavedChangesDialogOpen = true
-        } else {
-            navigationAction()
-            pendingNavigationAction = null
-            unsavedChangesDialogOpen = false
-        }
-    }
+    val navigationGuard = rememberNavigationGuard()
 
     fun navigate(route: Route) {
-        navigateGuarded {
+        navigationGuard.navigate {
             navController.navigate(route) {
                 launchSingleTop = true
             }
@@ -159,7 +133,7 @@ fun GymAppNavHost(
     }
 
     fun popBackStack() {
-        navigateGuarded {
+        navigationGuard.navigate {
             navController.popBackStack()
         }
     }
@@ -262,16 +236,16 @@ fun GymAppNavHost(
             composable<Route.GymWorkout> {
                 GymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = ::onNavigationGuardChange,
-                    releaseNavigationGuard = ::releaseNavigationGuard
+                    onNavigationGuardChange = navigationGuard::guard,
+                    releaseNavigationGuard = navigationGuard::release
                 )
             }
 
             composable<Route.CreateGymWorkout> {
                 CreateGymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = ::onNavigationGuardChange,
-                    releaseNavigationGuard = ::releaseNavigationGuard
+                    onNavigationGuardChange = navigationGuard::guard,
+                    releaseNavigationGuard = navigationGuard::release
                 )
             }
 
@@ -287,15 +261,15 @@ fun GymAppNavHost(
             composable<Route.CardioWorkout> {
                 CardioWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = ::onNavigationGuardChange,
-                    releaseNavigationGuard = ::releaseNavigationGuard
+                    onNavigationGuardChange = navigationGuard::guard,
+                    releaseNavigationGuard = navigationGuard::release
                 )
             }
             composable<Route.CreateCardioWorkout> {
                 CreateCardioWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = ::onNavigationGuardChange,
-                    releaseNavigationGuard = ::releaseNavigationGuard
+                    onNavigationGuardChange = navigationGuard::guard,
+                    releaseNavigationGuard = navigationGuard::release
                 )
             }
 
@@ -362,15 +336,15 @@ fun GymAppNavHost(
             }
         }
 
-        if (unsavedChangesDialogOpen) {
+        if (navigationGuard.unsavedChangesDialogOpen) {
             UnsavedChangesDialog(
                 onConfirm = { doNotAskAgain ->
                     if (doNotAskAgain) {
                         viewModel.stopAskingUnsavedChanges()
                     }
-                    releaseNavigationGuard()
+                    navigationGuard.release()
                 },
-                onCancel = { unsavedChangesDialogOpen = false }
+                onCancel = navigationGuard::dismissDialog
             )
         }
     }
