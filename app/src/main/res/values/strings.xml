@@ -71,4 +71,18 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="delete_are_you_sure_singular_item">Are you sure you want to delete %s?</string>
+    <string name="update">Update</string>
+    <string name="retry">Retry</string>
+    <string name="update_available">Update available</string>
+    <string name="update_available_description">Install the latest version of the application to get the newest features.</string>
+    <string name="downloading">Downloading…</string>
+    <string name="downloaded">Downloaded!</string>
+    <string name="update_cancelled">Update cancelled</string>
+    <string name="update_cancelled_description">Continue the update to get the newest features.</string>
+    <string name="update_failed">Update failed</string>
+    <string name="update_failed_description">Try the update again.</string>
+    <string name="update_installed">Update installed!</string>
+    <string name="update_installed_description">Update has been succesfully installed on your device. You can now enjoy all the newest features.</string>
+    <string name="update_unknown">Unexpected error</string>
+    <string name="update_unknown_description">Something went sideways. Please try again.</string>
 </resources>

@@ -63,4 +63,18 @@
     <string name="previous">Edellinen</string>
     <string name="next">Seuraava</string>
     <string name="delete_are_you_sure_singular_item">Oletko varma, että tahdot poistaa %s?</string>
+    <string name="update">Päivitä</string>
+    <string name="retry">Yritä uudelleen</string>
+    <string name="update_available">Päivitys saatavilla</string>
+    <string name="update_available_description">Asenna sovelluksen uusin versio saadaksesi uusimmat ominaisuudet käyttöösi.</string>
+    <string name="downloading">Ladataan…</string>
+    <string name="downloaded">Ladattu!</string>
+    <string name="update_cancelled">Päivitys peruutettu</string>
+    <string name="update_cancelled_description">Jatka päivitystä saadaksesi uusimmat ominaisuudet käyttöösi.</string>
+    <string name="update_failed">Päivitys epäonnistui</string>
+    <string name="update_failed_description">Yritä päivitystä uudelleen.</string>
+    <string name="update_installed">Päivitys asennettu!</string>
+    <string name="update_installed_description">Päivitys on onnistuneesti asennettu laitteellesi. Voit nyt nauttia uusimmista ominaisuuksista.</string>
+    <string name="update_unknown">Odottamaton virhe</string>
+    <string name="update_unknown_description">Jokin meni pieleen. Ole hyvä ja yritä uudelleen.</string>
 </resources>
