@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.core)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.play.app.update)
+    implementation(libs.play.app.update.ktx)
     implementation(libs.room)
     implementation(libs.room.runtime)
     implementation(libs.material3.adaptive.navigation.suite)

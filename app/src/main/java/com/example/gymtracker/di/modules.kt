@@ -34,7 +34,12 @@ import com.example.gymtracker.ui.stats.cardio.CardioWorkoutStatsViewModel
 import com.example.gymtracker.ui.stats.gym.GymSessionStatsViewModel
 import com.example.gymtracker.ui.stats.gym.GymWorkoutStatsViewModel
 import com.example.gymtracker.ui.stats.overview.StatsOverviewViewModel
+import com.example.gymtracker.update.InAppUpdateHandler
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import java.io.File
@@ -45,6 +50,8 @@ val appModule = module {
             File(androidContext().filesDir, "settings.preferences_pb")
         }
     }
+    single <AppUpdateManager>{ AppUpdateManagerFactory.create(androidContext()) }
+    singleOf(::InAppUpdateHandler)
 }
 
 val databaseModule = module {
@@ -68,61 +75,14 @@ val databaseModule = module {
 }
 
 val repositoryModule = module {
-    single<AppRepository> { AppRepositoryImpl(get()) }
-
-    single<GymWorkoutRepository> {
-        GymWorkoutRepositoryImpl(
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
-    single<GymSessionRepository> {
-        GymSessionRepositoryImpl(
-            get(),
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
-    single<GymStatsRepository> {
-        GymStatsRepositoryImpl(
-            get(),
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
-
-    single<CardioWorkoutRepository> {
-        CardioWorkoutRepositoryImpl(
-            get(),
-            get()
-        )
-    }
-    single<CardioSessionRepository> {
-        CardioSessionRepositoryImpl(
-            get(),
-            get()
-        )
-    }
-    single<CardioStatsRepository> {
-        CardioStatsRepositoryImpl(
-            get(),
-            get()
-        )
-    }
-    single<StatsOverviewRepository> {
-        StatsOverviewRepositoryImpl(
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
+    singleOf(::AppRepositoryImpl) { bind<AppRepository>() }
+    singleOf(::GymWorkoutRepositoryImpl) { bind<GymWorkoutRepository>() }
+    singleOf(::GymSessionRepositoryImpl) { bind<GymSessionRepository>() }
+    singleOf(::GymStatsRepositoryImpl) { bind<GymStatsRepository>() }
+    singleOf(::CardioWorkoutRepositoryImpl) { bind<CardioWorkoutRepository>() }
+    singleOf(::CardioSessionRepositoryImpl) { bind<CardioSessionRepository>() }
+    singleOf(::CardioStatsRepositoryImpl) { bind<CardioStatsRepository>() }
+    singleOf(::StatsOverviewRepositoryImpl) { bind<StatsOverviewRepository>() }
 }
 
 val viewModelModule = module {
