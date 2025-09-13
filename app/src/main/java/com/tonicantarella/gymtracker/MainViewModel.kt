@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-object GymPreferences{
+object GymPreferences {
     val USER_HAS_BEEN_WELCOMED = booleanPreferencesKey("user_has_been_welcomed")
     val SHOW_UNSAVED_CHANGES_DIALOG = booleanPreferencesKey("show_unsaved_changes_dialog")
     val SHOW_FINISH_WORKOUT_CONFIRM_DIALOG =
@@ -43,11 +43,15 @@ class MainViewModel(
             val hasBeenWelcomed = dataStore.data
                 .map { it[GymPreferences.USER_HAS_BEEN_WELCOMED] ?: false }
                 .first()
+            val showUnsavedChangesDialog = dataStore.data
+                .map { it[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] ?: true }
+                .first()
 
             _uiState.update {
                 it.copy(
                     userHasBeenWelcomed = hasBeenWelcomed,
                     initialRoute = if (hasBeenWelcomed) Route.GymMain else it.initialRoute,
+                    confirmUnsavedChanges = showUnsavedChangesDialog,
                     loading = false
                 )
             }
@@ -67,6 +71,7 @@ class MainViewModel(
             dataStore.edit { preferences ->
                 preferences[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] = false
             }
+            _uiState.update { it.copy(confirmUnsavedChanges = false) }
         }
     }
 }

@@ -6,19 +6,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-class NavigationGuardController {
+class NavigationGuardController(
+    private val showGuard: Boolean
+) {
     var isGuarded by mutableStateOf(false)
-    var unsavedChangesDialogOpen by mutableStateOf(false)
+    var guardDialogOpen by mutableStateOf(false)
     private var pendingNavigation: (() -> Unit)? = null
 
     fun guard(guarded: Boolean) {
-        isGuarded = guarded
+        isGuarded = guarded && showGuard
     }
 
     fun navigate(action: () -> Unit) {
         if (isGuarded) {
             pendingNavigation = action
-            unsavedChangesDialogOpen = true
+            guardDialogOpen = true
         } else {
             action()
         }
@@ -27,16 +29,16 @@ class NavigationGuardController {
     fun release() {
         pendingNavigation?.invoke()
         pendingNavigation = null
-        unsavedChangesDialogOpen = false
+        guardDialogOpen = false
         isGuarded = false
     }
 
     fun dismissDialog() {
-        unsavedChangesDialogOpen = false
+        guardDialogOpen = false
     }
 }
 
 @Composable
-fun rememberNavigationGuard(): NavigationGuardController {
-    return remember { NavigationGuardController() }
+fun rememberNavigationGuard(showGuard: Boolean = false): NavigationGuardController {
+    return remember(showGuard) { NavigationGuardController(showGuard) }
 }

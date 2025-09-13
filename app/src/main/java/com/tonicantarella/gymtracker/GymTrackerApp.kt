@@ -96,33 +96,15 @@ fun GymAppNavHost(
 ) {
     val mainUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val navigationGuard = rememberNavigationGuard(
+        showGuard = mainUiState.confirmUnsavedChanges
+    )
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val isWideScreen = adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
-
-    val navigationAnimationMoveInt = 1500
-    val enter =
-        if (isLandscape|| isWideScreen)
-            fadeIn()
-        else
-            slideInHorizontally { navigationAnimationMoveInt }
-    val exit =
-        if (isLandscape|| isWideScreen)
-            fadeOut()
-        else
-            slideOutHorizontally { -navigationAnimationMoveInt }
-    val popEnter =
-        if (isLandscape || isWideScreen)
-            fadeIn()
-        else
-            slideInHorizontally { -navigationAnimationMoveInt }
-    val popExit =
-        if (isLandscape|| isWideScreen)
-            fadeOut()
-        else
-            slideOutHorizontally { navigationAnimationMoveInt }
-
-    val navigationGuard = rememberNavigationGuard()
+    val isWideScreen =
+        adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
     fun navigate(route: Route) {
         navigationGuard.navigate {
@@ -137,6 +119,20 @@ fun GymAppNavHost(
             navController.popBackStack()
         }
     }
+
+    val navigationAnimationMoveInt = 1500
+    val enter =
+        if (isLandscape || isWideScreen) fadeIn()
+        else slideInHorizontally { navigationAnimationMoveInt }
+    val exit =
+        if (isLandscape || isWideScreen) fadeOut()
+        else slideOutHorizontally { -navigationAnimationMoveInt }
+    val popEnter =
+        if (isLandscape || isWideScreen) fadeIn()
+        else slideInHorizontally { -navigationAnimationMoveInt }
+    val popExit =
+        if (isLandscape || isWideScreen) fadeOut()
+        else slideOutHorizontally { navigationAnimationMoveInt }
 
     val navigationBarItems = listOf(
         NavigationBarItem(
@@ -161,23 +157,13 @@ fun GymAppNavHost(
         )
     )
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
     val matchesNavigationItemRoute = navigationBarItems.any { navigationBarRoute ->
         currentDestination?.hierarchy?.any { it.hasRoute(navigationBarRoute.route::class) } == true
     }
-
-    val defaultLayoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
-
-    val layoutType = if (matchesNavigationItemRoute) {
-        if (isLandscape) {
-            NavigationSuiteType.NavigationRail
-        } else {
-            defaultLayoutType
-        }
-    } else {
-        NavigationSuiteType.None
+    val layoutType = when {
+        !matchesNavigationItemRoute -> NavigationSuiteType.None
+        isLandscape -> NavigationSuiteType.NavigationRail
+        else -> NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
     }
 
     NavigationSuiteScaffold(
@@ -336,7 +322,7 @@ fun GymAppNavHost(
             }
         }
 
-        if (navigationGuard.unsavedChangesDialogOpen) {
+        if (navigationGuard.guardDialogOpen) {
             UnsavedChangesDialog(
                 onConfirm = { doNotAskAgain ->
                     if (doNotAskAgain) {
