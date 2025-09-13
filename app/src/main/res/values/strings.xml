@@ -82,7 +82,7 @@
     <string name="update_failed">Update failed</string>
     <string name="update_failed_description">Try the update again.</string>
     <string name="update_installed">Update installed!</string>
-    <string name="update_installed_description">Update has been succesfully installed on your device. You can now enjoy all the newest features.</string>
+    <string name="update_installed_description">Update has been successfully installed on your device. You can now enjoy all the newest features.</string>
     <string name="update_unknown">Unexpected error</string>
     <string name="update_unknown_description">Something went sideways. Please try again.</string>
 </resources>
