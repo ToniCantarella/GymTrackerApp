@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,60 +31,67 @@ import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 fun WelcomeScreen(
     onUnderstoodClick: () -> Unit
 ) {
-    Box {
-        Icon(
-            painter = painterResource(id = R.drawable.weight),
-            contentDescription = null,
-            modifier = Modifier
-                .graphicsLayer {
-                    translationX = -150F
-                    translationY = 200f
-                }
-                .blur(5.dp)
-                .align(Alignment.BottomStart)
-                .size(400.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.run),
-            contentDescription = null,
-            modifier = Modifier
-                .graphicsLayer {
-                    translationX = 200F
-                    translationY = -50f
-                }
-                .blur(10.dp)
-                .align(Alignment.TopEnd)
-                .size(300.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
-        )
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(id = R.dimen.padding_large))
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ){
+        Box(
+            modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_medium))
         ) {
+            Icon(
+                painter = painterResource(id = R.drawable.weight),
+                contentDescription = null,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = -150F
+                        translationY = 150f
+                    }
+                    .blur(5.dp)
+                    .align(Alignment.BottomStart)
+                    .size(400.dp),
+                tint = MaterialTheme.colorScheme.background.copy(alpha = .8f)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.run),
+                contentDescription = null,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = 200F
+                        translationY = -50f
+                    }
+                    .blur(10.dp)
+                    .align(Alignment.TopEnd)
+                    .size(300.dp),
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = .6f)
+            )
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(dimensionResource(id = R.dimen.padding_large))
             ) {
-                Text(
-                    text = stringResource(id = R.string.welcome),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
-                Text(
-                    text = stringResource(id = R.string.welcome_text),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                Button(
-                    onClick = onUnderstoodClick
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(id = R.string.understood)
+                        text = stringResource(id = R.string.welcome),
+                        style = MaterialTheme.typography.titleLarge
                     )
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
+                    Text(
+                        text = stringResource(id = R.string.welcome_text),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+                    Button(
+                        onClick = onUnderstoodClick
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.understood)
+                        )
+                    }
                 }
             }
         }
@@ -106,7 +114,7 @@ private fun WelcomeScreenPreview() {
 @Composable
 private fun WelcomeScreenPreviewFi() {
     GymTrackerTheme(darkTheme = true) {
-        Surface{
+        Surface {
             WelcomeScreen(
                 onUnderstoodClick = {}
             )

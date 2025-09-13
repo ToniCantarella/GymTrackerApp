@@ -17,7 +17,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -31,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.tonicantarella.gymtracker.R
+import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
@@ -42,7 +42,6 @@ import java.time.Instant
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsOverviewScreen(
-    onNavigateBack: () -> Unit,
     onGymSessionNavigate: (id: Int) -> Unit,
     onCardioSessionNavigate: (id: Int) -> Unit,
     onAddGymSessionNavigate: (workoutId: Int, timestamp: Instant) -> Unit,
@@ -53,7 +52,7 @@ fun StatsOverviewScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
+    GymScaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -63,7 +62,7 @@ fun StatsOverviewScreen(
                 }
             )
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         StatsOverviewScreen(
             loading = uiState.loading,
             gymWorkouts = uiState.gymWorkouts,
@@ -106,9 +105,9 @@ private fun StatsOverviewScreen(
     onCardioWorkoutStatsNavigate: (workoutId: Int) -> Unit,
     gymColorIndexMap: Map<Int, Int>,
     cardioColorIndexMap: Map<Int, Int>,
-    modifier : Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier){
+    Box(modifier = modifier) {
         if (loading) {
             Box(
                 contentAlignment = Alignment.Center,

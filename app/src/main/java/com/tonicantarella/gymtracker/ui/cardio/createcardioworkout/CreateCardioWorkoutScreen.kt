@@ -11,7 +11,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +25,7 @@ import androidx.compose.ui.zIndex
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.cardio.common.CardioContent
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
+import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 import org.koin.androidx.compose.koinViewModel
@@ -53,7 +53,7 @@ fun CreateCardioWorkoutScreen(
         }
     }
 
-    Scaffold(
+    GymScaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -78,11 +78,11 @@ fun CreateCardioWorkoutScreen(
         },
         floatingActionButton = {
             val enabled = uiState.name.isNotEmpty()
-            GymFloatingActionButton (
+            GymFloatingActionButton(
                 enabled = enabled,
                 onClick = {
-                        releaseNavigationGuard()
-                        viewModel.onSavePressed { onNavigateBack() }
+                    releaseNavigationGuard()
+                    viewModel.onSavePressed { onNavigateBack() }
                 }
             ) {
                 Icon(

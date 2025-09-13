@@ -21,7 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,6 +44,7 @@ import androidx.core.net.toUri
 import com.tonicantarella.gymtracker.BuildConfig
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
+import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +56,7 @@ fun InfoScreen(
     val uiState = viewModel.uiState.collectAsState()
     var deletionDialogOpen by remember { mutableStateOf(false) }
 
-    Scaffold(
+    GymScaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -66,7 +66,7 @@ fun InfoScreen(
                 }
             )
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         InfoScreen(
             showFinishWorkoutDialog = uiState.value.showConfirmOnFinishWorkout,
             onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
@@ -177,7 +177,7 @@ private fun InfoScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 Text(
                     text = stringResource(id = R.string.show_finish_workout_dialog)
                 )

@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -43,6 +42,7 @@ import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
 import com.tonicantarella.gymtracker.ui.common.EmptyListCard
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
+import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.WorkoutList
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import org.koin.androidx.compose.koinViewModel
@@ -61,7 +61,7 @@ fun CardioWorkoutsScreen(
         viewModel.getWorkouts()
     }
 
-    Scaffold(
+    GymScaffold(
         topBar = {
             TopAppBar(
                 title = {

@@ -25,6 +25,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -69,9 +71,7 @@ fun GymTrackerApp(
     }
 
     Surface(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.safeDrawing)
+        modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         GymAppNavHost(
             viewModel = viewModel,
@@ -190,7 +190,16 @@ fun GymAppNavHost(
                     }
                 )
             }
-        }
+        },
+        containerColor = Color.Transparent,
+        modifier = Modifier.background(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    MaterialTheme.colorScheme.background,
+                    MaterialTheme.colorScheme.primary
+                )
+            )
+        )
     ) {
         NavHost(
             enterTransition = { enter },
@@ -200,6 +209,7 @@ fun GymAppNavHost(
             navController = navController,
             startDestination = mainUiState.initialRoute,
             modifier = modifier
+
         ) {
             composable<Route.Welcome> {
                 WelcomeScreen(
@@ -262,7 +272,6 @@ fun GymAppNavHost(
             navigation<Route.StatsMain>(startDestination = Route.StatsOverview) {
                 composable<Route.StatsOverview> {
                     StatsOverviewScreen(
-                        onNavigateBack = ::popBackStack,
                         onGymSessionNavigate = { id ->
                             navController.navigate(Route.GymWorkoutSession(id))
                         },

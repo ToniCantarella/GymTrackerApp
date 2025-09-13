@@ -13,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.tonicantarella.gymtracker.R
+import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
 import com.tonicantarella.gymtracker.ui.stats.BasicLineChart
 import com.tonicantarella.gymtracker.utility.UnitUtil
@@ -39,7 +39,7 @@ fun CardioWorkoutStatsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
+    GymScaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -59,7 +59,7 @@ fun CardioWorkoutStatsScreen(
                 }
             )
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier.padding(innerPadding)
         ) {

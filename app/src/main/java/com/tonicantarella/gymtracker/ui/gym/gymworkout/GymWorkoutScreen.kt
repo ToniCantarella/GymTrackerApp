@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -41,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
+import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutSet
@@ -101,7 +101,7 @@ fun GymWorkoutScreen(
         onNavigateBack()
     }
 
-    Scaffold(
+    GymScaffold(
         topBar = {
             TopAppBar(
                 title = {
