@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -17,10 +15,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.tonicantarella.gymtracker.R
+import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseListCreate
@@ -76,15 +74,12 @@ fun CreateGymWorkoutScreen(
         },
         floatingActionButton = {
             val enabled = uiState.workoutName.isNotEmpty()
-            FloatingActionButton(
+            GymFloatingActionButton(
+                enabled = enabled,
                 onClick = {
-                    if (enabled){
-                        releaseNavigationGuard()
-                        viewModel.onCreateWorkoutPressed { onNavigateBack() }
-                    }
-                },
-                containerColor = if (enabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                contentColor = if (enabled) Color.White else Color.Black.copy(alpha = 0.5f)
+                    releaseNavigationGuard()
+                    viewModel.onCreateWorkoutPressed { onNavigateBack() }
+                }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.save),

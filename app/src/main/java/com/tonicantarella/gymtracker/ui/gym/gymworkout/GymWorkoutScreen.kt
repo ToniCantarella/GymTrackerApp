@@ -15,11 +15,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -35,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
+import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutSet
@@ -126,14 +124,14 @@ fun GymWorkoutScreen(
         },
         floatingActionButton = {
             val enabled = hasChanges
-            FloatingActionButton(
+            GymFloatingActionButton(
+                enabled = enabled,
                 onClick = {
-                    if (enabled) {
-                        if (hasPerformedSets) finishWorkoutCheck() else saveChanges()
-                    }
-                },
-                containerColor = if (enabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                contentColor = if (enabled) Color.White else Color.Black.copy(alpha = 0.5f)
+                    if (hasPerformedSets)
+                        finishWorkoutCheck()
+                    else
+                        saveChanges()
+                }
             ) {
                 if (hasPerformedSets) {
                     Icon(

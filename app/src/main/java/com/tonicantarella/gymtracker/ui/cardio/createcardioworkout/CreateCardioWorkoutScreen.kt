@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -27,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.cardio.common.CardioContent
+import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 import org.koin.androidx.compose.koinViewModel
@@ -79,15 +78,12 @@ fun CreateCardioWorkoutScreen(
         },
         floatingActionButton = {
             val enabled = uiState.name.isNotEmpty()
-            FloatingActionButton(
+            GymFloatingActionButton (
+                enabled = enabled,
                 onClick = {
-                    if (enabled){
                         releaseNavigationGuard()
                         viewModel.onSavePressed { onNavigateBack() }
-                    }
-                },
-                containerColor = if (enabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                contentColor = if (enabled) Color.White else Color.Black.copy(alpha = 0.5f)
+                }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.save),
