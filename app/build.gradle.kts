@@ -12,11 +12,11 @@ room {
 }
 
 android {
-    namespace = "com.example.gymtracker"
+    namespace = "com.tonicantarella.gymtracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.gymtracker"
+        applicationId = "com.tonicantarella.gymtracker"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
