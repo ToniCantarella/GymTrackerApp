@@ -22,6 +22,7 @@ import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseListCreate
+import com.tonicantarella.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
@@ -55,7 +56,8 @@ fun CreateGymWorkoutScreen(
                 title = {
                     TopBarTextField(
                         value = uiState.workoutName,
-                        onValueChange = viewModel::onWorkoutNameChange
+                        onValueChange = viewModel::onWorkoutNameChange,
+                        maxSize = WORKOUT_NAME_MAX_SIZE
                     )
                 },
                 navigationIcon = {

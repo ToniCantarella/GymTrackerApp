@@ -45,6 +45,7 @@ import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.WorkoutList
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
+import com.tonicantarella.gymtracker.utility.MAX_CARDIO
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,7 +133,8 @@ fun CardioWorkoutsScreen(
         },
         floatingActionButton = {
             GymFloatingActionButton(
-                onClick = onNavigateToCreateCardio
+                onClick = onNavigateToCreateCardio,
+                enabled = uiState.workouts.size < MAX_CARDIO
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

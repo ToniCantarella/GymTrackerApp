@@ -48,6 +48,7 @@ import com.tonicantarella.gymtracker.ui.gym.common.ExerciseListEdit
 import com.tonicantarella.gymtracker.ui.stats.BasicLineChart
 import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 import com.tonicantarella.gymtracker.utility.UnitUtil
+import com.tonicantarella.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import com.tonicantarella.gymtracker.utility.toDateAndTimeString
 import com.tonicantarella.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
@@ -107,7 +108,8 @@ fun GymWorkoutScreen(
                 title = {
                     TopBarTextField(
                         value = uiState.workoutName,
-                        onValueChange = viewModel::onWorkoutNameChange
+                        onValueChange = viewModel::onWorkoutNameChange,
+                        maxSize = WORKOUT_NAME_MAX_SIZE
                     )
                 },
                 navigationIcon = {

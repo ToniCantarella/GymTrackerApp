@@ -35,6 +35,7 @@ import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
+import com.tonicantarella.gymtracker.utility.CARDIO_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,7 +88,8 @@ fun CardioWorkoutScreen(
                 title = {
                     TopBarTextField(
                         value = uiState.workout.name,
-                        onValueChange = viewModel::onNameChange
+                        onValueChange = viewModel::onNameChange,
+                        maxSize = CARDIO_NAME_MAX_SIZE
                     )
                 },
                 navigationIcon = {

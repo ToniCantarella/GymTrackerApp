@@ -50,6 +50,7 @@ import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.WorkoutList
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
+import com.tonicantarella.gymtracker.utility.MAX_GYM_WORKOUTS
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 
@@ -137,6 +138,7 @@ fun GymWorkoutsScreen(
         },
         floatingActionButton = {
             GymFloatingActionButton(
+                enabled = uiState.workouts.size < MAX_GYM_WORKOUTS,
                 onClick = onCreateWorkoutClicked
             ) {
                 Icon(
