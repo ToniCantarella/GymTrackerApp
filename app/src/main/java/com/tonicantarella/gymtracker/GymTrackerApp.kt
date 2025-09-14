@@ -196,7 +196,7 @@ fun GymAppNavHost(
             brush = Brush.verticalGradient(
                 colors = listOf(
                     MaterialTheme.colorScheme.background,
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.colorScheme.primary.copy(alpha = .8f)
                 )
             )
         )
