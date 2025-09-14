@@ -2,7 +2,7 @@ package com.tonicantarella.gymtracker.ui.common
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -74,6 +75,7 @@ fun TopBarTextField(
             unfocusedContainerColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
     )
 }

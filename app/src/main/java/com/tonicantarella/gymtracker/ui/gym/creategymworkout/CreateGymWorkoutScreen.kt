@@ -5,23 +5,34 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.tonicantarella.gymtracker.R
+import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
-import com.tonicantarella.gymtracker.ui.gym.common.ExerciseListCreate
+import com.tonicantarella.gymtracker.ui.gym.common.CreateExercise
+import com.tonicantarella.gymtracker.ui.gym.common.ExerciseList
 import com.tonicantarella.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
@@ -118,19 +129,86 @@ private fun CreateGymWorkoutScreen(
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var deleteDialogOpen by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<Exercise?>(null) }
+
     Column(
         modifier = modifier
     ) {
-        ExerciseListCreate(
+        ExerciseList(
             exercises = exercises,
-            onAddExercise = addExercise,
-            onRemoveExercise = onRemoveExercise,
-            onExerciseNameChange = onExerciseNameChange,
-            onDescriptionChange = onDescriptionChange,
-            onAddSet = addSet,
-            onChangeWeight = onChangeWeight,
-            onChangeRepetitions = onChangeRepetitions,
-            onRemoveSet = onRemoveSet
-        )
+            addExercise = addExercise,
+            modifier = Modifier
+        ) { index, exercise, placeholderName ->
+            CreateExercise(
+                exercise = exercise,
+                placeholderName = placeholderName,
+                onNameChange = { name -> onExerciseNameChange(exercise.uuid, name) },
+                onDescriptionChange = { description ->
+                    onDescriptionChange(
+                        exercise.uuid,
+                        description
+                    )
+                },
+                onDeletePressed = {
+                    deleteDialogOpen = true
+                    itemToDelete = exercise.copy(name = exercise.name.ifBlank { placeholderName })
+                },
+                deleteEnabled = exercises.size > 1,
+                addSet = { addSet(exercise.uuid) },
+                onChangeWeight = { setId, weight -> onChangeWeight(exercise.uuid, setId, weight) },
+                onChangeRepetitions = { setId, repetitions ->
+                    onChangeRepetitions(
+                        exercise.uuid,
+                        setId,
+                        repetitions
+                    )
+                },
+                onRemoveSet = { setId -> onRemoveSet(exercise.uuid, setId) },
+            )
+        }
+
+        if (deleteDialogOpen && itemToDelete != null) {
+            ConfirmDialog(
+                subtitle = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.exercise_deletion_subtitle,
+                            itemToDelete!!.name
+                        ),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large))
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onRemoveExercise(itemToDelete!!.uuid)
+                            deleteDialogOpen = false
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.delete)
+                        )
+                    }
+                },
+                cancelButton = {
+                    OutlinedButton(
+                        onClick = {
+                            itemToDelete = null
+                            deleteDialogOpen = false
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.cancel)
+                        )
+                    }
+                },
+                onDismissRequest = {
+                    deleteDialogOpen = false
+                }
+            )
+        }
     }
 }

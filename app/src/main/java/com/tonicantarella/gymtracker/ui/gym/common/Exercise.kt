@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,9 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -251,7 +253,6 @@ fun EditExercise(
                 headerTitle = {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_small)))
                             .clickable(
                                 enabled = !editingTitle,
@@ -489,18 +490,24 @@ private fun AddSetButton(
 private fun ExerciseCard(
     modifier: Modifier = Modifier,
     header: @Composable () -> Unit,
-    actions: @Composable () -> Unit = {},
+    actions: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    ElevatedCard(
-        modifier = modifier
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = dimensionResource(id = R.dimen.card_elevation)
+        ),
+        modifier = modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
     ) {
         Column(
             modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         ) {
             header()
             content()
-            actions()
+            if (actions != null) {
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                actions()
+            }
         }
     }
 }

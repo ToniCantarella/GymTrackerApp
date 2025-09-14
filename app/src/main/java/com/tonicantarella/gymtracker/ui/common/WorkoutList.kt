@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
@@ -61,6 +62,7 @@ fun WorkoutList(
             horizontal = dimensionResource(id = R.dimen.padding_large)
         ),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
         itemsIndexed(workouts) { index, workout ->
@@ -80,16 +82,20 @@ fun WorkoutList(
                 animationSpec = tween(durationMillis = 300)
             )
 
-            WorkoutListItem(
-                workout = workout,
-                selectingItems = selectingItems,
-                selected = workout in selectedItems,
-                onSelect = onSelect,
-                onClick = onClick,
-                modifier = Modifier
-                    .offset(x = offsetX)
-                    .alpha(alpha)
-            )
+            Box(
+                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+            ) {
+                WorkoutListItem(
+                    workout = workout,
+                    selectingItems = selectingItems,
+                    selected = workout in selectedItems,
+                    onSelect = onSelect,
+                    onClick = onClick,
+                    modifier = Modifier
+                        .offset(x = offsetX)
+                        .alpha(alpha)
+                )
+            }
         }
     }
 }
@@ -105,7 +111,7 @@ fun WorkoutListItem(
 ) {
     Card(
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 12.dp
+            defaultElevation = dimensionResource(id = R.dimen.card_elevation)
         ),
         enabled = !selectingItems,
         onClick = {
