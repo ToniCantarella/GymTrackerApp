@@ -148,7 +148,6 @@ fun CardioWorkoutsScreen(
             selectedItems = uiState.selectedItems,
             onSelectWorkout = viewModel::onSelectItem,
             onWorkoutClick = { onNavigateToWorkout(it.id) },
-            onWorkoutHold = viewModel::startSelectingItems,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -203,7 +202,6 @@ private fun CardioWorkoutsScreen(
     selectedItems: List<WorkoutWithTimestamp>,
     onSelectWorkout: (workout: WorkoutWithTimestamp) -> Unit,
     onWorkoutClick: (workout: WorkoutWithTimestamp) -> Unit,
-    onWorkoutHold: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -228,7 +226,6 @@ private fun CardioWorkoutsScreen(
                 selectingItems = selectingItems,
                 selectedItems = selectedItems,
                 onSelect = onSelectWorkout,
-                onHold = onWorkoutHold,
                 onClick = onWorkoutClick
             )
         }

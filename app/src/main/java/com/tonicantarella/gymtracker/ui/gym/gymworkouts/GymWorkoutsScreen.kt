@@ -1,5 +1,6 @@
 package com.tonicantarella.gymtracker.ui.gym.gymworkouts
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -22,9 +24,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -151,7 +153,6 @@ fun GymWorkoutsScreen(
             selectedItems = uiState.selectedItems,
             onSelectWorkout = viewModel::onSelectItem,
             onWorkoutClick = { onNavigateToWorkout(it.id) },
-            onWorkoutHold = viewModel::startSelectingItems,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -191,7 +192,7 @@ fun GymWorkoutsScreen(
                 }
             },
             cancelButton = {
-                OutlinedButton(
+                TextButton(
                     onClick = {
                         deletionDialogOpen = false
                         viewModel.stopSelectingItems()
@@ -202,7 +203,8 @@ fun GymWorkoutsScreen(
                     )
                 }
             },
-            onDismissRequest = { deletionDialogOpen = false }
+            onDismissRequest = { deletionDialogOpen = false },
+            modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
         )
     }
 }
@@ -215,7 +217,6 @@ fun GymWorkoutsScreen(
     selectedItems: List<WorkoutWithTimestamp>,
     onSelectWorkout: (workout: WorkoutWithTimestamp) -> Unit,
     onWorkoutClick: (workout: WorkoutWithTimestamp) -> Unit,
-    onWorkoutHold: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -233,7 +234,8 @@ fun GymWorkoutsScreen(
                         text = stringResource(id = R.string.gym_workouts_intro),
                         textAlign = TextAlign.Center
                     )
-                }
+                },
+                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
             )
         } else {
             WorkoutList(
@@ -241,7 +243,6 @@ fun GymWorkoutsScreen(
                 selectingItems = selectingItems,
                 selectedItems = selectedItems,
                 onSelect = onSelectWorkout,
-                onHold = onWorkoutHold,
                 onClick = onWorkoutClick
             )
         }
@@ -249,8 +250,14 @@ fun GymWorkoutsScreen(
 }
 
 @Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    device = "spec:width=673dp,height=841dp",
+    locale = "fi"
+)
 @Composable
-private fun WorkoutPlansPreview() {
+private fun WorkoutsPreview() {
     GymTrackerTheme {
         Surface {
             GymWorkoutsScreen(
@@ -265,17 +272,22 @@ private fun WorkoutPlansPreview() {
                 selectedItems = emptyList(),
                 selectingItems = false,
                 onWorkoutClick = {},
-                onSelectWorkout = {},
-                onWorkoutHold = {}
+                onSelectWorkout = {}
             )
         }
     }
 }
 
-@Preview(showBackground = true, locale = "fi")
+@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    device = "spec:width=673dp,height=841dp",
+    locale = "fi"
+)
 @Composable
 private fun EmptyListPreview() {
-    GymTrackerTheme(darkTheme = true) {
+    GymTrackerTheme {
         Surface {
             GymWorkoutsScreen(
                 loading = false,
@@ -283,8 +295,7 @@ private fun EmptyListPreview() {
                 selectedItems = emptyList(),
                 selectingItems = false,
                 onSelectWorkout = {},
-                onWorkoutClick = {},
-                onWorkoutHold = {}
+                onWorkoutClick = {}
             )
         }
     }

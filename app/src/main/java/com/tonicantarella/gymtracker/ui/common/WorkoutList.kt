@@ -1,27 +1,30 @@
 package com.tonicantarella.gymtracker.ui.common
 
-import androidx.compose.animation.AnimatedVisibility
+import android.content.res.Configuration
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,11 +52,15 @@ fun WorkoutList(
     selectingItems: Boolean,
     selectedItems: List<WorkoutWithTimestamp>,
     onSelect: (workout: WorkoutWithTimestamp) -> Unit,
-    onHold: (workout: WorkoutWithTimestamp) -> Unit,
     onClick: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
+        contentPadding = PaddingValues(
+            vertical = dimensionResource(id = R.dimen.padding_medium),
+            horizontal = dimensionResource(id = R.dimen.padding_large)
+        ),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier.fillMaxSize()
     ) {
         itemsIndexed(workouts) { index, workout ->
@@ -64,23 +71,25 @@ fun WorkoutList(
                 visible = true
             }
 
-            HorizontalDivider()
-            AnimatedVisibility(
-                visible = visible,
-                enter = slideInHorizontally(initialOffsetX = { it / 2 }) + fadeIn()
-            ) {
-                WorkoutListItem(
-                    workout = workout,
-                    selectingItems = selectingItems,
-                    selected = workout in selectedItems,
-                    onSelect = onSelect,
-                    onHold = onHold,
-                    onClick = onClick
-                )
-            }
-        }
-        item {
-            HorizontalDivider()
+            val offsetX by animateDpAsState(
+                targetValue = if (visible) 0.dp else 200.dp,
+                animationSpec = tween(durationMillis = 300)
+            )
+            val alpha by animateFloatAsState(
+                targetValue = if (visible) 1f else 0f,
+                animationSpec = tween(durationMillis = 300)
+            )
+
+            WorkoutListItem(
+                workout = workout,
+                selectingItems = selectingItems,
+                selected = workout in selectedItems,
+                onSelect = onSelect,
+                onClick = onClick,
+                modifier = Modifier
+                    .offset(x = offsetX)
+                    .alpha(alpha)
+            )
         }
     }
 }
@@ -92,17 +101,17 @@ fun WorkoutListItem(
     modifier: Modifier = Modifier,
     selectingItems: Boolean = false,
     selected: Boolean = false,
-    onHold: (workout: WorkoutWithTimestamp) -> Unit = {},
     onSelect: (workout: WorkoutWithTimestamp) -> Unit = {}
 ) {
-    Surface(
-        color = Color.Transparent,
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 12.dp
+        ),
+        enabled = !selectingItems,
+        onClick = {
+            if (!selectingItems) onClick(workout)
+        },
         modifier = modifier
-            .combinedClickable(
-                onClick = { if (!selectingItems) onClick(workout) },
-                enabled = !selectingItems,
-                onLongClick = { onHold(workout) }
-            )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -169,43 +178,20 @@ fun WorkoutListItem(
 }
 
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun WorkoutListItemPreview() {
     GymTrackerTheme {
-        Surface {
-            WorkoutListItem(
-                workout = WorkoutWithTimestamp(
-                    id = 0,
-                    name = "Workout 1",
-                    timestamp = null
-                ),
-                selectingItems = false,
-                selected = false,
-                onSelect = {},
-                onHold = {},
-                onClick = {}
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun WorkoutListItemPreviewDark() {
-    GymTrackerTheme(darkTheme = true) {
-        Surface {
-            WorkoutListItem(
-                workout = WorkoutWithTimestamp(
-                    id = 0,
-                    name = "Workout 1",
-                    timestamp = null
-                ),
-                selectingItems = false,
-                selected = false,
-                onSelect = {},
-                onHold = {},
-                onClick = {}
-            )
-        }
+        WorkoutListItem(
+            workout = WorkoutWithTimestamp(
+                id = 0,
+                name = "Workout 1",
+                timestamp = null
+            ),
+            selectingItems = false,
+            selected = false,
+            onSelect = {},
+            onClick = {}
+        )
     }
 }
