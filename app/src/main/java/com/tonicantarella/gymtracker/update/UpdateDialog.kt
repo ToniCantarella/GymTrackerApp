@@ -1,36 +1,22 @@
 package com.tonicantarella.gymtracker.update
 
-import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
+import com.tonicantarella.gymtracker.ui.common.GymDialog
 import com.tonicantarella.gymtracker.ui.theme.info
 import com.tonicantarella.gymtracker.ui.theme.success
 import com.tonicantarella.gymtracker.ui.theme.warning
@@ -42,109 +28,38 @@ fun UpdateDialog(
     updateStatus: UpdateStatus,
     progress: Float
 ) {
-    Dialog(
-        onDismissRequest = onDismiss
-    ) {
-        when (updateStatus) {
-            UpdateStatus.AVAILABLE -> UpdateAvailable(
-                onCancel = onDismiss,
-                onUpdate = onUpdate
-            )
+    when (updateStatus) {
+        UpdateStatus.AVAILABLE -> UpdateAvailable(
+            onCancel = onDismiss,
+            onUpdate = onUpdate
+        )
 
-            UpdateStatus.DOWNLOADING -> UpdateDownloading(
-                progress = progress
-            )
+        UpdateStatus.DOWNLOADING -> UpdateDownloading(
+            progress = progress
+        )
 
-            UpdateStatus.DOWNLOADED -> UpdateDownloaded(
-                onDone = onDismiss
-            )
+        UpdateStatus.DOWNLOADED -> UpdateDownloaded(
+            onDone = onDismiss
+        )
 
-            UpdateStatus.CANCELED -> UpdateCancelled(
-                onCancel = onDismiss,
-                onUpdate = onUpdate
-            )
+        UpdateStatus.CANCELED -> UpdateCancelled(
+            onCancel = onDismiss,
+            onUpdate = onUpdate
+        )
 
-            UpdateStatus.FAILED -> UpdateFailed(
-                onCancel = onDismiss,
-                onRetry = onUpdate
-            )
+        UpdateStatus.FAILED -> UpdateFailed(
+            onCancel = onDismiss,
+            onRetry = onUpdate
+        )
 
-            UpdateStatus.INSTALLED -> UpdateInstalled(
-                onDone = onUpdate
-            )
+        UpdateStatus.INSTALLED -> UpdateInstalled(
+            onDone = onUpdate
+        )
 
-            else -> UpdateUnknown(
-                onCancel = onDismiss,
-                onRetry = onUpdate
-            )
-        }
-    }
-}
-
-@Composable
-private fun DialogContent(
-    title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    icon: @Composable (() -> Unit)? = null,
-    subtitle: @Composable (() -> Unit)? = null,
-    actions: @Composable () -> Unit = {},
-) {
-    Card(
-        modifier = modifier
-            .widthIn(max = 400.dp)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.padding_extra_large))
-                .fillMaxWidth()
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (icon != null) {
-                    Box(
-                        modifier = Modifier.size(48.dp)
-                    ) {
-                        icon()
-                    }
-                }
-                ProvideTextStyle(MaterialTheme.typography.titleLarge) {
-                    title()
-                }
-                if (subtitle != null) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxWidth(.8f)
-                    ) {
-                        ProvideTextStyle(
-                            value = MaterialTheme.typography.bodyMedium.copy(
-                                textAlign = TextAlign.Center
-                            )
-                        ) {
-                            subtitle()
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_extra_large)))
-            actions()
-        }
-    }
-}
-
-@Composable
-private fun DialogActions(
-    modifier: Modifier = Modifier,
-    actions: @Composable () -> Unit
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
-        modifier = modifier
-    ) {
-        actions()
+        else -> UpdateUnknown(
+            onCancel = onDismiss,
+            onRetry = onUpdate
+        )
     }
 }
 
@@ -154,7 +69,7 @@ private fun UpdateAvailable(
     onUpdate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.update),
@@ -173,14 +88,11 @@ private fun UpdateAvailable(
                 text = stringResource(id = R.string.update_available_description)
             )
         },
-        actions = {
-            DialogActions {
-                TextButton(onClick = onCancel) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-                Button(onClick = onUpdate) {
-                    Text(text = stringResource(id = R.string.update))
-                }
+        onDismissRequest = onCancel,
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onUpdate) {
+                Text(text = stringResource(id = R.string.update))
             }
         },
         modifier = modifier
@@ -192,7 +104,8 @@ private fun UpdateDownloading(
     progress: Float,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
+        onDismissRequest = {},
         title = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -215,7 +128,8 @@ private fun UpdateDownloaded(
     onDone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
+        onDismissRequest = onDone,
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.check_circle),
@@ -229,11 +143,9 @@ private fun UpdateDownloaded(
                 text = stringResource(id = R.string.downloaded)
             )
         },
-        actions = {
-            DialogActions {
-                Button(onClick = onDone) {
-                    Text(text = stringResource(id = R.string.done))
-                }
+        confirmButton = {
+            Button(onClick = onDone) {
+                Text(text = stringResource(id = R.string.done))
             }
         },
         modifier = modifier
@@ -246,7 +158,8 @@ private fun UpdateCancelled(
     onUpdate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
+        onDismissRequest = onCancel,
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.warning),
@@ -265,14 +178,10 @@ private fun UpdateCancelled(
                 text = stringResource(id = R.string.update_cancelled_description)
             )
         },
-        actions = {
-            DialogActions {
-                TextButton(onClick = onCancel) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-                Button(onClick = onUpdate) {
-                    Text(text = stringResource(id = R.string.update))
-                }
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onUpdate) {
+                Text(text = stringResource(id = R.string.update))
             }
         },
         modifier = modifier
@@ -285,7 +194,8 @@ private fun UpdateFailed(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
+        onDismissRequest = onCancel,
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.error),
@@ -304,14 +214,10 @@ private fun UpdateFailed(
                 text = stringResource(id = R.string.update_failed_description)
             )
         },
-        actions = {
-            DialogActions {
-                TextButton(onClick = onCancel) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-                Button(onClick = onRetry) {
-                    Text(text = stringResource(id = R.string.retry))
-                }
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onRetry) {
+                Text(text = stringResource(id = R.string.retry))
             }
         },
         modifier = modifier
@@ -323,7 +229,8 @@ private fun UpdateInstalled(
     onDone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
+        onDismissRequest = onDone,
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.check_circle),
@@ -342,11 +249,9 @@ private fun UpdateInstalled(
                 text = stringResource(id = R.string.update_installed_description)
             )
         },
-        actions = {
-            DialogActions {
-                Button(onClick = onDone) {
-                    Text(text = stringResource(id = R.string.done))
-                }
+        confirmButton = {
+            Button(onClick = onDone) {
+                Text(text = stringResource(id = R.string.done))
             }
         },
         modifier = modifier
@@ -359,7 +264,8 @@ private fun UpdateUnknown(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DialogContent(
+    GymDialog(
+        onDismissRequest = onCancel,
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.question_mark),
@@ -378,68 +284,12 @@ private fun UpdateUnknown(
                 text = stringResource(id = R.string.update_unknown_description)
             )
         },
-        actions = {
-            DialogActions {
-                TextButton(onClick = onCancel) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-                Button(onClick = onRetry) {
-                    Text(text = stringResource(id = R.string.retry))
-                }
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onRetry) {
+                Text(text = stringResource(id = R.string.retry))
             }
-
         },
         modifier = modifier
     )
-}
-
-@Preview(
-    device = "spec:width=3000px,height=3000px,dpi=440"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    locale = "fi",
-    device = "spec:width=3000px,height=3000px,dpi=440"
-)
-@Composable
-private fun UpdateDialogPreview() {
-    GymTrackerTheme {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
-            ) {
-                UpdateAvailable(
-                    onCancel = {},
-                    onUpdate = {}
-                )
-                UpdateDownloading(
-                    progress = .5f
-                )
-                UpdateDownloaded(
-                    onDone = {}
-                )
-                UpdateCancelled(
-                    onCancel = {},
-                    onUpdate = {}
-                )
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
-            ) {
-                UpdateFailed(
-                    onCancel = {},
-                    onRetry = {}
-                )
-                UpdateInstalled(
-                    onDone = {}
-                )
-                UpdateUnknown(
-                    onCancel = {},
-                    onRetry = {}
-                )
-            }
-        }
-    }
 }

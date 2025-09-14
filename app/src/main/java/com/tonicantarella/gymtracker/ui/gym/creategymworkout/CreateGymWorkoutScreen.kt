@@ -10,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -26,13 +25,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
+import com.tonicantarella.gymtracker.ui.common.GymDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.gym.common.CreateExercise
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseList
+import com.tonicantarella.gymtracker.ui.navigation.NavigationGuardController
 import com.tonicantarella.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
@@ -41,8 +41,7 @@ import java.util.UUID
 @Composable
 fun CreateGymWorkoutScreen(
     onNavigateBack: () -> Unit,
-    onNavigationGuardChange: (Boolean) -> Unit,
-    releaseNavigationGuard: () -> Unit,
+    navigationGuard : NavigationGuardController,
     viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -54,11 +53,7 @@ fun CreateGymWorkoutScreen(
     }
 
     LaunchedEffect(hasUnsavedChanges) {
-        if (hasUnsavedChanges) {
-            onNavigationGuardChange(true)
-        } else {
-            onNavigationGuardChange(false)
-        }
+        navigationGuard.guard(hasUnsavedChanges)
     }
 
     GymScaffold(
@@ -90,7 +85,7 @@ fun CreateGymWorkoutScreen(
             GymFloatingActionButton(
                 enabled = enabled,
                 onClick = {
-                    releaseNavigationGuard()
+                    navigationGuard.release()
                     viewModel.onCreateWorkoutPressed { onNavigateBack() }
                 }
             ) {
@@ -169,7 +164,9 @@ private fun CreateGymWorkoutScreen(
         }
 
         if (deleteDialogOpen && itemToDelete != null) {
-            ConfirmDialog(
+            GymDialog(
+                onDismissRequest = { deleteDialogOpen = false },
+                title = {},
                 subtitle = {
                     Text(
                         text = stringResource(
@@ -193,19 +190,8 @@ private fun CreateGymWorkoutScreen(
                         )
                     }
                 },
-                cancelButton = {
-                    OutlinedButton(
-                        onClick = {
-                            itemToDelete = null
-                            deleteDialogOpen = false
-                        }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.cancel)
-                        )
-                    }
-                },
-                onDismissRequest = {
+                onCancel = {
+                    itemToDelete = null
                     deleteDialogOpen = false
                 }
             )

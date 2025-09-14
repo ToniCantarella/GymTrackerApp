@@ -26,7 +26,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,8 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
 import com.tonicantarella.gymtracker.ui.common.EmptyListCard
+import com.tonicantarella.gymtracker.ui.common.GymDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.WorkoutList
@@ -172,7 +171,9 @@ fun GymWorkoutsScreen(
             )
         }
 
-        ConfirmDialog(
+        GymDialog(
+            onDismissRequest = { deletionDialogOpen = false },
+            title = {},
             subtitle = {
                 Text(
                     text = dialogSubtitle,
@@ -193,20 +194,10 @@ fun GymWorkoutsScreen(
                     )
                 }
             },
-            cancelButton = {
-                TextButton(
-                    onClick = {
-                        deletionDialogOpen = false
-                        viewModel.stopSelectingItems()
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.cancel)
-                    )
-                }
-            },
-            onDismissRequest = { deletionDialogOpen = false },
-            modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+            onCancel = {
+                deletionDialogOpen = false
+                viewModel.stopSelectingItems()
+            }
         )
     }
 }
@@ -237,7 +228,7 @@ fun GymWorkoutsScreen(
                         textAlign = TextAlign.Center
                     )
                 },
-                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
             )
         } else {
             WorkoutList(

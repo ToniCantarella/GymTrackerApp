@@ -23,7 +23,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -101,22 +104,30 @@ fun GymAppNavHost(
     val navigationGuard = rememberNavigationGuard(
         showGuard = mainUiState.confirmUnsavedChanges
     )
+    var unsavedChangesDialogOpen by remember { mutableStateOf(false) }
+
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isWideScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
     fun navigate(route: Route) {
-        navigationGuard.navigate {
+        navigationGuard.navigate(
+            onGuarded = { unsavedChangesDialogOpen = true }
+        ) {
             navController.navigate(route) {
                 launchSingleTop = true
             }
+            unsavedChangesDialogOpen = false
         }
     }
 
     fun popBackStack() {
-        navigationGuard.navigate {
+        navigationGuard.navigate(
+            onGuarded = { unsavedChangesDialogOpen = true }
+        ) {
             navController.popBackStack()
+            unsavedChangesDialogOpen = false
         }
     }
 
@@ -232,16 +243,14 @@ fun GymAppNavHost(
             composable<Route.GymWorkout> {
                 GymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = navigationGuard::guard,
-                    releaseNavigationGuard = navigationGuard::release
+                    navigationGuard = navigationGuard
                 )
             }
 
             composable<Route.CreateGymWorkout> {
                 CreateGymWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = navigationGuard::guard,
-                    releaseNavigationGuard = navigationGuard::release
+                    navigationGuard = navigationGuard
                 )
             }
 
@@ -257,15 +266,13 @@ fun GymAppNavHost(
             composable<Route.CardioWorkout> {
                 CardioWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = navigationGuard::guard,
-                    releaseNavigationGuard = navigationGuard::release
+                    navigationGuard = navigationGuard
                 )
             }
             composable<Route.CreateCardioWorkout> {
                 CreateCardioWorkoutScreen(
                     onNavigateBack = ::popBackStack,
-                    onNavigationGuardChange = navigationGuard::guard,
-                    releaseNavigationGuard = navigationGuard::release
+                    navigationGuard = navigationGuard
                 )
             }
 
@@ -331,7 +338,7 @@ fun GymAppNavHost(
             }
         }
 
-        if (navigationGuard.guardDialogOpen) {
+        if (unsavedChangesDialogOpen) {
             UnsavedChangesDialog(
                 onConfirm = { doNotAskAgain ->
                     if (doNotAskAgain) {
@@ -339,7 +346,7 @@ fun GymAppNavHost(
                     }
                     navigationGuard.release()
                 },
-                onCancel = navigationGuard::dismissDialog
+                onCancel = { unsavedChangesDialogOpen = false }
             )
         }
     }

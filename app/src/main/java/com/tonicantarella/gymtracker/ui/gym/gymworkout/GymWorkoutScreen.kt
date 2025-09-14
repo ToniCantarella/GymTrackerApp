@@ -5,21 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -35,16 +32,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
+import com.tonicantarella.gymtracker.ui.common.FinishWorkoutDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutSet
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseListEdit
+import com.tonicantarella.gymtracker.ui.navigation.NavigationGuardController
 import com.tonicantarella.gymtracker.ui.stats.BasicLineChart
 import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 import com.tonicantarella.gymtracker.utility.UnitUtil
@@ -59,8 +56,7 @@ import java.util.UUID
 @Composable
 fun GymWorkoutScreen(
     onNavigateBack: () -> Unit,
-    onNavigationGuardChange: (Boolean) -> Unit,
-    releaseNavigationGuard: () -> Unit,
+    navigationGuard: NavigationGuardController,
     viewModel: GymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -78,11 +74,11 @@ fun GymWorkoutScreen(
     }
 
     LaunchedEffect(hasChanges) {
-        onNavigationGuardChange(hasChanges)
+        navigationGuard.guard(hasChanges)
     }
 
     fun onFinishWorkout() {
-        releaseNavigationGuard()
+        navigationGuard.release()
         viewModel.onFinishWorkoutPressed {
             onNavigateBack()
         }
@@ -97,7 +93,7 @@ fun GymWorkoutScreen(
     }
 
     fun saveChanges() {
-        releaseNavigationGuard()
+        navigationGuard.release()
         viewModel.saveChanges()
         onNavigateBack()
     }
@@ -119,6 +115,16 @@ fun GymWorkoutScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.back)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { statsBottomSheetOpen = true }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.timeline),
+                            contentDescription = stringResource(id = R.string.stats)
                         )
                     }
                 }
@@ -206,51 +212,15 @@ fun GymWorkoutScreen(
     }
 
     if (finishWorkoutDialogOpen) {
-        var doNotAskAgain by remember { mutableStateOf(false) }
-
-        ConfirmDialog(
-            subtitle = {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.confirm_done_workout),
-                        textAlign = TextAlign.Center
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            doNotAskAgain,
-                            onCheckedChange = { doNotAskAgain = it }
-                        )
-                        Text(
-                            text = stringResource(id = R.string.do_not_ask_again)
-                        )
-                    }
+        FinishWorkoutDialog(
+            onCancel = { finishWorkoutDialogOpen = false },
+            onFinishWorkout = { doNotAskAgain ->
+                finishWorkoutDialogOpen = false
+                if (doNotAskAgain) {
+                    viewModel.stopAskingFinishConfirm()
                 }
-            },
-            cancelButton = {
-                OutlinedButton(
-                    onClick = { finishWorkoutDialogOpen = false }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.cancel)
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        finishWorkoutDialogOpen = false
-                        if (doNotAskAgain) {
-                            viewModel.stopAskingFinishConfirm()
-                        }
-                        onFinishWorkout()
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.ok)
-                    )
-                }
-            },
-            onDismissRequest = { finishWorkoutDialogOpen = false }
+                onFinishWorkout()
+            }
         )
     }
 }
@@ -283,8 +253,8 @@ fun GymWorkoutScreen(
         } else if (exercises.isNotEmpty()) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
+                    .widthIn(dimensionResource(id = R.dimen.breakpoint_small))
             ) {
                 if (addingTimestamp != null) {
                     Text(

@@ -36,7 +36,7 @@ fun WelcomeScreen(
         contentAlignment = Alignment.Center
     ){
         Box(
-            modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_medium))
+            modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.weight),

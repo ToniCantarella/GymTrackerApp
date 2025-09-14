@@ -83,7 +83,7 @@ fun WorkoutList(
             )
 
             Box(
-                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
             ) {
                 WorkoutListItem(
                     workout = workout,

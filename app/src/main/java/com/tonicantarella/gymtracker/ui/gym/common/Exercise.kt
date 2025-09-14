@@ -497,7 +497,7 @@ private fun ExerciseCard(
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = dimensionResource(id = R.dimen.card_elevation)
         ),
-        modifier = modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+        modifier = modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
     ) {
         Column(
             modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))

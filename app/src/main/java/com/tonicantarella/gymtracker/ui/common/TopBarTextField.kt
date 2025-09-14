@@ -76,6 +76,6 @@ fun TopBarTextField(
             unfocusedIndicatorColor = Color.Transparent
         ),
         modifier = modifier
-            .widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+            .widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
     )
 }

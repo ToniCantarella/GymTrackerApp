@@ -10,31 +10,25 @@ class NavigationGuardController(
     private val showGuard: Boolean
 ) {
     var isGuarded by mutableStateOf(false)
-    var guardDialogOpen by mutableStateOf(false)
     private var pendingNavigation: (() -> Unit)? = null
 
     fun guard(guarded: Boolean) {
         isGuarded = guarded && showGuard
     }
 
-    fun navigate(action: () -> Unit) {
+    fun navigate(onGuarded:() -> Unit, navigationAction: () -> Unit) {
         if (isGuarded) {
-            pendingNavigation = action
-            guardDialogOpen = true
+            pendingNavigation = navigationAction
+            onGuarded()
         } else {
-            action()
+            navigationAction()
         }
     }
 
     fun release() {
         pendingNavigation?.invoke()
         pendingNavigation = null
-        guardDialogOpen = false
         isGuarded = false
-    }
-
-    fun dismissDialog() {
-        guardDialogOpen = false
     }
 }
 

@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +30,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
+import com.tonicantarella.gymtracker.ui.common.GymDialog
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.utility.MAX_EXERCISES
 import kotlinx.coroutines.delay
@@ -91,7 +90,9 @@ fun ExerciseListEdit(
     }
 
     if (deleteDialogOpen && itemToDelete != null) {
-        ConfirmDialog(
+        GymDialog(
+            onDismissRequest = { deleteDialogOpen = false },
+            title = {},
             subtitle = {
                 Text(
                     text = stringResource(
@@ -115,19 +116,8 @@ fun ExerciseListEdit(
                     )
                 }
             },
-            cancelButton = {
-                OutlinedButton(
-                    onClick = {
-                        itemToDelete = null
-                        deleteDialogOpen = false
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.cancel)
-                    )
-                }
-            },
-            onDismissRequest = {
+            onCancel = {
+                itemToDelete = null
                 deleteDialogOpen = false
             }
         )
@@ -159,7 +149,7 @@ fun ExerciseList(
             val placeholderName = "${stringResource(id = R.string.exercise)} ${index + 1}"
 
             Column(
-                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
+                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
             ) {
                 content(index, exercise, placeholderName)
                 if (index == exercises.lastIndex) {

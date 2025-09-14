@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,8 +38,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.common.ConfirmDialog
 import com.tonicantarella.gymtracker.ui.common.EmptyListCard
+import com.tonicantarella.gymtracker.ui.common.GymDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.WorkoutList
@@ -155,7 +154,9 @@ fun CardioWorkoutsScreen(
     }
 
     if (deletionDialogOpen) {
-        ConfirmDialog(
+        GymDialog(
+            onDismissRequest = { deletionDialogOpen = false },
+            title = {},
             subtitle = {
                 Text(
                     text = stringResource(
@@ -179,19 +180,10 @@ fun CardioWorkoutsScreen(
                     )
                 }
             },
-            cancelButton = {
-                OutlinedButton(
-                    onClick = {
-                        deletionDialogOpen = false
-                        viewModel.stopSelectingItems()
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.cancel)
-                    )
-                }
-            },
-            onDismissRequest = { deletionDialogOpen = false }
+            onCancel = {
+                deletionDialogOpen = false
+                viewModel.stopSelectingItems()
+            }
         )
     }
 }
