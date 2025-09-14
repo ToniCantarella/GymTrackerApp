@@ -6,9 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -212,24 +210,28 @@ fun GymWorkoutsScreen(
     onWorkoutClick: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
     ) {
         if (loading) {
             CircularProgressIndicator()
         } else if (workouts.isEmpty()) {
-            EmptyListCard(
-                iconPainter = painterResource(id = R.drawable.weight),
-                subtitle = {
-                    Text(
-                        text = stringResource(id = R.string.gym_workouts_intro),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
-            )
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
+            ) {
+                EmptyListCard(
+                    iconPainter = painterResource(id = R.drawable.weight),
+                    subtitle = {
+                        Text(
+                            text = stringResource(id = R.string.gym_workouts_intro),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
+                )
+            }
         } else {
             WorkoutList(
                 workouts = workouts,

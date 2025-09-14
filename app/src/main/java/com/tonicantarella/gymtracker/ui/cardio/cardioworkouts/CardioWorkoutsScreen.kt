@@ -5,9 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -70,7 +68,6 @@ fun CardioWorkoutsScreen(
                     )
                 },
                 actions = {
-                    // TODO since this is repeated here and in gym workouts, make it reusable
                     Row {
                         AnimatedVisibility(
                             visible = uiState.selectingItems,
@@ -198,22 +195,27 @@ private fun CardioWorkoutsScreen(
     onWorkoutClick: (workout: WorkoutWithTimestamp) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
     ) {
         if (loading) {
             CircularProgressIndicator()
         } else if (workouts.isEmpty()) {
-            EmptyListCard(
-                iconPainter = painterResource(id = R.drawable.run),
-                subtitle = {
-                    Text(
-                        text = stringResource(id = R.string.cardio_intro),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            )
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
+            ){
+                EmptyListCard(
+                    iconPainter = painterResource(id = R.drawable.run),
+                    subtitle = {
+                        Text(
+                            text = stringResource(id = R.string.cardio_intro),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                )
+            }
         } else {
             WorkoutList(
                 workouts = workouts,

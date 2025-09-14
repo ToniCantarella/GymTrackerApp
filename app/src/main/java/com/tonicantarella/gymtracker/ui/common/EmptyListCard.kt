@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -27,7 +28,7 @@ fun EmptyListCard(
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = dimensionResource(id = R.dimen.card_elevation)
         ),
-        modifier = modifier
+        modifier = modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
