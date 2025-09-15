@@ -9,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.tonicantarella.gymtracker.GymPreferences
 import com.tonicantarella.gymtracker.repository.cardio.CardioSessionRepository
+import com.tonicantarella.gymtracker.repository.cardio.CardioStatsRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioMetrics
+import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
 import com.tonicantarella.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.tonicantarella.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +31,7 @@ data class CardioWorkoutUiState(
     val previousWorkout: WorkoutWithMetrics? = null,
     val sessionTimestamp: Instant? = null,
     val showFinishWorkoutDialog: Boolean = true,
+    val stats: CardioWorkoutStats? = null
 ) {
     val hasUnsavedChanges: Boolean = workout.name != initialWorkout.name
     val hasMarkedMetrics: Boolean = workout.metrics != initialWorkout.metrics
@@ -51,6 +54,7 @@ data class CardioWorkoutUiState(
 class CardioWorkoutViewModel(
     savedStateHandle: SavedStateHandle,
     private val workoutRepository: CardioWorkoutRepository,
+    private val statsRepository: CardioStatsRepository,
     private val sessionRepository: CardioSessionRepository,
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
@@ -87,6 +91,14 @@ class CardioWorkoutViewModel(
                     sessionTimestamp = sessionTimestamp,
                     showFinishWorkoutDialog = showFinishWorkoutDialog,
                     loading = false
+                )
+            }
+
+            val workoutStats = statsRepository.getWorkoutStats(navParams.id)
+
+            _uiState.update {
+                it.copy(
+                    stats = workoutStats
                 )
             }
         }

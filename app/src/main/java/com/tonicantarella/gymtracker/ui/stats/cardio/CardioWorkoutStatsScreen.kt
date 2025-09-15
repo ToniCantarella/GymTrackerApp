@@ -33,7 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardioWorkoutStatsScreen(
+fun CardioWorkoutStatsList(
     onNavigateBack: () -> Unit,
     viewModel: CardioWorkoutStatsViewModel = koinViewModel()
 ) {
@@ -71,7 +71,7 @@ fun CardioWorkoutStatsScreen(
                     CircularProgressIndicator()
                 }
             } else if (uiState.stats != null) {
-                CardioWorkoutStatsScreen(
+                CardioWorkoutStatsList(
                     stats = uiState.stats!!
                 )
             }
@@ -80,7 +80,7 @@ fun CardioWorkoutStatsScreen(
 }
 
 @Composable
-private fun CardioWorkoutStatsScreen(
+fun CardioWorkoutStatsList(
     stats: CardioWorkoutStats,
     modifier: Modifier = Modifier
 ) {

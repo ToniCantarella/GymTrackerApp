@@ -255,20 +255,20 @@ fun GymWorkoutScreen(
         if (loading) {
             CircularProgressIndicator()
         } else if (exercises.isNotEmpty()) {
+            val dateString = if (addingTimestamp != null) {
+                "${stringResource(id = R.string.adding_for_date)}: ${addingTimestamp.toDateString()}"
+            } else {
+                "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString() ?: "-"}"
+            }
+
             Row(
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
                     .widthIn(dimensionResource(id = R.dimen.breakpoint_small))
             ) {
-                if (addingTimestamp != null) {
-                    Text(
-                        text = "${stringResource(id = R.string.adding_for_date)}: ${addingTimestamp.toDateString()}"
-                    )
-                } else {
-                    Text(
-                        text = "${stringResource(id = R.string.last_time)}: ${latestTimestamp?.toDateAndTimeString() ?: "-"}"
-                    )
-                }
+                Text(
+                    text = dateString
+                )
             }
             ExerciseListEdit(
                 exercises = exercises,

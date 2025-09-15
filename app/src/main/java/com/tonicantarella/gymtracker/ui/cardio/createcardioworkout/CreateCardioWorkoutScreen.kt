@@ -108,6 +108,9 @@ fun CreateCardioWorkoutScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(
+                        horizontal = dimensionResource(id = R.dimen.padding_large)
+                    )
             ) {
                 CardioContent(
                     modifier = Modifier

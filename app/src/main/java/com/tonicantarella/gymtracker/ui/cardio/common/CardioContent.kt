@@ -62,7 +62,6 @@ fun CardioContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(dimensionResource(id = R.dimen.padding_large))
     ) {
         CardioCard(
             icon = {
