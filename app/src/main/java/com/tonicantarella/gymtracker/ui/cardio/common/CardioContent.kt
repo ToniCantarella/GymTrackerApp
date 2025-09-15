@@ -1,20 +1,26 @@
 package com.tonicantarella.gymtracker.ui.cardio.common
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,15 +37,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.NumericTextField
+import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 import com.tonicantarella.gymtracker.utility.UnitUtil
 import kotlinx.coroutines.delay
 import java.time.Duration
 
 @Composable
 fun CardioContent(
+    modifier: Modifier = Modifier,
     steps: Int? = 0,
     onStepsChange: (steps: Int) -> Unit = {},
     distance: Double? = 0.0,
@@ -48,14 +57,20 @@ fun CardioContent(
     onDurationChange: (duration: Duration) -> Unit = {}
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(dimensionResource(id = R.dimen.padding_large))
     ) {
         CardioCard(
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.footprint),
+                    contentDescription = stringResource(id = R.string.steps)
+                )
+            },
             title = {
                 Text(
                     text = stringResource(id = R.string.steps)
@@ -63,13 +78,9 @@ fun CardioContent(
             }
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.footprint),
-                    contentDescription = stringResource(id = R.string.steps)
-                )
                 NumericTextField(
                     value = steps,
                     onValueChange = onStepsChange,
@@ -82,6 +93,12 @@ fun CardioContent(
             }
         }
         CardioCard(
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.path),
+                    contentDescription = stringResource(id = R.string.distance)
+                )
+            },
             title = {
                 Text(
                     text = stringResource(id = R.string.distance)
@@ -89,13 +106,8 @@ fun CardioContent(
             }
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.path),
-                    contentDescription = stringResource(id = R.string.distance)
-                )
                 NumericTextField(
                     value = distance,
                     onValueChange = onDistanceChange,
@@ -108,6 +120,12 @@ fun CardioContent(
             }
         }
         CardioCard(
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.timer),
+                    contentDescription = stringResource(id = R.string.time)
+                )
+            },
             title = {
                 Text(
                     text = stringResource(id = R.string.time)
@@ -117,11 +135,6 @@ fun CardioContent(
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.timer),
-                    contentDescription = stringResource(id = R.string.time),
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
                 StopWatch(
                     onPause = { onDurationChange(Duration.ofMillis(it)) },
                     onStop = { onDurationChange(Duration.ofMillis(it)) },
@@ -155,10 +168,10 @@ private fun StopWatch(
 
     val durationString = if (displayDuration != null) {
         val totalMillis = displayDuration.toMillis()
-        val dispMinutes = (totalMillis / 1000) / 60
-        val dispSeconds = (totalMillis / 1000) % 60
-        val dispMillis = totalMillis % 1000
-        String.format("%02d:%02d.%03d", dispMinutes, dispSeconds, dispMillis)
+        val displayMinutes = (totalMillis / 1000) / 60
+        val displaySeconds = (totalMillis / 1000) % 60
+        val displayMillis = totalMillis % 1000
+        String.format("%02d:%02d.%03d", displayMinutes, displaySeconds, displayMillis)
     } else {
         val hours = (elapsedMillis / 3600000)
         val minutes = (elapsedMillis / 60000) % 60
@@ -176,31 +189,42 @@ private fun StopWatch(
             style = MaterialTheme.typography.displayMedium
         )
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            if (isRunning) {
-                IconButton(
-                    onClick = {
-                        isRunning = false
-                        onPause(elapsedMillis)
-                    }
+            Box{
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = isRunning,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut()
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.timer_pause),
-                        contentDescription = stringResource(id = R.string.pause),
-                        modifier = Modifier.size(40.dp)
-                    )
+                    IconButton(
+                        onClick = {
+                            isRunning = false
+                            onPause(elapsedMillis)
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.timer_pause),
+                            contentDescription = stringResource(id = R.string.pause),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
                 }
-            } else {
-                IconButton(
-                    onClick = {
-                        lastTickTime = System.currentTimeMillis()
-                        isRunning = true
-                    }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = !isRunning,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut()
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.timer_play),
-                        contentDescription = stringResource(id = R.string.play),
-                        modifier = Modifier.size(40.dp)
-                    )
+                    IconButton(
+                        onClick = {
+                            lastTickTime = System.currentTimeMillis()
+                            isRunning = true
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.timer_play),
+                            contentDescription = stringResource(id = R.string.play),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
                 }
             }
             IconButton(
@@ -223,27 +247,47 @@ private fun StopWatch(
 
 @Composable
 fun CardioCard(
+    icon: @Composable () -> Unit,
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    ElevatedCard(
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = dimensionResource(id = R.dimen.card_elevation)
+        ),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(
+        FlowRow (
+            itemVerticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.padding_large))
                 .fillMaxWidth()
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
             ) {
+                icon()
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
                 title()
             }
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
             content()
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    device = "spec:width=673dp,height=841dp",
+    locale = "fi",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun CardioPreview() {
+    GymTrackerTheme {
+        CardioContent()
     }
 }
