@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,15 +36,19 @@ fun WorkoutListing(
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
     ) {
         if (gymWorkouts.isNotEmpty()) {
             gymWorkouts.forEachIndexed { index, workout ->
                 WorkoutCard(
                     workout = workout,
                     onClick = { onGymWorkoutStatsNavigate(workout.id) },
-                    iconColor = highlightColors[gymColorIndexMap[workout.id] ?: 0]
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.weight),
+                            contentDescription = null,
+                            tint = highlightColors[gymColorIndexMap[workout.id] ?: 0]
+                        )
+                    }
                 )
             }
         }
@@ -54,7 +57,13 @@ fun WorkoutListing(
                 WorkoutCard(
                     workout = workout,
                     onClick = { onCardioWorkoutStatsNavigate(workout.id) },
-                    iconColor = highlightColors[cardioColorIndexMap[workout.id] ?: 0]
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.run),
+                            contentDescription = null,
+                            tint = highlightColors[cardioColorIndexMap[workout.id] ?: 0]
+                        )
+                    }
                 )
             }
         }
@@ -64,7 +73,7 @@ fun WorkoutListing(
 @Composable
 private fun WorkoutCard(
     workout: WorkoutWithTimestamp,
-    iconColor: Color,
+    icon: @Composable () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -85,11 +94,7 @@ private fun WorkoutCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.weight),
-                    tint = iconColor,
-                    contentDescription = stringResource(id = R.string.icon)
-                )
+                icon()
                 Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
                 Text(
                     text = workout.name,
