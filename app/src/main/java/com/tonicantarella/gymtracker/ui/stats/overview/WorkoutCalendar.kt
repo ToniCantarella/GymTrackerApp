@@ -41,6 +41,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ripple
@@ -77,11 +78,11 @@ import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.minusMonths
 import com.kizitonwose.calendar.core.plusMonths
 import com.tonicantarella.gymtracker.R
-import com.tonicantarella.gymtracker.ui.common.WorkoutListItem
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutType
+import com.tonicantarella.gymtracker.utility.toDateAndTimeString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -148,10 +149,10 @@ fun WorkoutCalendar(
         )
     val yearString = state.firstVisibleMonth.yearMonth.year.toString()
 
-    var sessionDialogOpen by remember { mutableStateOf(false) }
+    var daySessionDialogOpen by remember { mutableStateOf(false) }
     val todayButtonVisible = currentMonth != state.firstVisibleMonth.yearMonth
 
-    var sessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
+    var daySessionsForDialog: List<WorkoutSession> by remember { mutableStateOf(emptyList()) }
 
     fun onSessionClick(session: WorkoutSession) {
         if (session.type == WorkoutType.GYM) {
@@ -222,8 +223,8 @@ fun WorkoutCalendar(
 
                         onSessionClick(session)
                     } else {
-                        sessionDialogOpen = true
-                        sessionsForDialog = sessionsOnDay
+                        daySessionDialogOpen = true
+                        daySessionsForDialog = sessionsOnDay
                     }
                 }
 
@@ -281,29 +282,44 @@ fun WorkoutCalendar(
         )
     }
 
-    if (sessionDialogOpen) {
+    if (daySessionDialogOpen) {
         Dialog(
-            onDismissRequest = { sessionDialogOpen = false }
+            onDismissRequest = { daySessionDialogOpen = false }
         ) {
             ElevatedCard {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxHeight(.5f)
                 ) {
-                    itemsIndexed(sessionsForDialog) { index, session ->
-                        val workout = (gymWorkouts + cardioWorkouts).find { it.id == session.workoutId }
-
-                        WorkoutListItem(
-                            workout = WorkoutWithTimestamp(
-                                id = workout!!.id,
-                                name = workout.name,
-                                timestamp = session.timestamp
-                            ),
-                            onClick = { onSessionClick(session) }
-                        )
-
-                        if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
-                            HorizontalDivider()
+                    itemsIndexed(daySessionsForDialog) { index, session ->
+                        if (session.type == WorkoutType.GYM) {
+                            WorkoutDialogItem(
+                                onClick = { onSessionClick(session) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.weight),
+                                        contentDescription = null,
+                                        tint = highlightColors[gymColorIndexMap[session.workoutId]
+                                            ?: 0]
+                                    )
+                                },
+                                workoutName = session.workoutName,
+                                timestamp = session.timestamp.toDateAndTimeString()
+                            )
+                        } else {
+                            WorkoutDialogItem(
+                                onClick = { onSessionClick(session) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.run),
+                                        contentDescription = null,
+                                        tint = highlightColors[cardioColorIndexMap[session.workoutId]
+                                            ?: 0]
+                                    )
+                                },
+                                workoutName = session.workoutName,
+                                timestamp = session.timestamp.toDateAndTimeString()
+                            )
                         }
                     }
                 }
@@ -318,29 +334,81 @@ fun WorkoutCalendar(
             ElevatedCard {
                 LazyColumn(
                     modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_large))
                         .fillMaxHeight(.5f)
                 ) {
                     itemsIndexed(gymWorkouts) { index, workout ->
-                        WorkoutListItem(
-                            workout = workout,
-                            onClick = {
-                                timestamp?.let { onAddGymSessionClick(workout.id, it) }
-                            }
+                        WorkoutDialogItem(
+                            onClick = { timestamp?.let { onAddGymSessionClick(workout.id, it) } },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.weight),
+                                    contentDescription = null,
+                                    tint = highlightColors[gymColorIndexMap[workout.id] ?: 0]
+                                )
+                            },
+                            workoutName = workout.name
                         )
-                        if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
-                            HorizontalDivider()
-                        }
                     }
                     itemsIndexed(cardioWorkouts) { index, workout ->
-                        WorkoutListItem(
-                            workout = workout,
+                        WorkoutDialogItem(
                             onClick = {
-                                timestamp?.let { onAddCardioSessionClick(workout.id, it) }
-                            }
+                                timestamp?.let {
+                                    onAddCardioSessionClick(
+                                        workout.id,
+                                        it
+                                    )
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.run),
+                                    contentDescription = null,
+                                    tint = highlightColors[cardioColorIndexMap[workout.id] ?: 0]
+                                )
+                            },
+                            workoutName = workout.name
                         )
-                        if (sessionsForDialog.size > 1 && index != sessionsForDialog.lastIndex) {
-                            HorizontalDivider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkoutDialogItem(
+    icon: @Composable () -> Unit,
+    onClick: () -> Unit,
+    workoutName: String,
+    modifier: Modifier = Modifier,
+    timestamp: String? = null
+) {
+    Surface(
+        onClick = onClick
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = modifier
+                .padding(dimensionResource(id = R.dimen.padding_large))
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                icon()
+                Column {
+                    Text(
+                        text = workoutName
+                    )
+                    if (timestamp != null) {
+                        Row {
+                            Icon(
+                                painter = painterResource(id = R.drawable.history),
+                                contentDescription = null
+                            )
+                            Text(
+                                text = timestamp
+                            )
                         }
                     }
                 }
@@ -360,9 +428,10 @@ private fun Day(
 ) {
     Box(
         modifier = Modifier
+            .padding(1.dp)
             .clip(RoundedCornerShape(dimensionResource(id = R.dimen.padding_medium)))
             .aspectRatio(1f)
-            .padding(1.dp)
+
             .background(MaterialTheme.colorScheme.inverseOnSurface)
             .alpha(if (day.position == DayPosition.MonthDate && day.date <= today) 1f else .4f)
             .clickable(
@@ -374,7 +443,7 @@ private fun Day(
                 if (day.date == today)
                     Modifier
                         .border(
-                            width = 1.dp,
+                            width = 2.dp,
                             color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_medium))
                         )
@@ -445,7 +514,7 @@ private fun DayWorkoutIcons(
 
                     AnimatedWorkoutIcon(
                         visible = visible,
-                        painter = painterResource(id = R.drawable.weight) ,
+                        painter = painterResource(id = R.drawable.weight),
                         tint = highlightColors[colorIndex],
                         modifier = Modifier
                             .padding(start = dimensionResource(id = R.dimen.padding_medium) * index)
@@ -465,7 +534,7 @@ private fun DayWorkoutIcons(
 
                     AnimatedWorkoutIcon(
                         visible = visible,
-                        painter =painterResource(id = R.drawable.run),
+                        painter = painterResource(id = R.drawable.run),
                         tint = highlightColors[colorIndex],
                         modifier = Modifier
                             .padding(start = dimensionResource(id = R.dimen.padding_medium) * index)
@@ -606,19 +675,21 @@ private fun MonthPicker(
     val calendarStartYear = startMonth.year
     val calendarEndYear = endMonth.year
 
-    val menuWidth = 300.dp
-    val horizontalOffSetDp = -(anchorButtonWidth / 2 - menuWidth / 2)
+    val menuWidth = 350.dp
+    val horizontalOffSetDp = -(menuWidth / 2 - anchorButtonWidth / 2)
 
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
         offset = DpOffset(horizontalOffSetDp, 0.dp),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier
             .width(menuWidth)
-            .heightIn(max = 400.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 250.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
