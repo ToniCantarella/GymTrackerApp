@@ -116,6 +116,9 @@ fun GymAppNavHost(
             onGuarded = { unsavedChangesDialogOpen = true }
         ) {
             navController.navigate(route) {
+                popUpTo(route) {
+                    inclusive = true
+                }
                 launchSingleTop = true
             }
             unsavedChangesDialogOpen = false
