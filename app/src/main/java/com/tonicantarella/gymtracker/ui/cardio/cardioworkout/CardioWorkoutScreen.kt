@@ -40,7 +40,7 @@ import com.tonicantarella.gymtracker.ui.common.FinishWorkoutDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
-import com.tonicantarella.gymtracker.ui.navigation.NavigationGuardController
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsList
 import com.tonicantarella.gymtracker.utility.CARDIO_NAME_MAX_SIZE
 import com.tonicantarella.gymtracker.utility.toDateAndTimeString
@@ -51,7 +51,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CardioWorkoutScreen(
     onNavigateBack: () -> Unit,
-    navigationGuard: NavigationGuardController,
+    navigator: Navigator,
     viewModel: CardioWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -68,11 +68,11 @@ fun CardioWorkoutScreen(
     }
 
     LaunchedEffect(hasChanges) {
-        navigationGuard.guard(hasChanges)
+        navigator.guard(hasChanges)
     }
 
     fun onFinishWorkout() {
-        navigationGuard.release()
+        navigator.releaseGuard()
         viewModel.onFinishPressed {
             onNavigateBack()
         }
@@ -87,7 +87,7 @@ fun CardioWorkoutScreen(
     }
 
     fun saveChanges() {
-        navigationGuard.release()
+        navigator.releaseGuard()
         viewModel.onSaveChanges()
         onNavigateBack()
     }

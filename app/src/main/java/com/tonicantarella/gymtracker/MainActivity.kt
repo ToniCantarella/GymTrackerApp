@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.theme.GymTrackerTheme
 import com.tonicantarella.gymtracker.update.InAppUpdateHandler
 import com.tonicantarella.gymtracker.update.UpdateDialog
@@ -16,6 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModel()
+    private val navigator: Navigator by inject()
     private val inAppUpdateHandler: InAppUpdateHandler by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +40,8 @@ class MainActivity : ComponentActivity() {
             GymTrackerTheme {
                 if (!uiState.loading) {
                     GymTrackerApp(
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        navigator = navigator
                     )
                 }
                 if (updateState.updateStatus != UpdateStatus.IDLE) {

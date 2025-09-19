@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.tonicantarella.gymtracker.GymPreferences
+import com.tonicantarella.gymtracker.preferences.GymPreferences
 import com.tonicantarella.gymtracker.repository.cardio.CardioSessionRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioStatsRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository

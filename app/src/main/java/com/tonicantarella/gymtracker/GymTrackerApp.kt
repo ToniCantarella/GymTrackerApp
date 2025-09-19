@@ -1,6 +1,7 @@
 package com.tonicantarella.gymtracker
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -23,10 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -43,16 +41,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
-import com.tonicantarella.gymtracker.ui.cardio.cardioworkout.CardioWorkoutScreen
 import com.tonicantarella.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsScreen
-import com.tonicantarella.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutScreen
-import com.tonicantarella.gymtracker.ui.common.UnsavedChangesDialog
-import com.tonicantarella.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.tonicantarella.gymtracker.ui.info.InfoScreen
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.navigation.Route
-import com.tonicantarella.gymtracker.ui.navigation.rememberNavigationGuard
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioSessionStatsScreen
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsList
 import com.tonicantarella.gymtracker.ui.stats.gym.GymSessionStatsScreen
@@ -62,7 +56,8 @@ import com.tonicantarella.gymtracker.ui.welcome.WelcomeScreen
 
 @Composable
 fun GymTrackerApp(
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    navigator: Navigator
 ) {
     val focusManager = LocalFocusManager.current
     val isKeyboardOpen by keyboardAsState()
@@ -78,6 +73,7 @@ fun GymTrackerApp(
     ) {
         GymAppNavHost(
             viewModel = viewModel,
+            navigator = navigator,
             modifier = Modifier
         )
     }
@@ -95,43 +91,22 @@ data class NavigationBarItem(val titleResInt: Int, val route: Route, val iconRes
 @Composable
 fun GymAppNavHost(
     viewModel: MainViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigator: Navigator
 ) {
     val mainUiState by viewModel.uiState.collectAsState()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val navigationGuard = rememberNavigationGuard(
-        showGuard = mainUiState.confirmUnsavedChanges
-    )
-    var unsavedChangesDialogOpen by remember { mutableStateOf(false) }
 
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isWideScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
-    fun navigate(route: Route) {
-        navigationGuard.navigate(
-            onGuarded = { unsavedChangesDialogOpen = true }
-        ) {
-            navController.navigate(route) {
-                popUpTo(route) {
-                    inclusive = true
-                }
-                launchSingleTop = true
-            }
-            unsavedChangesDialogOpen = false
-        }
-    }
-
-    fun popBackStack() {
-        navigationGuard.navigate(
-            onGuarded = { unsavedChangesDialogOpen = true }
-        ) {
-            navController.popBackStack()
-            unsavedChangesDialogOpen = false
-        }
+    LaunchedEffect(navigator) {
+        Log.d("main", "main nav: ${navController}")
+        navigator.registerNavController(navController)
     }
 
     val navigationAnimationMoveInt = 1500
@@ -190,7 +165,7 @@ fun GymAppNavHost(
 
                 item(
                     selected = selected,
-                    onClick = { navigate(item.route) },
+                    onClick = { navigator.navigate(item.route) },
                     icon = {
                         Icon(
                             painter = painterResource(id = item.iconResInt),
@@ -229,7 +204,7 @@ fun GymAppNavHost(
                 WelcomeScreen(
                     onUnderstoodClick = {
                         viewModel.onUserWelcomed()
-                        navigate(Route.GymMain)
+                        navigator.navigate(Route.GymMain)
                     }
                 )
             }
@@ -237,46 +212,46 @@ fun GymAppNavHost(
             navigation<Route.GymMain>(startDestination = Route.GymWorkouts) {
                 composable<Route.GymWorkouts> {
                     GymWorkoutsScreen(
-                        onNavigateToWorkout = { navigate(Route.GymWorkout(it)) },
-                        onCreateWorkoutClicked = { navigate(Route.CreateGymWorkout) }
+                        onNavigateToWorkout = { navigator.navigate(Route.GymWorkout(it)) },
+                        onCreateWorkoutClicked = { navigator.navigate(Route.CreateGymWorkout) }
                     )
                 }
             }
 
             composable<Route.GymWorkout> {
-                GymWorkoutScreen(
-                    onNavigateBack = ::popBackStack,
-                    navigationGuard = navigationGuard
-                )
+                GymWorkoutScreen()
             }
 
             composable<Route.CreateGymWorkout> {
-                CreateGymWorkoutScreen(
-                    onNavigateBack = ::popBackStack,
+                // TODO
+                /*CreateGymWorkoutScreen(
+                    onNavigateBack = navigationGuard::popBackStack,
                     navigationGuard = navigationGuard
-                )
+                )*/
             }
 
             navigation<Route.CardioMain>(startDestination = Route.CardioWorkouts) {
                 composable<Route.CardioWorkouts> {
                     CardioWorkoutsScreen(
-                        onNavigateToWorkout = { navigate(Route.CardioWorkout(it)) },
-                        onNavigateToCreateCardio = { navigate(Route.CreateCardioWorkout) }
+                        onNavigateToWorkout = { navigator.navigate(Route.CardioWorkout(it)) },
+                        onNavigateToCreateCardio = { navigator.navigate(Route.CreateCardioWorkout) }
                     )
                 }
             }
 
             composable<Route.CardioWorkout> {
-                CardioWorkoutScreen(
-                    onNavigateBack = ::popBackStack,
+                // TODO
+                /*CardioWorkoutScreen(
+                    onNavigateBack = navigationGuard::popBackStack,
                     navigationGuard = navigationGuard
-                )
+                )*/
             }
             composable<Route.CreateCardioWorkout> {
-                CreateCardioWorkoutScreen(
-                    onNavigateBack = ::popBackStack,
+                //TODO
+                /*CreateCardioWorkoutScreen(
+                    onNavigateBack = navigationGuard::popBackStack,
                     navigationGuard = navigationGuard
-                )
+                )*/
             }
 
             navigation<Route.StatsMain>(startDestination = Route.StatsOverview) {
@@ -314,43 +289,31 @@ fun GymAppNavHost(
                 }
                 composable<Route.GymWorkoutSession> {
                     GymSessionStatsScreen(
-                        onNavigateBack = ::popBackStack
+                        onNavigateBack = navigator::popBackStack
                     )
                 }
                 composable<Route.CardioWorkoutSession> {
                     CardioSessionStatsScreen(
-                        onNavigateBack = ::popBackStack
+                        onNavigateBack = navigator::popBackStack
                     )
                 }
                 composable<Route.GymWorkoutStats> {
                     GymWorkoutStatsScreen(
-                        onNavigateBack = ::popBackStack
+                        onNavigateBack = navigator::popBackStack
                     )
                 }
                 composable<Route.CardioWorkoutStats> {
                     CardioWorkoutStatsList(
-                        onNavigateBack = ::popBackStack
+                        onNavigateBack = navigator::popBackStack
                     )
                 }
             }
 
             composable<Route.Info> {
                 InfoScreen(
-                    onDeleteFinished = { navigate(Route.Welcome) }
+                    onDeleteFinished = { navigator.navigate(Route.Welcome) }
                 )
             }
-        }
-
-        if (unsavedChangesDialogOpen) {
-            UnsavedChangesDialog(
-                onConfirm = { doNotAskAgain ->
-                    if (doNotAskAgain) {
-                        viewModel.stopAskingUnsavedChanges()
-                    }
-                    navigationGuard.release()
-                },
-                onCancel = { unsavedChangesDialogOpen = false }
-            )
         }
     }
 }

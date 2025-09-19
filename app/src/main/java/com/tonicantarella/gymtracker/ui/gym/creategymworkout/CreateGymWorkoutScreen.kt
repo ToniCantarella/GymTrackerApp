@@ -32,7 +32,7 @@ import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.gym.common.CreateExercise
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseList
-import com.tonicantarella.gymtracker.ui.navigation.NavigationGuardController
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
@@ -41,7 +41,7 @@ import java.util.UUID
 @Composable
 fun CreateGymWorkoutScreen(
     onNavigateBack: () -> Unit,
-    navigationGuard : NavigationGuardController,
+    navigator : Navigator,
     viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -53,7 +53,7 @@ fun CreateGymWorkoutScreen(
     }
 
     LaunchedEffect(hasUnsavedChanges) {
-        navigationGuard.guard(hasUnsavedChanges)
+        navigator.guard(hasUnsavedChanges)
     }
 
     GymScaffold(
@@ -85,7 +85,7 @@ fun CreateGymWorkoutScreen(
             GymFloatingActionButton(
                 enabled = enabled,
                 onClick = {
-                    navigationGuard.release()
+                    navigator.releaseGuard()
                     viewModel.onCreateWorkoutPressed { onNavigateBack() }
                 }
             ) {

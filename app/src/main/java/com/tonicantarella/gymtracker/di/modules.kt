@@ -31,6 +31,7 @@ import com.tonicantarella.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutVie
 import com.tonicantarella.gymtracker.ui.gym.gymworkout.GymWorkoutViewModel
 import com.tonicantarella.gymtracker.ui.gym.gymworkouts.GymWorkoutsViewModel
 import com.tonicantarella.gymtracker.ui.info.InfoViewModel
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioSessionStatsViewModel
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsViewModel
 import com.tonicantarella.gymtracker.ui.stats.gym.GymSessionStatsViewModel
@@ -72,6 +73,8 @@ val databaseModule = module {
     single { get<GymDatabase>().gymSessionDao() }
     single { get<GymDatabase>().cardioDao() }
     single { get<GymDatabase>().cardioSessionDao() }
+
+    singleOf(::Navigator)
 }
 
 val repositoryModule = module {
