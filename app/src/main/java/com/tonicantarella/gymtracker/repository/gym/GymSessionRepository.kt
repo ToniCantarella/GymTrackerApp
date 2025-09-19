@@ -12,6 +12,8 @@ import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutSet
 import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutWithExercises
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutType
+import com.tonicantarella.gymtracker.utility.UnitUtil.convertWeightFromDatabase
+import com.tonicantarella.gymtracker.utility.UnitUtil.convertWeightToDatabase
 import java.time.Instant
 
 interface GymSessionRepository {
@@ -88,7 +90,7 @@ class GymSessionRepositoryImpl(
                     sets = setSessionsForExercise.map { set ->
                         WorkoutSet(
                             uuid = set.uuid,
-                            weight = set.weight,
+                            weight = set.weight.convertWeightFromDatabase(),
                             repetitions = set.repetitions
                         )
                     }
@@ -124,7 +126,7 @@ class GymSessionRepositoryImpl(
                             setId = currentSet.id,
                             sessionId = sessionId,
                             uuid = set.uuid,
-                            weight = set.weight,
+                            weight = set.weight.convertWeightToDatabase(),
                             repetitions = set.repetitions
                         )
                     )
