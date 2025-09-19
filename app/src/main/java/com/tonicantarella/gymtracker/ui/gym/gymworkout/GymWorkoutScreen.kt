@@ -107,7 +107,7 @@ fun GymWorkoutScreen(
                     if (uiState.hasPerformedSets)
                         viewModel.finishWorkoutCheck()
                     else
-                        viewModel.saveChanges()
+                        viewModel.onSavePressed()
                 }
             ) {
                 if (uiState.hasPerformedSets) {

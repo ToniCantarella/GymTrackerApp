@@ -179,13 +179,9 @@ class GymWorkoutViewModel(
         navigator.releaseGuard()
     }
 
-    fun saveChanges() {
+    fun onSavePressed() {
         viewModelScope.launch {
-            workoutRepository.updateWorkout(
-                workoutId = navParams.id,
-                workoutName = uiState.value.workoutName,
-                exercises = uiState.value.exercises
-            )
+            saveChanges()
         }
         navigator.releaseGuard()
         navigateBack()
@@ -212,9 +208,9 @@ class GymWorkoutViewModel(
     fun finishWorkoutCheck() {
         if (uiState.value.hasPerformedSets) {
             _uiState.update {
-             it.copy(
-                 finishWorkoutDialogOpen = true
-             )
+                it.copy(
+                    finishWorkoutDialogOpen = true
+                )
             }
         } else {
             onFinishWorkoutPressed()
@@ -281,6 +277,14 @@ class GymWorkoutViewModel(
                 stats = workoutStats
             )
         }
+    }
+
+    private suspend fun saveChanges() {
+        workoutRepository.updateWorkout(
+            workoutId = navParams.id,
+            workoutName = uiState.value.workoutName,
+            exercises = uiState.value.exercises
+        )
     }
 
     // TODO rename

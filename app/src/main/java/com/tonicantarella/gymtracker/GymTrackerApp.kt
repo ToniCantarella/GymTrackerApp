@@ -41,7 +41,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.tonicantarella.gymtracker.ui.cardio.cardioworkout.CardioWorkoutScreen
 import com.tonicantarella.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsScreen
+import com.tonicantarella.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutScreen
+import com.tonicantarella.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.tonicantarella.gymtracker.ui.info.InfoScreen
@@ -223,11 +226,10 @@ fun GymAppNavHost(
             }
 
             composable<Route.CreateGymWorkout> {
-                // TODO
-                /*CreateGymWorkoutScreen(
-                    onNavigateBack = navigationGuard::popBackStack,
-                    navigationGuard = navigationGuard
-                )*/
+                CreateGymWorkoutScreen(
+                    onNavigateBack = navigator::popBackStack,
+                    navigator = navigator
+                )
             }
 
             navigation<Route.CardioMain>(startDestination = Route.CardioWorkouts) {
@@ -240,18 +242,16 @@ fun GymAppNavHost(
             }
 
             composable<Route.CardioWorkout> {
-                // TODO
-                /*CardioWorkoutScreen(
-                    onNavigateBack = navigationGuard::popBackStack,
-                    navigationGuard = navigationGuard
-                )*/
+                CardioWorkoutScreen(
+                    onNavigateBack = navigator::popBackStack,
+                    navigator = navigator
+                )
             }
             composable<Route.CreateCardioWorkout> {
-                //TODO
-                /*CreateCardioWorkoutScreen(
-                    onNavigateBack = navigationGuard::popBackStack,
-                    navigationGuard = navigationGuard
-                )*/
+                CreateCardioWorkoutScreen(
+                    onNavigateBack = navigator::popBackStack,
+                    navigator = navigator
+                )
             }
 
             navigation<Route.StatsMain>(startDestination = Route.StatsOverview) {
