@@ -85,4 +85,6 @@
     <string name="update_installed_description">Update has been successfully installed on your device. You can now enjoy all the newest features.</string>
     <string name="update_unknown">Unexpected error</string>
     <string name="update_unknown_description">Something went sideways. Please try again.</string>
+    <string name="show_unsaved_changes_dialog">Confirm unsaved changes</string>
+    <string name="developer_website">Developer website</string>
 </resources>

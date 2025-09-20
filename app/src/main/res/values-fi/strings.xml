@@ -77,4 +77,6 @@
     <string name="update_installed_description">Päivitys on onnistuneesti asennettu laitteellesi. Voit nyt nauttia uusimmista ominaisuuksista.</string>
     <string name="update_unknown">Odottamaton virhe</string>
     <string name="update_unknown_description">Jokin meni pieleen. Ole hyvä ja yritä uudelleen.</string>
+    <string name="show_unsaved_changes_dialog">Varmista tallentamattomat muutokset</string>
+    <string name="developer_website">Kehittäjän sivusto</string>
 </resources>

@@ -19,10 +19,14 @@ android {
         applicationId = "com.tonicantarella.gymtracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        versionCode = 5
         versionName = libs.versions.appVersion.get()
 
-        buildConfigField("String", "APP_VERSION", "\"${libs.versions.appVersion.get()}\"")
+        buildConfigField(
+            "String",
+            "APP_VERSION",
+            "\"${libs.versions.appVersion.get()} (${versionCode})\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

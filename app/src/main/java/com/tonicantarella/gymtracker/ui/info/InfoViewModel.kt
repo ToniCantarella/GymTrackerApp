@@ -56,6 +56,17 @@ class InfoViewModel(
         }
     }
 
+    fun onShowUnsavedChangesDialogChecked(checked: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] = checked
+            }
+            _uiState.value = InfoUiState(
+                confirmUnsavedChanges = checked
+            )
+        }
+    }
+
     fun onDeleteAllData() {
         viewModelScope.launch {
             appRepository.deleteAllData()
