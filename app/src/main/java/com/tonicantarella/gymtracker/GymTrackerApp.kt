@@ -1,7 +1,6 @@
 package com.tonicantarella.gymtracker
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -108,7 +107,6 @@ fun GymAppNavHost(
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
     LaunchedEffect(navigator) {
-        Log.d("main", "main nav: ${navController}")
         navigator.registerNavController(navController)
     }
 
@@ -214,10 +212,7 @@ fun GymAppNavHost(
 
             navigation<Route.GymMain>(startDestination = Route.GymWorkouts) {
                 composable<Route.GymWorkouts> {
-                    GymWorkoutsScreen(
-                        onNavigateToWorkout = { navigator.navigate(Route.GymWorkout(it)) },
-                        onCreateWorkoutClicked = { navigator.navigate(Route.CreateGymWorkout) }
-                    )
+                    GymWorkoutsScreen()
                 }
             }
 
@@ -226,93 +221,42 @@ fun GymAppNavHost(
             }
 
             composable<Route.CreateGymWorkout> {
-                CreateGymWorkoutScreen(
-                    onNavigateBack = navigator::popBackStack,
-                    navigator = navigator
-                )
+                CreateGymWorkoutScreen()
             }
 
             navigation<Route.CardioMain>(startDestination = Route.CardioWorkouts) {
                 composable<Route.CardioWorkouts> {
-                    CardioWorkoutsScreen(
-                        onNavigateToWorkout = { navigator.navigate(Route.CardioWorkout(it)) },
-                        onNavigateToCreateCardio = { navigator.navigate(Route.CreateCardioWorkout) }
-                    )
+                    CardioWorkoutsScreen()
                 }
             }
 
             composable<Route.CardioWorkout> {
-                CardioWorkoutScreen(
-                    onNavigateBack = navigator::popBackStack,
-                    navigator = navigator
-                )
+                CardioWorkoutScreen()
             }
             composable<Route.CreateCardioWorkout> {
-                CreateCardioWorkoutScreen(
-                    onNavigateBack = navigator::popBackStack,
-                    navigator = navigator
-                )
+                CreateCardioWorkoutScreen()
             }
 
             navigation<Route.StatsMain>(startDestination = Route.StatsOverview) {
                 composable<Route.StatsOverview> {
-                    StatsOverviewScreen(
-                        onGymSessionNavigate = { id ->
-                            navController.navigate(Route.GymWorkoutSession(id))
-                        },
-                        onCardioSessionNavigate = { id ->
-                            navController.navigate(Route.CardioWorkoutSession(id))
-                        },
-                        onAddGymSessionNavigate = { workoutId, timestamp ->
-                            navController.navigate(
-                                Route.GymWorkout(
-                                    workoutId,
-                                    timestamp.toString()
-                                )
-                            )
-                        },
-                        onAddCardioSessionNavigate = { workoutId, timestamp ->
-                            navController.navigate(
-                                Route.CardioWorkout(
-                                    workoutId,
-                                    timestamp.toString()
-                                )
-                            )
-                        },
-                        onGymWorkoutStatsNavigate = { id ->
-                            navController.navigate(Route.GymWorkoutStats(id))
-                        },
-                        onCardioWorkoutStatsNavigate = { id ->
-                            navController.navigate(Route.CardioWorkoutStats(id))
-                        }
-                    )
+                    StatsOverviewScreen()
                 }
                 composable<Route.GymWorkoutSession> {
-                    GymSessionStatsScreen(
-                        onNavigateBack = navigator::popBackStack
-                    )
+                    GymSessionStatsScreen()
                 }
                 composable<Route.CardioWorkoutSession> {
-                    CardioSessionStatsScreen(
-                        onNavigateBack = navigator::popBackStack
-                    )
+                    CardioSessionStatsScreen()
                 }
                 composable<Route.GymWorkoutStats> {
-                    GymWorkoutStatsScreen(
-                        onNavigateBack = navigator::popBackStack
-                    )
+                    GymWorkoutStatsScreen()
                 }
                 composable<Route.CardioWorkoutStats> {
-                    CardioWorkoutStatsList(
-                        onNavigateBack = navigator::popBackStack
-                    )
+                    CardioWorkoutStatsList()
                 }
             }
 
             composable<Route.Info> {
-                InfoScreen(
-                    onDeleteFinished = { navigator.navigate(Route.Welcome) }
-                )
+                InfoScreen()
             }
         }
     }

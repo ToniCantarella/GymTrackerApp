@@ -34,10 +34,11 @@ data class GymWorkoutUiState(
     val latestTimestamp: Instant? = null,
     val exercises: List<Exercise> = emptyList(),
     val initialExercises: List<Exercise> = emptyList(),
-    val showFinishWorkoutDialog: Boolean = true,
     val sessionTimestamp: Instant? = null,
     val stats: GymWorkoutStats? = null,
+    val confirmFinishWorkout: Boolean = true,
     val finishWorkoutDialogOpen: Boolean = false,
+    val confirmUnsavedChanges: Boolean = true,
     val unSavedChangesDialogOpen: Boolean = false
 ) {
     val hasUnsavedChanges = initialWorkoutName != workoutName || initialExercises != exercises
@@ -61,11 +62,15 @@ class GymWorkoutViewModel(
 
     init {
         viewModelScope.launch {
-            initScreen()
+            getWorkoutInfo()
+            getPreferences()
+            getStats()
         }
+        registerNavigationGuard()
+        registerNavigationAttempts()
     }
 
-    fun navigateBack() {
+    fun onNavigateBack() {
         navigator.popBackStack()
     }
 
@@ -165,7 +170,6 @@ class GymWorkoutViewModel(
     fun onConfirmUnsavedChangesDialog(doNotAskAgain: Boolean) {
         _uiState.update {
             it.copy(
-                // TODO what should set this to true? Certainly not the navigator, right?
                 unSavedChangesDialogOpen = false
             )
         }
@@ -184,12 +188,12 @@ class GymWorkoutViewModel(
             saveChanges()
         }
         navigator.releaseGuard()
-        navigateBack()
+        onNavigateBack()
     }
 
     fun stopAskingFinishConfirm() {
         viewModelScope.launch {
-            if (uiState.value.showFinishWorkoutDialog) {
+            if (uiState.value.confirmFinishWorkout) {
                 dataStore.edit { preferences ->
                     preferences[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] = false
                 }
@@ -205,19 +209,27 @@ class GymWorkoutViewModel(
         }
     }
 
-    fun finishWorkoutCheck() {
-        if (uiState.value.hasPerformedSets) {
+    fun onFinishPressed() {
+        if (uiState.value.hasPerformedSets && uiState.value.confirmFinishWorkout) {
             _uiState.update {
                 it.copy(
                     finishWorkoutDialogOpen = true
                 )
             }
         } else {
-            onFinishWorkoutPressed()
+            finishWorkout()
         }
     }
 
-    fun onFinishWorkoutPressed() {
+    fun onConfirmFinishWorkoutDialog(doNotAskAgain: Boolean) {
+        dismissFinishWorkoutDialog()
+        if (doNotAskAgain) {
+            stopAskingFinishConfirm()
+        }
+        finishWorkout()
+    }
+
+    fun finishWorkout() {
         viewModelScope.launch {
             saveChanges()
 
@@ -227,14 +239,7 @@ class GymWorkoutViewModel(
             )
         }
         navigator.releaseGuard()
-        navigateBack()
-    }
-
-    private suspend fun initScreen() {
-        getWorkoutInfo()
-        getPreferences()
-        getStats()
-        startNavigationGuardFoo()
+        onNavigateBack()
     }
 
     private suspend fun getWorkoutInfo() {
@@ -262,9 +267,14 @@ class GymWorkoutViewModel(
             .map { it[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] ?: true }
             .first()
 
+        val showUnsavedChangesDialog = dataStore.data
+            .map { it[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] ?: true }
+            .first()
+
         _uiState.update {
             it.copy(
-                showFinishWorkoutDialog = showFinishWorkoutDialog
+                confirmFinishWorkout = showFinishWorkoutDialog,
+                confirmUnsavedChanges = showUnsavedChangesDialog
             )
         }
     }
@@ -287,13 +297,28 @@ class GymWorkoutViewModel(
         )
     }
 
-    // TODO rename
-    private suspend fun startNavigationGuardFoo() {
-        uiState
-            .map { it.hasChanges }
-            .distinctUntilChanged()
-            .collect { hasChanges ->
-                navigator.guard(hasChanges)
+    private fun registerNavigationGuard() {
+        viewModelScope.launch {
+            uiState
+                .map { it.hasChanges }
+                .distinctUntilChanged()
+                .collect { hasChanges ->
+                    navigator.guard(hasChanges)
+                }
+        }
+    }
+
+    private fun registerNavigationAttempts() {
+        viewModelScope.launch {
+            navigator.navigationAttempts.collect { direction ->
+                if (navigator.isGuarded && uiState.value.confirmUnsavedChanges) {
+                    _uiState.update {
+                        it.copy(
+                            unSavedChangesDialogOpen = true
+                        )
+                    }
+                }
             }
+        }
     }
 }

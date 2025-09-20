@@ -49,7 +49,6 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoScreen(
-    onDeleteFinished: () -> Unit,
     viewModel: InfoViewModel = koinViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState()
@@ -67,7 +66,7 @@ fun InfoScreen(
         }
     ) { innerPadding ->
         InfoScreen(
-            showFinishWorkoutDialog = uiState.value.showConfirmOnFinishWorkout,
+            showFinishWorkoutDialog = uiState.value.confirmFinishWorkout,
             onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
             onDeleteAllData = { deletionDialogOpen = true },
             modifier = Modifier.padding(innerPadding)
@@ -88,9 +87,7 @@ fun InfoScreen(
             },
             confirmButton = {
                 Button(
-                    onClick = {
-                        viewModel.onDeleteAllData { onDeleteFinished() }
-                    }
+                    onClick = viewModel::onDeleteAllData
                 ) {
                     Text(
                         text = stringResource(id = R.string.delete)

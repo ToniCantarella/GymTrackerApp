@@ -8,6 +8,8 @@ import com.tonicantarella.gymtracker.ui.entity.statsoverview.Workout
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutType
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
+import com.tonicantarella.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -47,7 +49,8 @@ data class StatsOverviewUiState(
 )
 
 class StatsOverviewViewModel(
-    private val statsOverviewRepository: StatsOverviewRepository
+    private val statsOverviewRepository: StatsOverviewRepository,
+    private val navigator: Navigator
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StatsOverviewUiState())
     val uiState = _uiState.asStateFlow()
@@ -75,6 +78,30 @@ class StatsOverviewViewModel(
                 endDate = endDate
             )
         }
+    }
+
+    fun onGymSessionNavigate(sessionId: Int) {
+        navigator.navigate(Route.GymWorkoutSession(sessionId))
+    }
+
+    fun onCardioSessionNavigate(sessionId: Int) {
+        navigator.navigate(Route.CardioWorkoutSession(sessionId))
+    }
+
+    fun onAddGymSessionNavigate(workoutId: Int, timestamp: Instant) {
+        navigator.navigate(Route.GymWorkout(workoutId, timestamp.toString()))
+    }
+
+    fun onAddCardioSessionNavigate(workoutId: Int, timestamp: Instant) {
+        navigator.navigate(Route.CardioWorkout(workoutId, timestamp.toString()))
+    }
+
+    fun onGymWorkoutStatsNavigate(workoutId: Int) {
+        navigator.navigate(Route.GymWorkoutStats(workoutId))
+    }
+
+    fun onCardioWorkoutStatsNavigate(workoutId: Int) {
+        navigator.navigate(Route.CardioWorkoutStats(workoutId))
     }
 
     private suspend fun fetchAllWorkouts() {

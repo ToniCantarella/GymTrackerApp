@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
+import com.tonicantarella.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,7 +19,8 @@ data class CardioWorkoutsUiState(
 )
 
 class CardioWorkoutsViewModel(
-    private val workoutRepository: CardioWorkoutRepository
+    private val workoutRepository: CardioWorkoutRepository,
+    private val navigator: Navigator
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CardioWorkoutsUiState())
     val uiState = _uiState.asStateFlow()
@@ -79,5 +82,13 @@ class CardioWorkoutsViewModel(
             stopSelectingItems()
             getWorkouts()
         }
+    }
+
+    fun onNavigateToWorkout(id: Int) {
+        navigator.navigate(Route.CardioWorkout(id))
+    }
+
+    fun onCreateCardioClicked(){
+        navigator.navigate(Route.CreateCardioWorkout)
     }
 }

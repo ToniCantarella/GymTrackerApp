@@ -31,7 +31,6 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GymWorkoutStatsScreen(
-    onNavigateBack: () -> Unit,
     viewModel: GymWorkoutStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -46,7 +45,7 @@ fun GymWorkoutStatsScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onNavigateBack
+                        onClick = viewModel::onNavigateBack
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

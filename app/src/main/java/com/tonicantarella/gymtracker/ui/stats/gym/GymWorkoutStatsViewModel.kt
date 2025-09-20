@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.tonicantarella.gymtracker.repository.gym.GymStatsRepository
 import com.tonicantarella.gymtracker.ui.entity.gym.GymWorkoutStats
+import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,8 @@ data class GymWorkoutStatsUiState(
 
 class GymWorkoutStatsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val statRepository: GymStatsRepository
+    private val statRepository: GymStatsRepository,
+    private val navigator: Navigator
 ) : ViewModel() {
     private val navParams = savedStateHandle.toRoute<Route.GymWorkoutStats>()
 
@@ -38,5 +40,9 @@ class GymWorkoutStatsViewModel(
                 )
             }
         }
+    }
+
+    fun onNavigateBack() {
+        navigator.popBackStack()
     }
 }

@@ -48,8 +48,6 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardioWorkoutsScreen(
-    onNavigateToWorkout: (id: Int) -> Unit,
-    onNavigateToCreateCardio: () -> Unit,
     viewModel: CardioWorkoutsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -129,7 +127,7 @@ fun CardioWorkoutsScreen(
         },
         floatingActionButton = {
             GymFloatingActionButton(
-                onClick = onNavigateToCreateCardio,
+                onClick = viewModel::onCreateCardioClicked,
                 enabled = uiState.workouts.size < MAX_CARDIO
             ) {
                 Icon(
@@ -145,7 +143,7 @@ fun CardioWorkoutsScreen(
             selectingItems = uiState.selectingItems,
             selectedItems = uiState.selectedItems,
             onSelectWorkout = viewModel::onSelectItem,
-            onWorkoutClick = { onNavigateToWorkout(it.id) },
+            onWorkoutClick = { viewModel.onNavigateToWorkout(it.id) },
             modifier = Modifier.padding(innerPadding)
         )
     }

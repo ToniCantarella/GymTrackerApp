@@ -34,17 +34,10 @@ import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutType
 import org.koin.androidx.compose.koinViewModel
-import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsOverviewScreen(
-    onGymSessionNavigate: (id: Int) -> Unit,
-    onCardioSessionNavigate: (id: Int) -> Unit,
-    onAddGymSessionNavigate: (workoutId: Int, timestamp: Instant) -> Unit,
-    onAddCardioSessionNavigate: (workoutId: Int, timestamp: Instant) -> Unit,
-    onGymWorkoutStatsNavigate: (workoutId: Int) -> Unit,
-    onCardioWorkoutStatsNavigate: (workoutId: Int) -> Unit,
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -84,10 +77,10 @@ fun StatsOverviewScreen(
                             gymLegends = uiState.calendarGymLegends,
                             cardioLegends = uiState.calendarCardioLegends,
                             getMonthSessions = viewModel::getMonthData,
-                            onGymSessionClick = onGymSessionNavigate,
-                            onCardioSessionClick = onCardioSessionNavigate,
-                            onAddGymSessionClick = onAddGymSessionNavigate,
-                            onAddCardioSessionClick = onAddCardioSessionNavigate,
+                            onGymSessionClick = viewModel::onGymSessionNavigate,
+                            onCardioSessionClick = viewModel::onCardioSessionNavigate,
+                            onAddGymSessionClick = viewModel::onAddGymSessionNavigate,
+                            onAddCardioSessionClick = viewModel::onAddCardioSessionNavigate,
                             gymColorIndexMap = uiState.gymColorIndexMap,
                             cardioColorIndexMap = uiState.cardioColorIndexMap,
                             gymWorkouts = uiState.gymWorkouts,
@@ -165,8 +158,8 @@ fun StatsOverviewScreen(
                                 WorkoutListing(
                                     gymWorkouts = uiState.gymWorkouts,
                                     cardioWorkouts = uiState.cardioWorkouts,
-                                    onGymWorkoutStatsNavigate = onGymWorkoutStatsNavigate,
-                                    onCardioWorkoutStatsNavigate = onCardioWorkoutStatsNavigate,
+                                    onGymWorkoutStatsNavigate = viewModel::onGymWorkoutStatsNavigate,
+                                    onCardioWorkoutStatsNavigate = viewModel::onCardioWorkoutStatsNavigate,
                                     gymColorIndexMap = uiState.gymColorIndexMap,
                                     cardioColorIndexMap = uiState.cardioColorIndexMap
                                 )

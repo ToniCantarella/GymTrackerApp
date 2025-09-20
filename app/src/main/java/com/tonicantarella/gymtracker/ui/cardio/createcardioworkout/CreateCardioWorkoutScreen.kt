@@ -14,7 +14,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -30,26 +29,19 @@ import com.tonicantarella.gymtracker.ui.cardio.common.CardioContent
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
-import com.tonicantarella.gymtracker.ui.navigation.Navigator
+import com.tonicantarella.gymtracker.ui.common.UnsavedChangesDialog
 import com.tonicantarella.gymtracker.utility.CARDIO_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateCardioWorkoutScreen(
-    onNavigateBack: () -> Unit,
-    navigator: Navigator,
     viewModel: CreateCardioWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val hasUnsavedChanges = uiState.name.isNotEmpty()
 
     BackHandler {
-        onNavigateBack()
-    }
-
-    LaunchedEffect(hasUnsavedChanges) {
-        navigator.guard(hasUnsavedChanges)
+        viewModel.onNavigateBack()
     }
 
     GymScaffold(
@@ -64,9 +56,7 @@ fun CreateCardioWorkoutScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            onNavigateBack()
-                        }
+                        onClick = viewModel::onNavigateBack
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -80,10 +70,7 @@ fun CreateCardioWorkoutScreen(
             val enabled = uiState.name.isNotEmpty()
             GymFloatingActionButton(
                 enabled = enabled,
-                onClick = {
-                    navigator.releaseGuard()
-                    viewModel.onSavePressed { onNavigateBack() }
-                }
+                onClick = viewModel::onCreateWorkoutPressed
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.save),
@@ -118,5 +105,12 @@ fun CreateCardioWorkoutScreen(
                 )
             }
         }
+    }
+
+    if (uiState.unSavedChangesDialogOpen) {
+        UnsavedChangesDialog(
+            onConfirm = viewModel::onConfirmUnsavedChangesDialog,
+            onCancel = viewModel::dismissUnsavedChangesDialog
+        )
     }
 }

@@ -45,7 +45,6 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GymSessionStatsScreen(
-    onNavigateBack: () -> Unit,
     viewModel: GymSessionStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -60,7 +59,7 @@ fun GymSessionStatsScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onNavigateBack
+                        onClick = viewModel::onNavigateBack
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

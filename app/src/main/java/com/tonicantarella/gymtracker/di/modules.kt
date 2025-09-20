@@ -38,6 +38,8 @@ import com.tonicantarella.gymtracker.ui.stats.gym.GymSessionStatsViewModel
 import com.tonicantarella.gymtracker.ui.stats.gym.GymWorkoutStatsViewModel
 import com.tonicantarella.gymtracker.ui.stats.overview.StatsOverviewViewModel
 import com.tonicantarella.gymtracker.update.InAppUpdateHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -74,7 +76,7 @@ val databaseModule = module {
     single { get<GymDatabase>().cardioDao() }
     single { get<GymDatabase>().cardioSessionDao() }
 
-    singleOf(::Navigator)
+    single<Navigator> { Navigator(scope = CoroutineScope(Dispatchers.Main)) }
 }
 
 val repositoryModule = module {

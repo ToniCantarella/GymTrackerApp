@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,10 +28,10 @@ import com.tonicantarella.gymtracker.ui.common.GymDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
+import com.tonicantarella.gymtracker.ui.common.UnsavedChangesDialog
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.gym.common.CreateExercise
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseList
-import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.utility.WORKOUT_NAME_MAX_SIZE
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
@@ -40,20 +39,12 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateGymWorkoutScreen(
-    onNavigateBack: () -> Unit,
-    navigator : Navigator,
     viewModel: CreateGymWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val hasUnsavedChanges =
-        uiState.workoutName.isNotEmpty() || uiState.exercises != uiState.initialExercises
 
     BackHandler {
-        onNavigateBack()
-    }
-
-    LaunchedEffect(hasUnsavedChanges) {
-        navigator.guard(hasUnsavedChanges)
+        viewModel.onNavigateBack()
     }
 
     GymScaffold(
@@ -69,7 +60,7 @@ fun CreateGymWorkoutScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            onNavigateBack()
+                            viewModel.onNavigateBack()
                         }
                     ) {
                         Icon(
@@ -84,10 +75,7 @@ fun CreateGymWorkoutScreen(
             val enabled = uiState.workoutName.isNotEmpty()
             GymFloatingActionButton(
                 enabled = enabled,
-                onClick = {
-                    navigator.releaseGuard()
-                    viewModel.onCreateWorkoutPressed { onNavigateBack() }
-                }
+                onClick = viewModel::onCreateWorkoutPressed
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.save),
@@ -107,6 +95,13 @@ fun CreateGymWorkoutScreen(
             onChangeRepetitions = viewModel::onChangeRepetitions,
             onRemoveSet = viewModel::onRemoveSet,
             modifier = Modifier.padding(innerPadding)
+        )
+    }
+
+    if (uiState.unSavedChangesDialogOpen) {
+        UnsavedChangesDialog(
+            onConfirm = viewModel::onConfirmUnsavedChangesDialog,
+            onCancel = viewModel::dismissUnsavedChangesDialog
         )
     }
 }

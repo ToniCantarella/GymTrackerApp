@@ -64,7 +64,7 @@ fun GymWorkoutScreen(
     var statsBottomSheetOpen by remember { mutableStateOf(false) }
 
     BackHandler {
-        viewModel.navigateBack()
+        viewModel.onNavigateBack()
     }
 
     GymScaffold(
@@ -79,7 +79,7 @@ fun GymWorkoutScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = viewModel::navigateBack
+                        onClick = viewModel::onNavigateBack
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -105,7 +105,7 @@ fun GymWorkoutScreen(
                 enabled = enabled,
                 onClick = {
                     if (uiState.hasPerformedSets)
-                        viewModel.finishWorkoutCheck()
+                        viewModel.onFinishPressed()
                     else
                         viewModel.onSavePressed()
                 }
@@ -183,9 +183,7 @@ fun GymWorkoutScreen(
 
     if (uiState.unSavedChangesDialogOpen) {
         UnsavedChangesDialog(
-            onConfirm = { doNotAskAgain ->
-                viewModel.onConfirmUnsavedChangesDialog(doNotAskAgain)
-            },
+            onConfirm = viewModel::onConfirmUnsavedChangesDialog,
             onCancel = viewModel::dismissUnsavedChangesDialog
         )
     }
@@ -193,13 +191,7 @@ fun GymWorkoutScreen(
     if (uiState.finishWorkoutDialogOpen) {
         FinishWorkoutDialog(
             onCancel = viewModel::dismissFinishWorkoutDialog,
-            onFinishWorkout = { doNotAskAgain ->
-                viewModel.dismissFinishWorkoutDialog()
-                if (doNotAskAgain) {
-                    viewModel.stopAskingFinishConfirm()
-                }
-                viewModel.onFinishWorkoutPressed()
-            }
+            onFinishWorkout = viewModel::onConfirmFinishWorkoutDialog
         )
     }
 }

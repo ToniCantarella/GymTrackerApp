@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +39,7 @@ import com.tonicantarella.gymtracker.ui.common.FinishWorkoutDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
-import com.tonicantarella.gymtracker.ui.navigation.Navigator
+import com.tonicantarella.gymtracker.ui.common.UnsavedChangesDialog
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsList
 import com.tonicantarella.gymtracker.utility.CARDIO_NAME_MAX_SIZE
 import com.tonicantarella.gymtracker.utility.toDateAndTimeString
@@ -50,46 +49,14 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardioWorkoutScreen(
-    onNavigateBack: () -> Unit,
-    navigator: Navigator,
     viewModel: CardioWorkoutViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     var statsBottomSheetOpen by remember { mutableStateOf(false) }
-    var finishWorkoutDialogOpen by remember { mutableStateOf(false) }
-
-    val hasUnsavedChanges = uiState.hasUnsavedChanges
-    val hasMarkedMetrics = uiState.hasMarkedMetrics
-    val hasChanges = hasUnsavedChanges || hasMarkedMetrics
 
     BackHandler {
-        onNavigateBack()
-    }
-
-    LaunchedEffect(hasChanges) {
-        navigator.guard(hasChanges)
-    }
-
-    fun onFinishWorkout() {
-        navigator.releaseGuard()
-        viewModel.onFinishPressed {
-            onNavigateBack()
-        }
-    }
-
-    fun finishWorkoutCheck() {
-        if (hasMarkedMetrics && uiState.showFinishWorkoutDialog) {
-            finishWorkoutDialogOpen = true
-        } else {
-            onFinishWorkout()
-        }
-    }
-
-    fun saveChanges() {
-        navigator.releaseGuard()
-        viewModel.onSaveChanges()
-        onNavigateBack()
+        viewModel.onNavigateBack()
     }
 
     GymScaffold(
@@ -104,7 +71,7 @@ fun CardioWorkoutScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onNavigateBack
+                        onClick = viewModel::onNavigateBack
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -125,17 +92,17 @@ fun CardioWorkoutScreen(
             )
         },
         floatingActionButton = {
-            val enabled = hasChanges
+            val enabled = uiState.hasChanges
             GymFloatingActionButton(
                 enabled = enabled,
                 onClick = {
-                    if (hasMarkedMetrics)
-                        finishWorkoutCheck()
+                    if (uiState.hasMarkedMetrics)
+                        viewModel.onFinishWorkoutPressed()
                     else
-                        saveChanges()
+                        viewModel.onSavePressed()
                 }
             ) {
-                if (hasMarkedMetrics) {
+                if (uiState.hasMarkedMetrics) {
                     Icon(
                         painter = painterResource(id = R.drawable.goal),
                         contentDescription = stringResource(id = R.string.done)
@@ -201,16 +168,17 @@ fun CardioWorkoutScreen(
         }
     }
 
-    if (finishWorkoutDialogOpen) {
+    if (uiState.unSavedChangesDialogOpen) {
+        UnsavedChangesDialog(
+            onConfirm = viewModel::onConfirmUnsavedChangesDialog,
+            onCancel = viewModel::dismissUnsavedChangesDialog
+        )
+    }
+
+    if (uiState.finishWorkoutDialogOpen) {
         FinishWorkoutDialog(
-            onCancel = { finishWorkoutDialogOpen = false },
-            onFinishWorkout = { doNotAskAgain ->
-                finishWorkoutDialogOpen = false
-                if (doNotAskAgain) {
-                    viewModel.stopAskingFinishConfirm()
-                }
-                onFinishWorkout()
-            }
+            onCancel = viewModel::dismissFinishWorkoutDialog,
+            onFinishWorkout = viewModel::onConfirmFinishWorkoutDialog
         )
     }
 }

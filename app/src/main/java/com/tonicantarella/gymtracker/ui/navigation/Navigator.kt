@@ -1,20 +1,30 @@
 package com.tonicantarella.gymtracker.ui.navigation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 
-class Navigator {
+enum class NavigationDirection {
+    FORWARD,
+    BACK
+}
+
+class Navigator(
+    private val scope: CoroutineScope
+) {
     var navController: NavHostController? = null
-    var isGuarded by mutableStateOf(false)
+    private val _navigationAttempts = MutableSharedFlow<NavigationDirection>()
+    val navigationAttempts: SharedFlow<NavigationDirection> = _navigationAttempts
+    var isGuarded: Boolean = false
     var pendingAction: (() -> Unit)? = null
 
     fun registerNavController(navController: NavHostController) {
         this.navController = navController
     }
 
-    fun guard (isGuarded: Boolean) {
+    fun guard(isGuarded: Boolean) {
         this.isGuarded = isGuarded
     }
 
@@ -25,6 +35,9 @@ class Navigator {
     }
 
     fun navigate(route: Route) {
+        scope.launch{
+            _navigationAttempts.emit(NavigationDirection.FORWARD)
+        }
         if (isGuarded) {
             pendingAction = { navigate(route) }
         } else {
@@ -38,6 +51,9 @@ class Navigator {
     }
 
     fun popBackStack() {
+        scope.launch{
+            _navigationAttempts.emit(NavigationDirection.BACK)
+        }
         if (isGuarded) {
             pendingAction = { popBackStack() }
         } else {

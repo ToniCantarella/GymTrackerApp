@@ -54,8 +54,6 @@ import java.time.Instant
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GymWorkoutsScreen(
-    onNavigateToWorkout: (id: Int) -> Unit,
-    onCreateWorkoutClicked: () -> Unit,
     viewModel: GymWorkoutsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -136,7 +134,7 @@ fun GymWorkoutsScreen(
         floatingActionButton = {
             GymFloatingActionButton(
                 enabled = uiState.workouts.size < MAX_GYM_WORKOUTS,
-                onClick = onCreateWorkoutClicked
+                onClick = viewModel::onCreateWorkoutClicked
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -151,7 +149,7 @@ fun GymWorkoutsScreen(
             selectingItems = uiState.selectingItems,
             selectedItems = uiState.selectedItems,
             onSelectWorkout = viewModel::onSelectItem,
-            onWorkoutClick = { onNavigateToWorkout(it.id) },
+            onWorkoutClick = { viewModel.onNavigateToWorkout(it.id) },
             modifier = Modifier.padding(innerPadding)
         )
     }
