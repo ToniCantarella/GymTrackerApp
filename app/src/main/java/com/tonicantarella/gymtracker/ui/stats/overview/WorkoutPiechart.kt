@@ -38,7 +38,7 @@ fun WorkoutPieChart(
 ) {
     var data by remember {
         mutableStateOf(
-            if (legends.isNotEmpty()) {
+            if (legends.isNotEmpty() && legends.any { it.sessionCount > 0 }) {
                 legends.mapIndexed { index, legend ->
                     val colorIndex = colorIndexMap[legend.workout.id] ?: 0
                     val color = highlightColors[colorIndex]
