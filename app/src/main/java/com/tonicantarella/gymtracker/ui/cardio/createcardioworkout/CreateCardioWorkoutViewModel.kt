@@ -81,7 +81,7 @@ class CreateCardioWorkoutViewModel(
         navigator.releaseGuard()
     }
 
-    fun getPreferences() {
+    private fun getPreferences() {
         viewModelScope.launch {
             dataStore.data.map { preferences ->
                 preferences[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] ?: true

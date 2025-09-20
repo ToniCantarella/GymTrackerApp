@@ -191,16 +191,6 @@ class GymWorkoutViewModel(
         onNavigateBack()
     }
 
-    fun stopAskingFinishConfirm() {
-        viewModelScope.launch {
-            if (uiState.value.confirmFinishWorkout) {
-                dataStore.edit { preferences ->
-                    preferences[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] = false
-                }
-            }
-        }
-    }
-
     fun dismissFinishWorkoutDialog() {
         _uiState.update {
             it.copy(
@@ -286,6 +276,16 @@ class GymWorkoutViewModel(
             it.copy(
                 stats = workoutStats
             )
+        }
+    }
+
+    private fun stopAskingFinishConfirm() {
+        viewModelScope.launch {
+            if (uiState.value.confirmFinishWorkout) {
+                dataStore.edit { preferences ->
+                    preferences[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] = false
+                }
+            }
         }
     }
 

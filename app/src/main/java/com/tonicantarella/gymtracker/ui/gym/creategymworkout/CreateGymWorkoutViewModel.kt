@@ -47,6 +47,10 @@ class CreateGymWorkoutViewModel(
         getPreferences()
     }
 
+    fun onNavigateBack() {
+        navigator.popBackStack()
+    }
+
     fun onWorkoutNameChange(name: String) {
         _uiState.update {
             it.copy(
@@ -124,20 +128,6 @@ class CreateGymWorkoutViewModel(
         }
     }
 
-    fun getPreferences() {
-        viewModelScope.launch {
-            dataStore.data.map { preferences ->
-                preferences[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] ?: true
-            }.distinctUntilChanged().collect { showDialog ->
-                _uiState.update {
-                    it.copy(
-                        confirmUnsavedChanges = showDialog
-                    )
-                }
-            }
-        }
-    }
-
     fun onCreateWorkoutPressed() {
         viewModelScope.launch {
             workoutRepository.addWorkout(
@@ -146,10 +136,6 @@ class CreateGymWorkoutViewModel(
             )
         }
         navigator.releaseGuard()
-        navigator.popBackStack()
-    }
-
-    fun onNavigateBack() {
         navigator.popBackStack()
     }
 
@@ -175,6 +161,20 @@ class CreateGymWorkoutViewModel(
             }
         }
         navigator.releaseGuard()
+    }
+
+    private fun getPreferences() {
+        viewModelScope.launch {
+            dataStore.data.map { preferences ->
+                preferences[GymPreferences.SHOW_UNSAVED_CHANGES_DIALOG] ?: true
+            }.distinctUntilChanged().collect { showDialog ->
+                _uiState.update {
+                    it.copy(
+                        confirmUnsavedChanges = showDialog
+                    )
+                }
+            }
+        }
     }
 
     private fun registerNavigationGuard() {

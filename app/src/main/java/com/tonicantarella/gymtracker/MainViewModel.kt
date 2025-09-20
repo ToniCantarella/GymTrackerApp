@@ -30,7 +30,15 @@ class MainViewModel(
         checkUserPreferences()
     }
 
-    fun checkUserPreferences() {
+    fun onUserWelcomed() {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[GymPreferences.USER_HAS_BEEN_WELCOMED] = true
+            }
+        }
+    }
+
+    private fun checkUserPreferences() {
         viewModelScope.launch {
             val hasBeenWelcomed = dataStore.data
                 .map { it[GymPreferences.USER_HAS_BEEN_WELCOMED] ?: false }
@@ -42,14 +50,6 @@ class MainViewModel(
                     initialRoute = if (hasBeenWelcomed) Route.GymMain else it.initialRoute,
                     loading = false
                 )
-            }
-        }
-    }
-
-    fun onUserWelcomed() {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[GymPreferences.USER_HAS_BEEN_WELCOMED] = true
             }
         }
     }

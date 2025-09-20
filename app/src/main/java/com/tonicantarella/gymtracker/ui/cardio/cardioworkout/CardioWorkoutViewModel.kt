@@ -76,41 +76,8 @@ class CardioWorkoutViewModel(
         registerNavigationAttempts()
     }
 
-    fun getWorkout() {
-        viewModelScope.launch {
-            val latestWorkoutWithMetrics =
-                workoutRepository.getLatestWorkoutWithMetrics(navParams.id)
-            val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
-
-            val currentWorkout = uiState.value.workout.copy(
-                id = latestWorkoutWithMetrics?.id ?: 0,
-                name = latestWorkoutWithMetrics?.name ?: "",
-                timestamp = latestWorkoutWithMetrics?.timestamp
-            )
-
-            val showFinishWorkoutDialog = dataStore.data
-                .map { it[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] ?: true }
-                .first()
-
-            _uiState.update {
-                it.copy(
-                    workout = currentWorkout,
-                    initialWorkout = currentWorkout,
-                    previousWorkout = latestWorkoutWithMetrics,
-                    sessionTimestamp = sessionTimestamp,
-                    confirmFinishWorkout = showFinishWorkoutDialog,
-                    loading = false
-                )
-            }
-
-            val workoutStats = statsRepository.getWorkoutStats(navParams.id)
-
-            _uiState.update {
-                it.copy(
-                    stats = workoutStats
-                )
-            }
-        }
+    fun onNavigateBack() {
+        navigator.popBackStack()
     }
 
     fun onNameChange(name: String) {
@@ -189,25 +156,12 @@ class CardioWorkoutViewModel(
         navigator.popBackStack()
     }
 
-    suspend fun saveChanges() {
-        if (uiState.value.workout.name != uiState.value.initialWorkout.name){
-            workoutRepository.updateWorkout(
-                workoutId = navParams.id,
-                workoutName = uiState.value.workout.name
-            )
-        }
-    }
-
     fun dismissFinishWorkoutDialog() {
         _uiState.update {
             it.copy(
                 finishWorkoutDialogOpen = false
             )
         }
-    }
-
-    fun onNavigateBack() {
-        navigator.popBackStack()
     }
 
     fun onFinishWorkoutPressed() {
@@ -230,7 +184,44 @@ class CardioWorkoutViewModel(
         finishWorkout()
     }
 
-    fun finishWorkout() {
+    private fun getWorkout() {
+        viewModelScope.launch {
+            val latestWorkoutWithMetrics =
+                workoutRepository.getLatestWorkoutWithMetrics(navParams.id)
+            val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
+
+            val currentWorkout = uiState.value.workout.copy(
+                id = latestWorkoutWithMetrics?.id ?: 0,
+                name = latestWorkoutWithMetrics?.name ?: "",
+                timestamp = latestWorkoutWithMetrics?.timestamp
+            )
+
+            val showFinishWorkoutDialog = dataStore.data
+                .map { it[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] ?: true }
+                .first()
+
+            _uiState.update {
+                it.copy(
+                    workout = currentWorkout,
+                    initialWorkout = currentWorkout,
+                    previousWorkout = latestWorkoutWithMetrics,
+                    sessionTimestamp = sessionTimestamp,
+                    confirmFinishWorkout = showFinishWorkoutDialog,
+                    loading = false
+                )
+            }
+
+            val workoutStats = statsRepository.getWorkoutStats(navParams.id)
+
+            _uiState.update {
+                it.copy(
+                    stats = workoutStats
+                )
+            }
+        }
+    }
+
+    private fun finishWorkout() {
         viewModelScope.launch {
             saveChanges()
             sessionRepository.markSessionDone(
@@ -242,13 +233,22 @@ class CardioWorkoutViewModel(
         navigator.popBackStack()
     }
 
-    fun stopAskingFinishConfirm() {
+    private fun stopAskingFinishConfirm() {
         viewModelScope.launch {
             if (uiState.value.confirmFinishWorkout) {
                 dataStore.edit { preferences ->
                     preferences[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] = false
                 }
             }
+        }
+    }
+
+    private suspend fun saveChanges() {
+        if (uiState.value.workout.name != uiState.value.initialWorkout.name){
+            workoutRepository.updateWorkout(
+                workoutId = navParams.id,
+                workoutName = uiState.value.workout.name
+            )
         }
     }
 
