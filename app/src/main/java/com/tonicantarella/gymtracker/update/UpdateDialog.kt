@@ -25,6 +25,7 @@ import com.tonicantarella.gymtracker.ui.theme.warning
 fun UpdateDialog(
     onDismiss: () -> Unit,
     onUpdate: () -> Unit,
+    onComplete: () -> Unit,
     updateStatus: UpdateStatus,
     progress: Float
 ) {
@@ -53,7 +54,7 @@ fun UpdateDialog(
         )
 
         UpdateStatus.INSTALLED -> UpdateInstalled(
-            onDone = onUpdate
+            onDone = onComplete
         )
 
         else -> UpdateUnknown(

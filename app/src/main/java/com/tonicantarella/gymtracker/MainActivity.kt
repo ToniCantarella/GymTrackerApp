@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
                     UpdateDialog(
                         onDismiss = inAppUpdateHandler::dismissUpdate,
                         onUpdate = inAppUpdateHandler::startUpdate,
+                        onComplete = inAppUpdateHandler::completeUpdate,
                         updateStatus = updateState.updateStatus,
                         progress = updateState.progress
                     )

@@ -19,7 +19,7 @@ android {
         applicationId = "com.tonicantarella.gymtracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
+        versionCode = 8
         versionName = libs.versions.appVersion.get()
 
         buildConfigField(

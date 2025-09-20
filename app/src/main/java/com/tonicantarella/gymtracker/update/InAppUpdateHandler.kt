@@ -154,6 +154,10 @@ class InAppUpdateHandler(
         _uiState.update { it.copy(updateStatus = UpdateStatus.IDLE) }
     }
 
+    fun completeUpdate() {
+        appUpdateManager.completeUpdate()
+    }
+
     private fun monitorFlexibleUpdate() {
         appUpdateManager.registerListener(listener)
     }
