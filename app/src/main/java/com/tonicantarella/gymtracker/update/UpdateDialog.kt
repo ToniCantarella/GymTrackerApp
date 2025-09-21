@@ -62,17 +62,21 @@ fun UpdateDialog(
             onCancel = onDismiss,
             onRetry = onUpdate
         )
+
         UpdateStatus.INSTALLING -> UpdateInstalling(
             onCancel = onDismiss
         )
+
         UpdateStatus.PENDING -> UpdatePending(
             onCancel = onDismiss,
             onRetry = onUpdate
         )
+
         UpdateStatus.REQUIRES_INTENT -> UpdateRequiresIntent(
             onCancel = onDismiss,
             onRetry = onUpdate
         )
+
         UpdateStatus.UNKNOWN -> UpdateUnknown(
             onCancel = onDismiss,
             onRetry = onUpdate
@@ -279,7 +283,8 @@ private fun UpdateInstalled(
 fun UpdateIdle(
     onCancel: () -> Unit,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
     GymDialog(
         onDismissRequest = onCancel,
         icon = {
@@ -313,7 +318,8 @@ fun UpdateIdle(
 @Composable
 fun UpdateInstalling(
     onCancel: () -> Unit,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
     GymDialog(
         onDismissRequest = onCancel,
         icon = {
@@ -332,7 +338,8 @@ fun UpdateInstalling(
 fun UpdatePending(
     onCancel: () -> Unit,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
     GymDialog(
         onDismissRequest = onCancel,
         icon = {
@@ -367,7 +374,8 @@ fun UpdatePending(
 fun UpdateRequiresIntent(
     onCancel: () -> Unit,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
     GymDialog(
         onDismissRequest = onCancel,
         icon = {

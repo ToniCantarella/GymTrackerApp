@@ -14,7 +14,7 @@ interface CardioWorkoutDao {
     @Update
     suspend fun update(workout: CardioWorkoutEntity)
 
-    @Query("SELECT * FROM CardioWorkouts ORDER BY id DESC")
+    @Query("SELECT * FROM CardioWorkouts")
     suspend fun getAll(): List<CardioWorkoutEntity>
 
     @Query("SELECT * FROM CardioWorkouts WHERE id = :id")
