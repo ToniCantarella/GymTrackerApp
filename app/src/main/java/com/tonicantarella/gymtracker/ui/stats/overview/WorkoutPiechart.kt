@@ -79,10 +79,10 @@ fun WorkoutPieChart(
                 Icon(
                     painter =
                         if (workoutType == WorkoutType.GYM)
-                            painterResource(id = R.drawable.weight)
+                            painterResource(id = R.drawable.dumbbell)
                         else
                             painterResource(id = R.drawable.run),
-                    contentDescription = stringResource(id = R.string.icon),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(40.dp)
                         .align(Alignment.Center)

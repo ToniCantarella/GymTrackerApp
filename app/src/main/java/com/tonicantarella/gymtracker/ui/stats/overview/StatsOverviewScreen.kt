@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -99,6 +100,12 @@ fun StatsOverviewScreen(
                                 .widthIn(min = dimensionResource(id = R.dimen.breakpoint_small))
                                 .padding(start = dimensionResource(id = R.dimen.padding_large))
                         ){
+                            Icon(
+                                painter = painterResource(id = R.drawable.history),
+                                contentDescription = stringResource(id = R.string.stats),
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
                             Text(
                                 text = stringResource(id = R.string.all_time),
                                 style = MaterialTheme.typography.headlineLarge
@@ -132,15 +139,16 @@ fun StatsOverviewScreen(
                         }
                     }
 
-
                     item {
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                         Column(
                             modifier = Modifier
                                 .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
                                 .widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
                         ) {
-                            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                            Row{
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ){
                                 Icon(
                                     painter = painterResource(id = R.drawable.timeline),
                                     contentDescription = stringResource(id = R.string.stats),
@@ -154,10 +162,10 @@ fun StatsOverviewScreen(
                             }
                             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
 
-                            if (uiState.gymWorkouts.isNotEmpty() || uiState.cardioWorkouts.isNotEmpty()) {
-                                WorkoutListing(
-                                    gymWorkouts = uiState.gymWorkouts,
-                                    cardioWorkouts = uiState.cardioWorkouts,
+                            if (uiState.gymWorkoutsGeneralStats.isNotEmpty() || uiState.cardioWorkoutsGeneralStats.isNotEmpty()) {
+                                GeneralWorkoutStatsList(
+                                    gymWorkouts = uiState.gymWorkoutsGeneralStats,
+                                    cardioWorkouts = uiState.cardioWorkoutsGeneralStats,
                                     onGymWorkoutStatsNavigate = viewModel::onGymWorkoutStatsNavigate,
                                     onCardioWorkoutStatsNavigate = viewModel::onCardioWorkoutStatsNavigate,
                                     gymColorIndexMap = uiState.gymColorIndexMap,

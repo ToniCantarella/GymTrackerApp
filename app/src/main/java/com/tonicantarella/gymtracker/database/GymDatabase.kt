@@ -1,9 +1,12 @@
 package com.tonicantarella.gymtracker.database
 
+import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.RenameColumn
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
 import com.tonicantarella.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.tonicantarella.gymtracker.database.dao.cardio.CardioSessionDao
 import com.tonicantarella.gymtracker.database.dao.cardio.CardioWorkoutDao
@@ -20,7 +23,6 @@ import com.tonicantarella.gymtracker.database.entity.gym.GymSessionEntity
 import com.tonicantarella.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetSessionEntity
-import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
@@ -35,7 +37,14 @@ import java.util.UUID
         CardioMetricsEntity::class,
         CardioSessionEntity::class
     ],
-    version = 1,
+    version = 2,
+    autoMigrations = [
+        AutoMigration(
+            from = 1,
+            to = 2,
+            spec = DurationToMillisMigration::class
+        )
+    ],
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -62,10 +71,16 @@ class Converters {
 
     @TypeConverter
     fun toInstant(millis: Long): Instant = Instant.ofEpochMilli(millis)
-
-    @TypeConverter
-    fun fromDuration(duration: Duration): Long = duration.toMillis()
-
-    @TypeConverter
-    fun toDuration(millis: Long): Duration = Duration.ofMillis(millis)
 }
+
+@RenameColumn(
+    tableName = "cardio_metrics",
+    fromColumnName = "duration",
+    toColumnName = "durationMillis"
+)
+@RenameColumn(
+    tableName = "cardio_sessions",
+    fromColumnName = "duration",
+    toColumnName = "durationMillis"
+)
+class DurationToMillisMigration : AutoMigrationSpec

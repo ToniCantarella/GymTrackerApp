@@ -220,7 +220,7 @@ fun GymWorkoutsScreen(
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
             ) {
                 EmptyListCard(
-                    iconPainter = painterResource(id = R.drawable.weight),
+                    iconPainter = painterResource(id = R.drawable.dumbbell),
                     subtitle = {
                         Text(
                             text = stringResource(id = R.string.gym_workouts_intro),

@@ -87,4 +87,12 @@
     <string name="update_unknown_description">Something went sideways. Please try again.</string>
     <string name="show_unsaved_changes_dialog">Confirm unsaved changes</string>
     <string name="developer_website">Developer website</string>
+    <string name="details">Details</string>
+    <string name="exercises">Exercises</string>
+    <string name="avg_sets">Sets average</string>
+    <string name="avg_reps">Repetitions average</string>
+    <string name="avg_weight">Weight average</string>
+    <string name="avg_steps">Steps average</string>
+    <string name="avg_distance">Distance average</string>
+    <string name="avg_duration">Time average</string>
 </resources>

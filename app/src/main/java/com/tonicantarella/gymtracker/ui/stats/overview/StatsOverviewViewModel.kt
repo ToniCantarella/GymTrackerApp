@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tonicantarella.gymtracker.repository.StatsOverviewRepository
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
+import com.tonicantarella.gymtracker.ui.entity.statsoverview.CardioWorkoutWithGeneralStats
+import com.tonicantarella.gymtracker.ui.entity.statsoverview.GymWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.Workout
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
@@ -37,6 +39,8 @@ data class StatsOverviewUiState(
     val loading: Boolean = true,
     val gymWorkouts: List<WorkoutWithTimestamp> = emptyList(),
     val cardioWorkouts: List<WorkoutWithTimestamp> = emptyList(),
+    val gymWorkoutsGeneralStats: List<GymWorkoutWithGeneralStats> = emptyList(),
+    val cardioWorkoutsGeneralStats: List<CardioWorkoutWithGeneralStats> = emptyList(),
     val gymLegends: List<WorkoutLegend> = emptyList(),
     val cardioLegends: List<WorkoutLegend> = emptyList(),
     val calendarSessions: Map<LocalDate, List<WorkoutSession>> = emptyMap(),
@@ -63,6 +67,7 @@ class StatsOverviewViewModel(
                 startDate = uiState.value.startDate,
                 endDate = uiState.value.endDate
             )
+            fetchAllGeneralStats()
             _uiState.update {
                 it.copy(
                     loading = false
@@ -208,6 +213,18 @@ class StatsOverviewViewModel(
                 calendarSessions = calendarSessions,
                 calendarGymLegends = calendarGymLegends,
                 calendarCardioLegends = calendarCardioLegends
+            )
+        }
+    }
+
+    private suspend fun fetchAllGeneralStats() {
+        val gymWorkoutsStats = statsOverviewRepository.getAllGymWorkoutsWithGeneralStats()
+        val cardioWorkoutsStats = statsOverviewRepository.getAllCardioWorkoutsWithGeneralStats()
+
+        _uiState.update {
+            it.copy(
+                gymWorkoutsGeneralStats = gymWorkoutsStats,
+                cardioWorkoutsGeneralStats = cardioWorkoutsStats
             )
         }
     }

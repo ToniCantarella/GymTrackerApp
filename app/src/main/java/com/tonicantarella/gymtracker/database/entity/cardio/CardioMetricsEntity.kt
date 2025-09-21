@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.time.Duration
 
 @Entity(
     tableName = "cardio_metrics",
@@ -24,5 +23,5 @@ data class CardioMetricsEntity(
     val workoutId: Int = 0,
     val steps: Int? = null,
     val distance: Double? = null,
-    val duration: Duration? = null
+    val durationMillis: Long? = null
 )

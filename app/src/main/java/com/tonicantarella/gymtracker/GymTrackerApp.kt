@@ -128,7 +128,7 @@ fun GymAppNavHost(
         NavigationBarItem(
             titleResInt = R.string.gym,
             route = Route.GymMain,
-            iconResInt = R.drawable.weight
+            iconResInt = R.drawable.dumbbell
         ),
         NavigationBarItem(
             titleResInt = R.string.cardio,

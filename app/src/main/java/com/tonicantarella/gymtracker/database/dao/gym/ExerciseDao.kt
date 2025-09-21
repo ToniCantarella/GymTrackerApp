@@ -23,4 +23,7 @@ interface ExerciseDao {
 
     @Query("SELECT * FROM exercises WHERE id = :exerciseId")
     suspend fun getExercisesById(exerciseId: Int): ExerciseEntity
+
+    @Query("SELECT COUNT(*) FROM exercises WHERE workoutId = :workoutId")
+    suspend fun countExercisesByWorkoutId(workoutId: Int): Int
 }

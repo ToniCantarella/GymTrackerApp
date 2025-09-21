@@ -79,4 +79,12 @@
     <string name="update_unknown_description">Jokin meni pieleen. Ole hyvä ja yritä uudelleen.</string>
     <string name="show_unsaved_changes_dialog">Varmista tallentamattomat muutokset</string>
     <string name="developer_website">Kehittäjän sivusto</string>
+    <string name="details">Lisätiedot</string>
+    <string name="exercises">Liikkeet</string>
+    <string name="avg_sets">Sarjojen keskiarvo</string>
+    <string name="avg_reps">Toistojen keskiarvo</string>
+    <string name="avg_weight">Paino keskiarvo</string>
+    <string name="avg_steps">Askelten keskiarvo</string>
+    <string name="avg_distance">Matkan keskiarvo</string>
+    <string name="avg_duration">Ajan keskiarvo</string>
 </resources>

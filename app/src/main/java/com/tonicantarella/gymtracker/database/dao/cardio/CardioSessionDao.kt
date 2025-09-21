@@ -3,6 +3,7 @@ package com.tonicantarella.gymtracker.database.dao.cardio
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.tonicantarella.gymtracker.database.entity.cardio.AverageCardioStats
 import com.tonicantarella.gymtracker.database.entity.cardio.CardioSessionEntity
 import java.time.Instant
 
@@ -25,4 +26,15 @@ interface CardioSessionDao {
 
     @Query("SELECT * FROM cardio_sessions WHERE timestamp BETWEEN :start AND :end")
     suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<CardioSessionEntity>?
+
+    @Query("""
+        SELECT 
+            AVG(cs.distance) as avgDistance,
+            AVG(cs.steps) as avgSteps,
+            AVG(cs.durationMillis) as avgDurationMillis 
+        FROM cardio_sessions cs
+        WHERE cs.workoutId = :cardioWorkoutId
+    """)
+    suspend fun getAverageStatsForCardioWorkout(cardioWorkoutId: Int): AverageCardioStats?
+
 }

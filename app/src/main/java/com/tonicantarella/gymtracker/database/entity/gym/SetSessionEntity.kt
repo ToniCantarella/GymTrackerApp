@@ -39,3 +39,8 @@ data class SetSessionEntity(
     val weight: Double,
     val repetitions: Int
 )
+
+data class AverageSetStats(
+    val avgWeight: Double?,
+    val avgReps: Double?
+)

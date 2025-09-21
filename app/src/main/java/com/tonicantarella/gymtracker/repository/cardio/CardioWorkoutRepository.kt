@@ -64,7 +64,7 @@ class CardioWorkoutRepositoryImpl(
             metrics = CardioMetrics(
                 steps = session?.steps ?: 0,
                 distance = distance,
-                duration = session?.duration ?: Duration.ZERO
+                duration = Duration.ofMillis(session?.durationMillis ?: 0)
             )
         )
     }

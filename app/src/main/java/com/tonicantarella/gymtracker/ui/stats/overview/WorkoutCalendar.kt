@@ -297,7 +297,7 @@ fun WorkoutCalendar(
                                 onClick = { onSessionClick(session) },
                                 icon = {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.weight),
+                                        painter = painterResource(id = R.drawable.dumbbell),
                                         contentDescription = null,
                                         tint = highlightColors[gymColorIndexMap[session.workoutId]
                                             ?: 0]
@@ -341,7 +341,7 @@ fun WorkoutCalendar(
                             onClick = { timestamp?.let { onAddGymSessionClick(workout.id, it) } },
                             icon = {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.weight),
+                                    painter = painterResource(id = R.drawable.dumbbell),
                                     contentDescription = null,
                                     tint = highlightColors[gymColorIndexMap[workout.id] ?: 0]
                                 )
@@ -514,7 +514,7 @@ private fun DayWorkoutIcons(
 
                     AnimatedWorkoutIcon(
                         visible = visible,
-                        painter = painterResource(id = R.drawable.weight),
+                        painter = painterResource(id = R.drawable.dumbbell),
                         tint = highlightColors[colorIndex],
                         modifier = Modifier
                             .padding(start = dimensionResource(id = R.dimen.padding_medium) * index)

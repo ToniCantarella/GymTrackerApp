@@ -39,7 +39,7 @@ fun WelcomeScreen(
             modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.breakpoint_compact))
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.weight),
+                painter = painterResource(id = R.drawable.dumbbell),
                 contentDescription = null,
                 modifier = Modifier
                     .graphicsLayer {

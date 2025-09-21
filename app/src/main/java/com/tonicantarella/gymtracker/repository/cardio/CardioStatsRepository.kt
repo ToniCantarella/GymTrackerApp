@@ -6,6 +6,7 @@ import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
 import com.tonicantarella.gymtracker.ui.entity.cardio.DistanceWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.cardio.DurationWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.cardio.StepsWithTimestamp
+import java.time.Duration
 
 interface CardioStatsRepository {
     suspend fun getWorkoutStats(workoutId: Int): CardioWorkoutStats?
@@ -37,7 +38,7 @@ class CardioStatsRepositoryImpl(
             }.orEmpty(),
             durationHistory = sessions?.map {
                 DurationWithTimestamp(
-                    value = it.duration,
+                    value = if (it.durationMillis != null) Duration.ofMillis(it.durationMillis) else null,
                     timestamp = it.timestamp
                 )
             }.orEmpty()

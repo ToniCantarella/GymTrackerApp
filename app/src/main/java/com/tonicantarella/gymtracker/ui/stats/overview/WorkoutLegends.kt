@@ -66,7 +66,7 @@ private fun WorkoutLegend(
         WorkoutIcon(
             painter =
                 if (workout.type == WorkoutType.GYM)
-                    painterResource(id = R.drawable.weight)
+                    painterResource(id = R.drawable.dumbbell)
                 else
                     painterResource(id = R.drawable.run),
             tint = highlightColor
