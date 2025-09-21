@@ -95,4 +95,11 @@
     <string name="avg_steps">Steps average</string>
     <string name="avg_distance">Distance average</string>
     <string name="avg_duration">Time average</string>
+    <string name="update_idle">Idle</string>
+    <string name="update_idle_description">This update is idle. Waiting for action.</string>
+    <string name="update_installing">Installing</string>
+    <string name="update_pending">Pending</string>
+    <string name="update_pending_description">This update is pending. Waiting for action.</string>
+    <string name="update_requires_intent">Action required</string>
+    <string name="update_requires_intent_description">This update requires action. Waiting.</string>
 </resources>

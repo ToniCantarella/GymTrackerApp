@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +58,22 @@ fun UpdateDialog(
             onDone = onComplete
         )
 
-        else -> UpdateUnknown(
+        UpdateStatus.IDLE -> UpdateIdle(
+            onCancel = onDismiss,
+            onRetry = onUpdate
+        )
+        UpdateStatus.INSTALLING -> UpdateInstalling(
+            onCancel = onDismiss
+        )
+        UpdateStatus.PENDING -> UpdatePending(
+            onCancel = onDismiss,
+            onRetry = onUpdate
+        )
+        UpdateStatus.REQUIRES_INTENT -> UpdateRequiresIntent(
+            onCancel = onDismiss,
+            onRetry = onUpdate
+        )
+        UpdateStatus.UNKNOWN -> UpdateUnknown(
             onCancel = onDismiss,
             onRetry = onUpdate
         )
@@ -253,6 +269,129 @@ private fun UpdateInstalled(
         confirmButton = {
             Button(onClick = onDone) {
                 Text(text = stringResource(id = R.string.done))
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun UpdateIdle(
+    onCancel: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier) {
+    GymDialog(
+        onDismissRequest = onCancel,
+        icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.hourglass),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.info,
+                modifier = Modifier.fillMaxSize()
+            )
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.update_idle)
+            )
+        },
+        subtitle = {
+            Text(
+                text = stringResource(id = R.string.update_idle_description)
+            )
+        },
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onRetry) {
+                Text(text = stringResource(id = R.string.retry))
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun UpdateInstalling(
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier) {
+    GymDialog(
+        onDismissRequest = onCancel,
+        icon = {
+            CircularProgressIndicator()
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.update_installing)
+            )
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun UpdatePending(
+    onCancel: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier) {
+    GymDialog(
+        onDismissRequest = onCancel,
+        icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.pending),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.info,
+                modifier = Modifier.fillMaxSize()
+            )
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.update_pending)
+            )
+        },
+        subtitle = {
+            Text(
+                text = stringResource(id = R.string.update_pending_description)
+            )
+        },
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onRetry) {
+                Text(text = stringResource(id = R.string.retry))
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun UpdateRequiresIntent(
+    onCancel: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier) {
+    GymDialog(
+        onDismissRequest = onCancel,
+        icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.pending),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.fillMaxSize()
+            )
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.update_requires_intent)
+            )
+        },
+        subtitle = {
+            Text(
+                text = stringResource(id = R.string.update_requires_intent_description)
+            )
+        },
+        onCancel = onCancel,
+        confirmButton = {
+            Button(onClick = onRetry) {
+                Text(text = stringResource(id = R.string.retry))
             }
         },
         modifier = modifier

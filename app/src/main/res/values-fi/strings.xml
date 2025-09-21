@@ -87,4 +87,11 @@
     <string name="avg_steps">Askelten keskiarvo</string>
     <string name="avg_distance">Matkan keskiarvo</string>
     <string name="avg_duration">Ajan keskiarvo</string>
+    <string name="update_idle">Odottaa</string>
+    <string name="update_idle_description">Tämä päivitys on odotustilassa. Toimintoa odotetaan.</string>
+    <string name="update_installing">Asennetaan</string>
+    <string name="update_pending">Käsittelee</string>
+    <string name="update_pending_description">Tämä päivitys on käsittelyssä. Toimintoa odotetaan.</string>
+    <string name="update_requires_intent">Toiminto vaadittu</string>
+    <string name="update_requires_intent_description">Tämä päivitys tarvitsee toiminnon. Odotetaan.</string>
 </resources>

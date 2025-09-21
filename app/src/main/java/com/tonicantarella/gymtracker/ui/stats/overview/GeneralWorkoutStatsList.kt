@@ -89,10 +89,10 @@ private fun GymStatCard(
                 text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgSets}"
             )
             Text(
-                text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgReps}"
+                text = "${stringResource(id = R.string.avg_reps)}: ${workout.avgReps}"
             )
             Text(
-                text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgWeight} ${stringResource(UnitUtil.weightUnitStringId)}"
+                text = "${stringResource(id = R.string.avg_weight)}: ${workout.avgWeight} ${stringResource(UnitUtil.weightUnitStringId)}"
             )
         }
     }
@@ -119,13 +119,13 @@ private fun CardioStatCard(
     ) {
         Column {
             Text(
-                text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgSteps}"
+                text = "${stringResource(id = R.string.avg_steps)}: ${workout.avgSteps}"
             )
             Text(
-                text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgDistance} ${stringResource(UnitUtil.distanceUnitStringId)}"
+                text = "${stringResource(id = R.string.avg_distance)}: ${workout.avgDistance} ${stringResource(UnitUtil.distanceUnitStringId)}"
             )
             Text(
-                text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgDuration.toReadableString()}"
+                text = "${stringResource(id = R.string.avg_duration)}: ${workout.avgDuration.toReadableString()}"
             )
         }
     }

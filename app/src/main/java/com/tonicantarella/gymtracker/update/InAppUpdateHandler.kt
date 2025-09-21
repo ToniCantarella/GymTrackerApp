@@ -31,6 +31,9 @@ enum class UpdateStatus {
     CANCELED,
     FAILED,
     INSTALLED,
+    INSTALLING,
+    PENDING,
+    REQUIRES_INTENT,
     UNKNOWN
 }
 
@@ -72,7 +75,19 @@ class InAppUpdateHandler(
                 _uiState.update { it.copy(updateStatus = UpdateStatus.INSTALLED) }
             }
 
-            else -> {
+            InstallStatus.INSTALLING -> {
+                _uiState.update { it.copy(updateStatus = UpdateStatus.INSTALLING) }
+            }
+
+            InstallStatus.PENDING -> {
+                _uiState.update { it.copy(updateStatus = UpdateStatus.PENDING) }
+            }
+
+            InstallStatus.REQUIRES_UI_INTENT -> {
+                _uiState.update { it.copy(updateStatus = UpdateStatus.REQUIRES_INTENT) }
+            }
+
+            InstallStatus.UNKNOWN -> {
                 _uiState.update { it.copy(updateStatus = UpdateStatus.UNKNOWN) }
             }
         }
