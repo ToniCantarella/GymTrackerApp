@@ -226,6 +226,7 @@ class GymWorkoutViewModel(
             sessionRepository.markSessionDone(
                 workoutId = navParams.id,
                 exercises = uiState.value.exercises,
+                timestamp = uiState.value.sessionTimestamp
             )
         }
         navigator.releaseGuard()

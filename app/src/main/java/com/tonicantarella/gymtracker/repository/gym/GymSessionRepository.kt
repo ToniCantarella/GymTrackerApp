@@ -22,7 +22,8 @@ interface GymSessionRepository {
     suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithExercises?
     suspend fun markSessionDone(
         workoutId: Int,
-        exercises: List<Exercise>
+        exercises: List<Exercise>,
+        timestamp: Instant? = null
     )
 }
 
@@ -101,13 +102,13 @@ class GymSessionRepositoryImpl(
 
     override suspend fun markSessionDone(
         workoutId: Int,
-        exercises: List<Exercise>
+        exercises: List<Exercise>,
+        timestamp: Instant?
     ) {
-        val timestamp = Instant.now()
         val sessionId = sessionDao.insert(
             GymSessionEntity(
                 workoutId = workoutId,
-                timestamp = timestamp
+                timestamp = timestamp ?: Instant.now()
             )
         ).toInt()
 

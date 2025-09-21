@@ -226,7 +226,8 @@ class CardioWorkoutViewModel(
             saveChanges()
             sessionRepository.markSessionDone(
                 workoutId = navParams.id,
-                metrics = uiState.value.workout.metrics
+                metrics = uiState.value.workout.metrics,
+                timestamp = uiState.value.sessionTimestamp
             )
         }
         navigator.releaseGuard()

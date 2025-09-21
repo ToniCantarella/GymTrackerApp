@@ -16,7 +16,11 @@ interface CardioSessionRepository {
     suspend fun getAllSessions(): List<WorkoutSession>
     suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<WorkoutSession>
     suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithMetrics?
-    suspend fun markSessionDone(workoutId: Int, metrics: CardioMetrics)
+    suspend fun markSessionDone(
+        workoutId: Int,
+        metrics: CardioMetrics,
+        timestamp: Instant? = null
+    )
 }
 
 class CardioSessionRepositoryImpl(
@@ -75,14 +79,14 @@ class CardioSessionRepositoryImpl(
 
     override suspend fun markSessionDone(
         workoutId: Int,
-        metrics: CardioMetrics
+        metrics: CardioMetrics,
+        timestamp: Instant?
     ) {
-        val timestamp = Instant.now()
 
         sessionDao.insert(
             CardioSessionEntity(
                 workoutId = workoutId,
-                timestamp = timestamp,
+                timestamp = timestamp ?: Instant.now(),
                 steps = metrics.steps,
                 distance = metrics.distance?.convertDistanceToDatabase(),
                 durationMillis = metrics.duration?.toMillis()
