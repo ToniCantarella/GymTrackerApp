@@ -4,12 +4,15 @@ import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
@@ -71,14 +74,22 @@ fun InfoScreen(
             )
         }
     ) { innerPadding ->
-        InfoScreen(
-            showFinishWorkoutDialog = uiState.value.confirmFinishWorkout,
-            onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
-            showUnsavedChangesDialog = uiState.value.confirmUnsavedChanges,
-            onUnsavedChangesDialogChecked = viewModel::onShowUnsavedChangesDialogChecked,
-            onDeleteAllData = { deletionDialogOpen = true },
-            modifier = Modifier.padding(innerPadding)
-        )
+        Box(
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ){
+            InfoScreen(
+                showFinishWorkoutDialog = uiState.value.confirmFinishWorkout,
+                onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,
+                showUnsavedChangesDialog = uiState.value.confirmUnsavedChanges,
+                onUnsavedChangesDialogChecked = viewModel::onShowUnsavedChangesDialogChecked,
+                onDeleteAllData = { deletionDialogOpen = true },
+                modifier = Modifier
+                    .widthIn(max = dimensionResource(id = R.dimen.breakpoint_small))
+            )
+        }
     }
 
     if (deletionDialogOpen) {

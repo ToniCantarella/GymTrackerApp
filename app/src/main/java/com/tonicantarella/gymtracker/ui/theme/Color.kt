@@ -2,6 +2,7 @@ package com.tonicantarella.gymtracker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val primary = Color(0xFFFF8036)
+val tertiary = Color(0xFF00BCD4)
 
 val primaryLight = primary
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -11,7 +12,7 @@ val secondaryLight = Color(0xFFA47F3D)
 val onSecondaryLight = Color(0xFF2A331E)
 val secondaryContainerLight = Color(0xFF4A3F33)
 val onSecondaryContainerLight = Color(0xFFDCE7C8)
-val tertiaryLight = Color(0xFF93D5C8)
+val tertiaryLight = tertiary
 val onTertiaryLight = Color(0xFF003939)
 val tertiaryContainerLight = Color(0xFF0C5149)
 val onTertiaryContainerLight = Color(0xFFAFF2DF)
@@ -47,7 +48,7 @@ val secondaryDark = Color(0xFFA47F3D)
 val onSecondaryDark = Color(0xFF2A331E)
 val secondaryContainerDark = Color(0xFF4A3F33)
 val onSecondaryContainerDark = Color(0xFFDCE7C8)
-val tertiaryDark = Color(0xFF93D5C8)
+val tertiaryDark = tertiary
 val onTertiaryDark = Color(0xFF003939)
 val tertiaryContainerDark = Color(0xFF0C5149)
 val onTertiaryContainerDark = Color(0xFFAFF2DF)
