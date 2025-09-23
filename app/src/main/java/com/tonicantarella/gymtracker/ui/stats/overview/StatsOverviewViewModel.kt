@@ -59,7 +59,7 @@ class StatsOverviewViewModel(
     private val _uiState = MutableStateFlow(StatsOverviewUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun fetchAllStats() {
         viewModelScope.launch {
             fetchAllWorkouts()
             fetchAllWorkoutSessions()

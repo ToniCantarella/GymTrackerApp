@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,10 @@ fun StatsOverviewScreen(
     viewModel: StatsOverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllStats()
+    }
 
     GymScaffold(
         topBar = {
@@ -99,7 +104,7 @@ fun StatsOverviewScreen(
                             modifier = Modifier
                                 .widthIn(min = dimensionResource(id = R.dimen.breakpoint_small))
                                 .padding(start = dimensionResource(id = R.dimen.padding_large))
-                        ){
+                        ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.history),
                                 contentDescription = stringResource(id = R.string.stats),
@@ -148,7 +153,7 @@ fun StatsOverviewScreen(
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth()
-                            ){
+                            ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.timeline),
                                     contentDescription = stringResource(id = R.string.stats),
