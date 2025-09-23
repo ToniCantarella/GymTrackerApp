@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,6 +83,7 @@ import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutType
 import com.tonicantarella.gymtracker.utility.toDateAndTimeString
+import com.tonicantarella.gymtracker.utility.toDateString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -291,7 +292,7 @@ fun WorkoutCalendar(
                     modifier = Modifier
                         .fillMaxHeight(.5f)
                 ) {
-                    itemsIndexed(daySessionsForDialog) { index, session ->
+                    items(daySessionsForDialog) { session ->
                         if (session.type == WorkoutType.GYM) {
                             WorkoutDialogItem(
                                 onClick = { onSessionClick(session) },
@@ -321,6 +322,7 @@ fun WorkoutCalendar(
                                 timestamp = session.timestamp.toDateAndTimeString()
                             )
                         }
+                        HorizontalDivider()
                     }
                 }
             }
@@ -336,7 +338,19 @@ fun WorkoutCalendar(
                     modifier = Modifier
                         .fillMaxHeight(.5f)
                 ) {
-                    itemsIndexed(gymWorkouts) { index, workout ->
+                    stickyHeader {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(dimensionResource(id = R.dimen.padding_large))
+                        ) {
+                            Text(
+                                text = timestamp?.toDateString() ?: ""
+                            )
+                        }
+                    }
+                    items(gymWorkouts) { workout ->
                         WorkoutDialogItem(
                             onClick = { timestamp?.let { onAddGymSessionClick(workout.id, it) } },
                             icon = {
@@ -346,10 +360,18 @@ fun WorkoutCalendar(
                                     tint = highlightColors[gymColorIndexMap[workout.id] ?: 0]
                                 )
                             },
-                            workoutName = workout.name
+                            workoutName = workout.name,
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = null
+                                )
+                            }
                         )
+                        HorizontalDivider()
                     }
-                    itemsIndexed(cardioWorkouts) { index, workout ->
+                    items(cardioWorkouts) { workout ->
                         WorkoutDialogItem(
                             onClick = {
                                 timestamp?.let {
@@ -366,8 +388,16 @@ fun WorkoutCalendar(
                                     tint = highlightColors[cardioColorIndexMap[workout.id] ?: 0]
                                 )
                             },
-                            workoutName = workout.name
+                            workoutName = workout.name,
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = null
+                                )
+                            }
                         )
+                        HorizontalDivider()
                     }
                 }
             }
@@ -381,26 +411,30 @@ private fun WorkoutDialogItem(
     onClick: () -> Unit,
     workoutName: String,
     modifier: Modifier = Modifier,
-    timestamp: String? = null
+    timestamp: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     Surface(
-        onClick = onClick
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier
+            modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.padding_large))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 icon()
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
                 Column {
                     Text(
                         text = workoutName
                     )
                     if (timestamp != null) {
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.history),
@@ -411,6 +445,10 @@ private fun WorkoutDialogItem(
                             )
                         }
                     }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                if (trailingIcon != null) {
+                    trailingIcon()
                 }
             }
         }
