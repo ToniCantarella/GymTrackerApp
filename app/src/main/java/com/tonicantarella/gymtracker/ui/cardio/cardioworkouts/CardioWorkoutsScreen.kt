@@ -7,8 +7,10 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -61,9 +63,18 @@ fun CardioWorkoutsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(id = R.string.cardio)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.run),
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                        Text(
+                            text = stringResource(id = R.string.cardio)
+                        )
+                    }
                 },
                 actions = {
                     Row {
@@ -203,7 +214,7 @@ private fun CardioWorkoutsScreen(
             Box(
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_large))
-            ){
+            ) {
                 EmptyListCard(
                     iconPainter = painterResource(id = R.drawable.run),
                     subtitle = {

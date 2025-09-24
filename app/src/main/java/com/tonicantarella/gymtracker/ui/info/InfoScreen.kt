@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,9 +68,18 @@ fun InfoScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(id = R.string.info)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                        Text(
+                            text = stringResource(id = R.string.info)
+                        )
+                    }
                 }
             )
         }
@@ -79,7 +89,7 @@ fun InfoScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-        ){
+        ) {
             InfoScreen(
                 showFinishWorkoutDialog = uiState.value.confirmFinishWorkout,
                 onFinishWorkoutDialogChecked = viewModel::onShowFinishDialogChecked,

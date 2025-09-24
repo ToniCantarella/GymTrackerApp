@@ -52,9 +52,18 @@ fun StatsOverviewScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(id = R.string.stats),
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.stats),
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                        Text(
+                            text = stringResource(id = R.string.stats),
+                        )
+                    }
                 }
             )
         }
