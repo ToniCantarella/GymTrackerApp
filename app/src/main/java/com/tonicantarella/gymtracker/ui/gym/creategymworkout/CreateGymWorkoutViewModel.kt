@@ -42,6 +42,7 @@ class CreateGymWorkoutViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
+        //TODO these navigation registrations should be in one function in all cases it appears
         registerNavigationGuard()
         registerNavigationAttempts()
         getPreferences()
