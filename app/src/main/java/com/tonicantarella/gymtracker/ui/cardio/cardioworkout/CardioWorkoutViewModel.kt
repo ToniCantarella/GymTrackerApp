@@ -185,53 +185,57 @@ class CardioWorkoutViewModel(
     }
 
     private fun getWorkout() {
-        viewModelScope.launch {
-            val latestWorkoutWithMetrics =
-                workoutRepository.getLatestWorkoutWithMetrics(navParams.id)
-            val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
+        if (navParams.id != null) {
+            viewModelScope.launch {
+                val latestWorkoutWithMetrics =
+                    workoutRepository.getLatestWorkoutWithMetrics(navParams.id)
+                val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
-            val currentWorkout = uiState.value.workout.copy(
-                id = latestWorkoutWithMetrics?.id ?: 0,
-                name = latestWorkoutWithMetrics?.name ?: "",
-                timestamp = latestWorkoutWithMetrics?.timestamp
-            )
-
-            val showFinishWorkoutDialog = dataStore.data
-                .map { it[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] ?: true }
-                .first()
-
-            _uiState.update {
-                it.copy(
-                    workout = currentWorkout,
-                    initialWorkout = currentWorkout,
-                    previousWorkout = latestWorkoutWithMetrics,
-                    sessionTimestamp = sessionTimestamp,
-                    confirmFinishWorkout = showFinishWorkoutDialog,
-                    loading = false
+                val currentWorkout = uiState.value.workout.copy(
+                    id = latestWorkoutWithMetrics?.id ?: 0,
+                    name = latestWorkoutWithMetrics?.name ?: "",
+                    timestamp = latestWorkoutWithMetrics?.timestamp
                 )
-            }
 
-            val workoutStats = statsRepository.getWorkoutStats(navParams.id)
+                val showFinishWorkoutDialog = dataStore.data
+                    .map { it[GymPreferences.SHOW_FINISH_WORKOUT_CONFIRM_DIALOG] ?: true }
+                    .first()
 
-            _uiState.update {
-                it.copy(
-                    stats = workoutStats
-                )
+                _uiState.update {
+                    it.copy(
+                        workout = currentWorkout,
+                        initialWorkout = currentWorkout,
+                        previousWorkout = latestWorkoutWithMetrics,
+                        sessionTimestamp = sessionTimestamp,
+                        confirmFinishWorkout = showFinishWorkoutDialog,
+                        loading = false
+                    )
+                }
+
+                val workoutStats = statsRepository.getWorkoutStats(navParams.id)
+
+                _uiState.update {
+                    it.copy(
+                        stats = workoutStats
+                    )
+                }
             }
         }
     }
 
     private fun finishWorkout() {
-        viewModelScope.launch {
-            saveChanges()
-            sessionRepository.markSessionDone(
-                workoutId = navParams.id,
-                metrics = uiState.value.workout.metrics,
-                timestamp = uiState.value.sessionTimestamp
-            )
+        if (navParams.id != null) {
+            viewModelScope.launch {
+                saveChanges()
+                sessionRepository.markSessionDone(
+                    workoutId = navParams.id,
+                    metrics = uiState.value.workout.metrics,
+                    timestamp = uiState.value.sessionTimestamp
+                )
+            }
+            navigator.releaseGuard()
+            navigator.popBackStack()
         }
-        navigator.releaseGuard()
-        navigator.popBackStack()
     }
 
     private fun stopAskingFinishConfirm() {
@@ -245,7 +249,11 @@ class CardioWorkoutViewModel(
     }
 
     private suspend fun saveChanges() {
-        if (uiState.value.workout.name != uiState.value.initialWorkout.name){
+        if (navParams.id == null) {
+            workoutRepository.addWorkout(
+                workoutName = uiState.value.workout.name
+            )
+        } else {
             workoutRepository.updateWorkout(
                 workoutId = navParams.id,
                 workoutName = uiState.value.workout.name

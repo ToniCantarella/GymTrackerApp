@@ -16,26 +16,15 @@ import com.tonicantarella.gymtracker.utility.UnitUtil.convertWeightFromDatabase
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertWeightToDatabase
 import java.time.Instant
 
-interface GymSessionRepository {
-    suspend fun getAllSessions(): List<WorkoutSession>
-    suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<WorkoutSession>
-    suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithExercises?
-    suspend fun markSessionDone(
-        workoutId: Int,
-        exercises: List<Exercise>,
-        timestamp: Instant? = null
-    )
-}
-
-class GymSessionRepositoryImpl(
+class GymSessionRepository(
     private val workoutDao: GymWorkoutDao,
     private val sessionDao: GymSessionDao,
     private val exerciseDao: ExerciseDao,
     private val setDao: SetDao,
     private val setSessionDao: SetSessionDao
-) : GymSessionRepository {
+)  {
 
-    override suspend fun getAllSessions(): List<WorkoutSession> {
+    suspend fun getAllSessions(): List<WorkoutSession> {
         return sessionDao.getAllSessions()?.mapNotNull { session ->
             workoutDao.getById(session.workoutId)?.let { workout ->
                 WorkoutSession(
@@ -49,7 +38,7 @@ class GymSessionRepositoryImpl(
         }.orEmpty()
     }
 
-    override suspend fun getSessionsForTimespan(
+    suspend fun getSessionsForTimespan(
         start: Instant,
         end: Instant
     ): List<WorkoutSession> {
@@ -66,7 +55,7 @@ class GymSessionRepositoryImpl(
         }.orEmpty()
     }
 
-    override suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithExercises? {
+    suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithExercises? {
         val gymSession = sessionDao.getById(sessionId)
         val workout = workoutDao.getById(gymSession.workoutId)
         if (workout == null) {
@@ -100,7 +89,7 @@ class GymSessionRepositoryImpl(
         )
     }
 
-    override suspend fun markSessionDone(
+    suspend fun markSessionDone(
         workoutId: Int,
         exercises: List<Exercise>,
         timestamp: Instant?

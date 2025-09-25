@@ -14,10 +14,7 @@ open class Route {
     object GymWorkouts : Route()
 
     @Serializable
-    class GymWorkout(val id: Int, val timestampString: String? = null) : Route()
-
-    @Serializable
-    object CreateGymWorkout : Route()
+    class GymWorkout(val id: Int? = null, val timestampString: String? = null) : Route()
 
     @Serializable
     object CardioMain : Route()
@@ -26,10 +23,7 @@ open class Route {
     object CardioWorkouts : Route()
 
     @Serializable
-    class CardioWorkout(val id: Int, val timestampString: String? = null) : Route()
-
-    @Serializable
-    object CreateCardioWorkout : Route()
+    class CardioWorkout(val id: Int? = null, val timestampString: String? = null) : Route()
 
     @Serializable
     object StatsMain : Route()

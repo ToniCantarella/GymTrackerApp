@@ -89,6 +89,6 @@ class CardioWorkoutsViewModel(
     }
 
     fun onCreateCardioClicked(){
-        navigator.navigate(Route.CreateCardioWorkout)
+        navigator.navigate(Route.CardioWorkout())
     }
 }

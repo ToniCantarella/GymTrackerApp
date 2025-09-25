@@ -19,15 +19,11 @@ import com.tonicantarella.gymtracker.repository.cardio.CardioStatsRepositoryImpl
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepositoryImpl
 import com.tonicantarella.gymtracker.repository.gym.GymSessionRepository
-import com.tonicantarella.gymtracker.repository.gym.GymSessionRepositoryImpl
 import com.tonicantarella.gymtracker.repository.gym.GymStatsRepository
 import com.tonicantarella.gymtracker.repository.gym.GymStatsRepositoryImpl
 import com.tonicantarella.gymtracker.repository.gym.GymWorkoutRepository
-import com.tonicantarella.gymtracker.repository.gym.GymWorkoutRepositoryImpl
 import com.tonicantarella.gymtracker.ui.cardio.cardioworkout.CardioWorkoutViewModel
 import com.tonicantarella.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsViewModel
-import com.tonicantarella.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutViewModel
-import com.tonicantarella.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutViewModel
 import com.tonicantarella.gymtracker.ui.gym.gymworkout.GymWorkoutViewModel
 import com.tonicantarella.gymtracker.ui.gym.gymworkouts.GymWorkoutsViewModel
 import com.tonicantarella.gymtracker.ui.info.InfoViewModel
@@ -53,7 +49,7 @@ val appModule = module {
             File(androidContext().filesDir, "settings.preferences_pb")
         }
     }
-    single <AppUpdateManager>{ AppUpdateManagerFactory.create(androidContext()) }
+    single<AppUpdateManager> { AppUpdateManagerFactory.create(androidContext()) }
     singleOf(::InAppUpdateHandler)
 }
 
@@ -81,8 +77,8 @@ val databaseModule = module {
 
 val repositoryModule = module {
     singleOf(::AppRepositoryImpl) { bind<AppRepository>() }
-    singleOf(::GymWorkoutRepositoryImpl) { bind<GymWorkoutRepository>() }
-    singleOf(::GymSessionRepositoryImpl) { bind<GymSessionRepository>() }
+    singleOf(::GymWorkoutRepository)
+    singleOf(::GymSessionRepository)
     singleOf(::GymStatsRepositoryImpl) { bind<GymStatsRepository>() }
     singleOf(::CardioWorkoutRepositoryImpl) { bind<CardioWorkoutRepository>() }
     singleOf(::CardioSessionRepositoryImpl) { bind<CardioSessionRepository>() }
@@ -96,8 +92,6 @@ val viewModelModule = module {
     viewModelOf(::CardioWorkoutsViewModel)
     viewModelOf(::CardioWorkoutViewModel)
     viewModelOf(::GymWorkoutViewModel)
-    viewModelOf(::CreateGymWorkoutViewModel)
-    viewModelOf(::CreateCardioWorkoutViewModel)
     viewModelOf(::StatsOverviewViewModel)
     viewModelOf(::GymSessionStatsViewModel)
     viewModelOf(::CardioSessionStatsViewModel)

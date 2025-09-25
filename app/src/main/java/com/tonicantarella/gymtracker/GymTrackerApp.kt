@@ -42,8 +42,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.tonicantarella.gymtracker.ui.cardio.cardioworkout.CardioWorkoutScreen
 import com.tonicantarella.gymtracker.ui.cardio.cardioworkouts.CardioWorkoutsScreen
-import com.tonicantarella.gymtracker.ui.cardio.createcardioworkout.CreateCardioWorkoutScreen
-import com.tonicantarella.gymtracker.ui.gym.creategymworkout.CreateGymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkout.GymWorkoutScreen
 import com.tonicantarella.gymtracker.ui.gym.gymworkouts.GymWorkoutsScreen
 import com.tonicantarella.gymtracker.ui.info.InfoScreen
@@ -220,10 +218,6 @@ fun GymAppNavHost(
                 GymWorkoutScreen()
             }
 
-            composable<Route.CreateGymWorkout> {
-                CreateGymWorkoutScreen()
-            }
-
             navigation<Route.CardioMain>(startDestination = Route.CardioWorkouts) {
                 composable<Route.CardioWorkouts> {
                     CardioWorkoutsScreen()
@@ -232,9 +226,6 @@ fun GymAppNavHost(
 
             composable<Route.CardioWorkout> {
                 CardioWorkoutScreen()
-            }
-            composable<Route.CreateCardioWorkout> {
-                CreateCardioWorkoutScreen()
             }
 
             navigation<Route.StatsMain>(startDestination = Route.StatsOverview) {

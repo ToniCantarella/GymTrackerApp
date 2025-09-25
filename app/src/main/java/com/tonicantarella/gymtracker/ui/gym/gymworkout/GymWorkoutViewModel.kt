@@ -27,7 +27,7 @@ import java.time.Instant
 import java.util.UUID
 
 data class GymWorkoutUiState(
-    val loading: Boolean = false,
+    val loading: Boolean = true,
     val workoutId: Int = 0,
     val workoutName: String = "",
     val initialWorkoutName: String = "",
@@ -185,8 +185,13 @@ class GymWorkoutViewModel(
 
     fun onSavePressed() {
         viewModelScope.launch {
-            saveChanges()
+            if (navParams.id != null) {
+                saveChanges(navParams.id)
+            } else {
+                createWorkout()
+            }
         }
+
         navigator.releaseGuard()
         onNavigateBack()
     }
@@ -219,12 +224,17 @@ class GymWorkoutViewModel(
         finishWorkout()
     }
 
-    fun finishWorkout() {
+    private fun finishWorkout() {
         viewModelScope.launch {
-            saveChanges()
+            val workoutId = if (navParams.id != null) {
+                saveChanges(navParams.id)
+                navParams.id
+            } else {
+                createWorkout()
+            }
 
             sessionRepository.markSessionDone(
-                workoutId = navParams.id,
+                workoutId = workoutId,
                 exercises = uiState.value.exercises,
                 timestamp = uiState.value.sessionTimestamp
             )
@@ -234,22 +244,33 @@ class GymWorkoutViewModel(
     }
 
     private suspend fun getWorkoutInfo() {
-        val latestWorkout = workoutRepository.getLatestWorkoutWithExercises(navParams.id)
-        val workoutName = latestWorkout?.name ?: ""
-        val exercises = latestWorkout?.exercises ?: emptyList()
-        val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
+        if (navParams.id != null) {
+            val latestWorkout = workoutRepository.getLatestWorkoutWithExercises(navParams.id)
+            val workoutName = latestWorkout?.name ?: ""
+            val exercises = latestWorkout?.exercises ?: emptyList()
+            val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
-        _uiState.update {
-            it.copy(
-                workoutId = navParams.id,
-                workoutName = workoutName,
-                initialWorkoutName = workoutName,
-                latestTimestamp = latestWorkout?.timestamp,
-                exercises = exercises,
-                initialExercises = exercises,
-                sessionTimestamp = sessionTimestamp,
-                loading = false
-            )
+            _uiState.update {
+                it.copy(
+                    workoutId = navParams.id,
+                    workoutName = workoutName,
+                    initialWorkoutName = workoutName,
+                    latestTimestamp = latestWorkout?.timestamp,
+                    exercises = exercises,
+                    initialExercises = exercises,
+                    sessionTimestamp = sessionTimestamp,
+                    loading = false
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    exercises = listOf(
+                        Exercise.emptyExercise()
+                    ),
+                    loading = false
+                )
+            }
         }
     }
 
@@ -271,12 +292,14 @@ class GymWorkoutViewModel(
     }
 
     private suspend fun getStats() {
-        val workoutStats = statsRepository.getWorkoutStats(navParams.id)
+        if (navParams.id != null) {
+            val workoutStats = statsRepository.getWorkoutStats(navParams.id)
 
-        _uiState.update {
-            it.copy(
-                stats = workoutStats
-            )
+            _uiState.update {
+                it.copy(
+                    stats = workoutStats
+                )
+            }
         }
     }
 
@@ -290,9 +313,16 @@ class GymWorkoutViewModel(
         }
     }
 
-    private suspend fun saveChanges() {
+    private suspend fun createWorkout(): Int {
+        return workoutRepository.addWorkout(
+            workoutName = uiState.value.workoutName,
+            exercises = uiState.value.exercises
+        )
+    }
+
+    private suspend fun saveChanges(workoutId: Int) {
         workoutRepository.updateWorkout(
-            workoutId = navParams.id,
+            workoutId = workoutId,
             workoutName = uiState.value.workoutName,
             exercises = uiState.value.exercises
         )

@@ -89,6 +89,6 @@ class GymWorkoutsViewModel(
     }
 
     fun onCreateWorkoutClicked() {
-        navigator.navigate(Route.CreateGymWorkout)
+        navigator.navigate(Route.GymWorkout())
     }
 }
