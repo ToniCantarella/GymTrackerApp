@@ -191,7 +191,6 @@ class GymWorkoutViewModel(
                 createWorkout()
             }
         }
-
         navigator.releaseGuard()
         onNavigateBack()
     }

@@ -150,7 +150,11 @@ class CardioWorkoutViewModel(
 
     fun onSavePressed() {
         viewModelScope.launch {
-            saveChanges()
+            if (navParams.id != null) {
+                saveChanges(navParams.id)
+            } else {
+                createWorkout()
+            }
         }
         navigator.releaseGuard()
         navigator.popBackStack()
@@ -221,21 +225,30 @@ class CardioWorkoutViewModel(
                 }
             }
         }
+        _uiState.update {
+            it.copy(
+                loading = false
+            )
+        }
     }
 
     private fun finishWorkout() {
-        if (navParams.id != null) {
-            viewModelScope.launch {
-                saveChanges()
-                sessionRepository.markSessionDone(
-                    workoutId = navParams.id,
-                    metrics = uiState.value.workout.metrics,
-                    timestamp = uiState.value.sessionTimestamp
-                )
+        viewModelScope.launch {
+            val workoutId = if (navParams.id != null) {
+                saveChanges(navParams.id)
+                navParams.id
+            } else {
+                createWorkout()
             }
-            navigator.releaseGuard()
-            navigator.popBackStack()
+
+            sessionRepository.markSessionDone(
+                workoutId = workoutId,
+                metrics = uiState.value.workout.metrics,
+                timestamp = uiState.value.sessionTimestamp
+            )
         }
+        navigator.releaseGuard()
+        navigator.popBackStack()
     }
 
     private fun stopAskingFinishConfirm() {
@@ -248,17 +261,17 @@ class CardioWorkoutViewModel(
         }
     }
 
-    private suspend fun saveChanges() {
-        if (navParams.id == null) {
-            workoutRepository.addWorkout(
-                workoutName = uiState.value.workout.name
-            )
-        } else {
-            workoutRepository.updateWorkout(
-                workoutId = navParams.id,
-                workoutName = uiState.value.workout.name
-            )
-        }
+    private suspend fun createWorkout(): Int{
+        return workoutRepository.addWorkout(
+            workoutName = uiState.value.workout.name
+        )
+    }
+
+    private suspend fun saveChanges(workoutId: Int) {
+        workoutRepository.updateWorkout(
+            workoutId = workoutId,
+            workoutName = uiState.value.workout.name
+        )
     }
 
     private fun registerNavigationGuard() {

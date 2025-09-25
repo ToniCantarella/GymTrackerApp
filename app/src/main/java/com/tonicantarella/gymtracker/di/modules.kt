@@ -17,7 +17,6 @@ import com.tonicantarella.gymtracker.repository.cardio.CardioSessionRepositoryIm
 import com.tonicantarella.gymtracker.repository.cardio.CardioStatsRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioStatsRepositoryImpl
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository
-import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepositoryImpl
 import com.tonicantarella.gymtracker.repository.gym.GymSessionRepository
 import com.tonicantarella.gymtracker.repository.gym.GymStatsRepository
 import com.tonicantarella.gymtracker.repository.gym.GymStatsRepositoryImpl
@@ -80,7 +79,7 @@ val repositoryModule = module {
     singleOf(::GymWorkoutRepository)
     singleOf(::GymSessionRepository)
     singleOf(::GymStatsRepositoryImpl) { bind<GymStatsRepository>() }
-    singleOf(::CardioWorkoutRepositoryImpl) { bind<CardioWorkoutRepository>() }
+    singleOf(::CardioWorkoutRepository)
     singleOf(::CardioSessionRepositoryImpl) { bind<CardioSessionRepository>() }
     singleOf(::CardioStatsRepositoryImpl) { bind<CardioStatsRepository>() }
     singleOf(::StatsOverviewRepositoryImpl) { bind<StatsOverviewRepository>() }

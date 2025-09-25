@@ -9,19 +9,11 @@ import com.tonicantarella.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertDistanceFromDatabase
 import java.time.Duration
 
-interface CardioWorkoutRepository {
-    suspend fun getAllWorkouts(): List<WorkoutWithTimestamp>
-    suspend fun addWorkout(workoutName: String)
-    suspend fun updateWorkout(workoutId: Int, workoutName: String)
-    suspend fun getLatestWorkoutWithMetrics(workoutId: Int): WorkoutWithMetrics?
-    suspend fun deleteWorkout(workoutId: Int)
-}
-
-class CardioWorkoutRepositoryImpl(
+class CardioWorkoutRepository(
     private val workoutDao: CardioWorkoutDao,
     private val sessionDao: CardioSessionDao
-) : CardioWorkoutRepository {
-    override suspend fun getAllWorkouts(): List<WorkoutWithTimestamp> {
+) {
+    suspend fun getAllWorkouts(): List<WorkoutWithTimestamp> {
         val workouts = workoutDao.getAll()
 
         return workouts.map { workout ->
@@ -35,15 +27,15 @@ class CardioWorkoutRepositoryImpl(
         }
     }
 
-    override suspend fun addWorkout(workoutName: String) {
-        workoutDao.insert(
+    suspend fun addWorkout(workoutName: String): Int {
+        return workoutDao.insert(
             CardioWorkoutEntity(
                 name = workoutName.trim()
             )
-        )
+        ).toInt()
     }
 
-    override suspend fun updateWorkout(workoutId: Int, workoutName: String) {
+    suspend fun updateWorkout(workoutId: Int, workoutName: String) {
         workoutDao.update(
             workoutDao.getById(workoutId)?.copy(
                 name = workoutName.trim()
@@ -51,7 +43,7 @@ class CardioWorkoutRepositoryImpl(
         )
     }
 
-    override suspend fun getLatestWorkoutWithMetrics(workoutId: Int): WorkoutWithMetrics? {
+    suspend fun getLatestWorkoutWithMetrics(workoutId: Int): WorkoutWithMetrics? {
         val workout = workoutDao.getById(workoutId)
         val session = sessionDao.getLastSession(workoutId)
 
@@ -69,7 +61,7 @@ class CardioWorkoutRepositoryImpl(
         )
     }
 
-    override suspend fun deleteWorkout(workoutId: Int) {
+    suspend fun deleteWorkout(workoutId: Int) {
         workoutDao.deleteById(workoutId)
     }
 }
