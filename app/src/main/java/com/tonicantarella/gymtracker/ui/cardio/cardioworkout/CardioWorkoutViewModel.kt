@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.tonicantarella.gymtracker.preferences.GymPreferences
+import com.tonicantarella.gymtracker.repository.StatsRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioSessionRepository
-import com.tonicantarella.gymtracker.repository.cardio.CardioStatsRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioMetrics
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
@@ -60,7 +60,7 @@ data class CardioWorkoutUiState(
 class CardioWorkoutViewModel(
     savedStateHandle: SavedStateHandle,
     private val workoutRepository: CardioWorkoutRepository,
-    private val statsRepository: CardioStatsRepository,
+    private val statsRepository: StatsRepository,
     private val sessionRepository: CardioSessionRepository,
     private val dataStore: DataStore<Preferences>,
     private val navigator: Navigator
@@ -216,7 +216,7 @@ class CardioWorkoutViewModel(
                     )
                 }
 
-                val workoutStats = statsRepository.getWorkoutStats(navParams.id)
+                val workoutStats = statsRepository.getCardioWorkoutStats(navParams.id)
 
                 _uiState.update {
                     it.copy(

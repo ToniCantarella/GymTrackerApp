@@ -2,7 +2,11 @@ package com.tonicantarella.gymtracker.ui.stats.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tonicantarella.gymtracker.repository.StatsOverviewRepository
+import com.tonicantarella.gymtracker.repository.StatsRepository
+import com.tonicantarella.gymtracker.repository.cardio.CardioSessionRepository
+import com.tonicantarella.gymtracker.repository.cardio.CardioWorkoutRepository
+import com.tonicantarella.gymtracker.repository.gym.GymSessionRepository
+import com.tonicantarella.gymtracker.repository.gym.GymWorkoutRepository
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.CardioWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.GymWorkoutWithGeneralStats
@@ -35,6 +39,7 @@ fun firstDayOfMonthInstant(
     return firstOfMonth.atStartOfDayIn(zoneId).toJavaInstant()
 }
 
+// Todo maybe split this into multiple states? like data class CalendarState...
 data class StatsOverviewUiState(
     val loading: Boolean = true,
     val gymWorkouts: List<WorkoutWithTimestamp> = emptyList(),
@@ -53,7 +58,11 @@ data class StatsOverviewUiState(
 )
 
 class StatsOverviewViewModel(
-    private val statsOverviewRepository: StatsOverviewRepository,
+    private val gymWorkoutRepository: GymWorkoutRepository,
+    private val cardioWorkoutRepository: CardioWorkoutRepository,
+    private val gymSessionRepository: GymSessionRepository,
+    private val cardioSessionRepository: CardioSessionRepository,
+    private val statsRepository: StatsRepository,
     private val navigator: Navigator
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StatsOverviewUiState())
@@ -110,8 +119,8 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkouts() {
-        val gymWorkouts = statsOverviewRepository.getAllGymWorkouts()
-        val cardioWorkouts = statsOverviewRepository.getAllCardioWorkouts()
+        val gymWorkouts = gymWorkoutRepository.getAllWorkouts()
+        val cardioWorkouts = cardioWorkoutRepository.getAllWorkouts()
 
         val gymColorIndexMap = gymWorkouts
             .mapIndexed { index, workout -> workout.id to index }
@@ -130,7 +139,7 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllWorkoutSessions() {
-        val gymSessions = statsOverviewRepository.getAllGymSessions()
+        val gymSessions = gymSessionRepository.getAllSessions()
         val gymSessionsGrouped = gymSessions.groupBy { session -> session.workoutId }
         val gymLegends = uiState.value.gymWorkouts
             .map { workout ->
@@ -143,7 +152,7 @@ class StatsOverviewViewModel(
                     )
                 )
             }
-        val cardioSessions = statsOverviewRepository.getAllCardioSessions()
+        val cardioSessions = cardioSessionRepository.getAllSessions()
         val cardioSessionsGrouped = cardioSessions.groupBy { session -> session.workoutId }
         val cardioLegends = uiState.value.cardioWorkouts
             .map { workout ->
@@ -166,8 +175,10 @@ class StatsOverviewViewModel(
 
     @OptIn(ExperimentalTime::class)
     private suspend fun fetchWorkoutSessionsBetweenDates(startDate: Instant, endDate: Instant) {
-        val sessionsForMonth =
-            statsOverviewRepository.getWorkoutSessionsForTimespan(startDate, endDate)
+        val gymSessionsForMonth = gymSessionRepository.getSessionsForTimespan(startDate, endDate)
+        val cardioSessionsForMonth =
+            cardioSessionRepository.getSessionsForTimespan(startDate, endDate)
+        val sessionsForMonth = gymSessionsForMonth + cardioSessionsForMonth
 
         val gymSessionsGrouped =
             sessionsForMonth.filter { it.type == WorkoutType.GYM }.groupBy { it.workoutId }
@@ -218,8 +229,8 @@ class StatsOverviewViewModel(
     }
 
     private suspend fun fetchAllGeneralStats() {
-        val gymWorkoutsStats = statsOverviewRepository.getAllGymWorkoutsWithGeneralStats()
-        val cardioWorkoutsStats = statsOverviewRepository.getAllCardioWorkoutsWithGeneralStats()
+        val gymWorkoutsStats = statsRepository.getAllGymWorkoutsWithGeneralStats()
+        val cardioWorkoutsStats = statsRepository.getAllCardioWorkoutsWithGeneralStats()
 
         _uiState.update {
             it.copy(

@@ -38,9 +38,6 @@ object UnitUtil {
     fun kmToMi(km: Double): Double = km * DISTANCE_CONVERSION_DOUBLE
     fun miToKm(mi: Double): Double = mi / DISTANCE_CONVERSION_DOUBLE
 
-    fun Double.roundToDisplay(decimals: Int = 2): Double =
-        "%.${decimals}f".format(this).toDouble()
-
     fun Double.convertWeightToDatabase(): Double =
         if (weightUnit == WeightUnit.KILOGRAM)
             this

@@ -4,15 +4,10 @@ import com.tonicantarella.gymtracker.database.GymDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-interface AppRepository {
-    suspend fun deleteAllData()
-}
-
-class AppRepositoryImpl(
+class AppRepository(
     private val db: GymDatabase,
-) : AppRepository {
-
-    override suspend fun deleteAllData() {
+) {
+    suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
             db.clearAllTables()
         }

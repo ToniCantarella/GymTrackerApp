@@ -12,22 +12,11 @@ import com.tonicantarella.gymtracker.utility.UnitUtil.convertDistanceToDatabase
 import java.time.Duration
 import java.time.Instant
 
-interface CardioSessionRepository {
-    suspend fun getAllSessions(): List<WorkoutSession>
-    suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<WorkoutSession>
-    suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithMetrics?
-    suspend fun markSessionDone(
-        workoutId: Int,
-        metrics: CardioMetrics,
-        timestamp: Instant? = null
-    )
-}
-
-class CardioSessionRepositoryImpl(
+class CardioSessionRepository(
     private val sessionDao: CardioSessionDao,
     private val workoutDao: CardioWorkoutDao
-) : CardioSessionRepository {
-    override suspend fun getAllSessions(): List<WorkoutSession> {
+) {
+    suspend fun getAllSessions(): List<WorkoutSession> {
         return sessionDao.getAllSessions()?.mapNotNull { session ->
             workoutDao.getById(session.workoutId)?.let { workout ->
                 WorkoutSession(
@@ -41,7 +30,7 @@ class CardioSessionRepositoryImpl(
         }.orEmpty()
     }
 
-    override suspend fun getSessionsForTimespan(
+    suspend fun getSessionsForTimespan(
         start: Instant,
         end: Instant
     ): List<WorkoutSession> {
@@ -58,7 +47,7 @@ class CardioSessionRepositoryImpl(
         }.orEmpty()
     }
 
-    override suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithMetrics? {
+    suspend fun getWorkoutForSession(sessionId: Int): WorkoutWithMetrics? {
         val session = sessionDao.getById(sessionId)
         val workout = workoutDao.getById(session.workoutId)
         if (workout == null) {
@@ -72,12 +61,12 @@ class CardioSessionRepositoryImpl(
             metrics = CardioMetrics(
                 steps = session.steps,
                 distance = session.distance?.convertDistanceFromDatabase(),
-                duration = if (session.durationMillis != null)Duration.ofMillis(session.durationMillis) else null
+                duration = if (session.durationMillis != null) Duration.ofMillis(session.durationMillis) else null
             )
         )
     }
 
-    override suspend fun markSessionDone(
+    suspend fun markSessionDone(
         workoutId: Int,
         metrics: CardioMetrics,
         timestamp: Instant?
