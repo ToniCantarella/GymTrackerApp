@@ -237,9 +237,9 @@ class GymWorkoutViewModel(
                 exercises = uiState.value.exercises,
                 timestamp = uiState.value.sessionTimestamp
             )
+            navigator.releaseGuard()
+            onNavigateBack()
         }
-        navigator.releaseGuard()
-        onNavigateBack()
     }
 
     private suspend fun getWorkoutInfo() {

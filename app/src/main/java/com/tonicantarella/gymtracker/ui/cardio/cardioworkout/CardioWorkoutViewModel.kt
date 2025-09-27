@@ -246,9 +246,9 @@ class CardioWorkoutViewModel(
                 metrics = uiState.value.workout.metrics,
                 timestamp = uiState.value.sessionTimestamp
             )
+            navigator.releaseGuard()
+            navigator.popBackStack()
         }
-        navigator.releaseGuard()
-        navigator.popBackStack()
     }
 
     private fun stopAskingFinishConfirm() {
