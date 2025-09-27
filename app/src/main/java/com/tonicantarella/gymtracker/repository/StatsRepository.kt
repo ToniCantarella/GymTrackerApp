@@ -7,8 +7,6 @@ import com.tonicantarella.gymtracker.database.dao.gym.GymSessionDao
 import com.tonicantarella.gymtracker.database.dao.gym.GymWorkoutDao
 import com.tonicantarella.gymtracker.database.dao.gym.SetDao
 import com.tonicantarella.gymtracker.database.dao.gym.SetSessionDao
-import com.tonicantarella.gymtracker.database.entity.cardio.CardioWorkoutEntity
-import com.tonicantarella.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
 import com.tonicantarella.gymtracker.ui.entity.cardio.DistanceWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.cardio.DurationWithTimestamp
@@ -110,17 +108,18 @@ class StatsRepository(
         )
     }
 
-    suspend fun getGymWorkoutGeneralStats(workout: GymWorkoutEntity): GymWorkoutWithGeneralStats {
-        val exerciseCount = exerciseDao.countExercisesByWorkoutId(workout.id)
+    suspend fun getGymWorkoutGeneralStats(workoutId: Int): GymWorkoutWithGeneralStats? {
+        val workout = gymWorkoutDao.getById(workoutId) ?: return null
+        val exerciseCount = exerciseDao.countExercisesByWorkoutId(workoutId)
 
-        val avgSetStats = setSessionDao.getAverageWeightAndRepsForWorkout(workout.id)
+        val avgSetStats = setSessionDao.getAverageWeightAndRepsForWorkout(workoutId)
         val avgWeight = avgSetStats?.avgWeight?.roundToDisplay() ?: 0.0
         val avgReps = avgSetStats?.avgReps?.roundToDisplay() ?: 0.0
 
-        val avgSets = setDao.getAverageSetsPerExerciseForWorkout(workout.id) ?: 0.0
+        val avgSets = setDao.getAverageSetsPerExerciseForWorkout(workoutId) ?: 0.0
 
         return GymWorkoutWithGeneralStats(
-            id = workout.id,
+            id = workoutId,
             name = workout.name,
             exerciseCount = exerciseCount,
             avgWeight = avgWeight,
@@ -130,8 +129,9 @@ class StatsRepository(
         )
     }
 
-    suspend fun getCardioWorkoutGeneralStats(workout: CardioWorkoutEntity): CardioWorkoutWithGeneralStats {
-        val avgStats = cardioSessionDao.getAverageStatsForCardioWorkout(workout.id)
+    suspend fun getCardioWorkoutGeneralStats(workoutId: Int): CardioWorkoutWithGeneralStats? {
+        val workout = cardioWorkoutDao.getById(workoutId) ?: return null
+        val avgStats = cardioSessionDao.getAverageStatsForCardioWorkout(workoutId)
 
         val avgDistance = avgStats?.avgDistance?.roundToDisplay() ?: 0.0
         val avgSteps = avgStats?.avgSteps?.toInt() ?: 0
@@ -140,7 +140,7 @@ class StatsRepository(
         } ?: Duration.ZERO
 
         return CardioWorkoutWithGeneralStats(
-            id = workout.id,
+            id = workoutId,
             name = workout.name,
             avgSteps = avgSteps,
             avgDuration = avgDuration,
@@ -149,14 +149,14 @@ class StatsRepository(
     }
 
     suspend fun getAllGymWorkoutsWithGeneralStats(): List<GymWorkoutWithGeneralStats> {
-        return gymWorkoutDao.getAll().map { workout ->
-            getGymWorkoutGeneralStats(workout)
+        return gymWorkoutDao.getAll().mapNotNull { workout ->
+            getGymWorkoutGeneralStats(workout.id)
         }
     }
 
     suspend fun getAllCardioWorkoutsWithGeneralStats(): List<CardioWorkoutWithGeneralStats> {
-        return cardioWorkoutDao.getAll().map { workout ->
-            getCardioWorkoutGeneralStats(workout)
+        return cardioWorkoutDao.getAll().mapNotNull { workout ->
+            getCardioWorkoutGeneralStats(workout.id)
         }
     }
 }

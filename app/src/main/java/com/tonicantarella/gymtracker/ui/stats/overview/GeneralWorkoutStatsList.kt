@@ -24,8 +24,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.CardioWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.GymWorkoutWithGeneralStats
-import com.tonicantarella.gymtracker.utility.UnitUtil
-import com.tonicantarella.gymtracker.utility.toReadableString
+import com.tonicantarella.gymtracker.ui.stats.common.CardioGeneralStats
+import com.tonicantarella.gymtracker.ui.stats.common.GymGeneralStats
 
 @Composable
 fun GeneralWorkoutStatsList(
@@ -81,20 +81,9 @@ private fun GymStatCard(
         },
         modifier = modifier
     ) {
-        Column {
-            Text(
-                text = "${stringResource(id = R.string.exercises)}: ${workout.exerciseCount}"
-            )
-            Text(
-                text = "${stringResource(id = R.string.avg_sets)}: ${workout.avgSets}"
-            )
-            Text(
-                text = "${stringResource(id = R.string.avg_reps)}: ${workout.avgReps}"
-            )
-            Text(
-                text = "${stringResource(id = R.string.avg_weight)}: ${workout.avgWeight} ${stringResource(UnitUtil.weightUnitStringId)}"
-            )
-        }
+        GymGeneralStats(
+            stats = workout
+        )
     }
 }
 
@@ -117,17 +106,9 @@ private fun CardioStatCard(
         },
         modifier = modifier
     ) {
-        Column {
-            Text(
-                text = "${stringResource(id = R.string.avg_steps)}: ${workout.avgSteps}"
-            )
-            Text(
-                text = "${stringResource(id = R.string.avg_distance)}: ${workout.avgDistance} ${stringResource(UnitUtil.distanceUnitStringId)}"
-            )
-            Text(
-                text = "${stringResource(id = R.string.avg_duration)}: ${workout.avgDuration.toReadableString()}"
-            )
-        }
+        CardioGeneralStats(
+            stats = workout
+        )
     }
 }
 

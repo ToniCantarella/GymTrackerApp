@@ -26,14 +26,16 @@ import androidx.compose.ui.res.stringResource
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
+import com.tonicantarella.gymtracker.ui.entity.statsoverview.CardioWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.stats.BasicLineChart
+import com.tonicantarella.gymtracker.ui.stats.common.CardioGeneralStats
 import com.tonicantarella.gymtracker.utility.UnitUtil
 import com.tonicantarella.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardioWorkoutStatsList(
+fun CardioWorkoutStatsScreen(
     viewModel: CardioWorkoutStatsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -71,7 +73,8 @@ fun CardioWorkoutStatsList(
                 }
             } else if (uiState.stats != null) {
                 CardioWorkoutStatsList(
-                    stats = uiState.stats!!
+                    stats = uiState.stats!!,
+                    generalStats = uiState.generalStats!!
                 )
             }
         }
@@ -81,12 +84,23 @@ fun CardioWorkoutStatsList(
 @Composable
 fun CardioWorkoutStatsList(
     stats: CardioWorkoutStats,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    generalStats: CardioWorkoutWithGeneralStats? = null
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
     ) {
+        if (generalStats != null) {
+            item {
+                CardioGeneralStats(
+                    stats = generalStats,
+                    modifier = Modifier.padding(
+                        dimensionResource(id = R.dimen.padding_large)
+                    )
+                )
+            }
+        }
         item {
             val stepHistory = stats.stepsHistory.filter { it.value != null }
             val stepValues = stepHistory.map { it.value!!.toDouble() }

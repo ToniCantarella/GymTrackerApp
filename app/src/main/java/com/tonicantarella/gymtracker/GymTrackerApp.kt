@@ -48,7 +48,7 @@ import com.tonicantarella.gymtracker.ui.info.InfoScreen
 import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.navigation.Route
 import com.tonicantarella.gymtracker.ui.stats.cardio.CardioSessionStatsScreen
-import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsList
+import com.tonicantarella.gymtracker.ui.stats.cardio.CardioWorkoutStatsScreen
 import com.tonicantarella.gymtracker.ui.stats.gym.GymSessionStatsScreen
 import com.tonicantarella.gymtracker.ui.stats.gym.GymWorkoutStatsScreen
 import com.tonicantarella.gymtracker.ui.stats.overview.StatsOverviewScreen
@@ -242,7 +242,7 @@ fun GymAppNavHost(
                     GymWorkoutStatsScreen()
                 }
                 composable<Route.CardioWorkoutStats> {
-                    CardioWorkoutStatsList()
+                    CardioWorkoutStatsScreen()
                 }
             }
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.tonicantarella.gymtracker.repository.StatsRepository
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioWorkoutStats
+import com.tonicantarella.gymtracker.ui.entity.statsoverview.CardioWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import kotlinx.coroutines.launch
 
 data class CardioWorkoutStatsUiState(
     val loading: Boolean = true,
-    val stats: CardioWorkoutStats? = null
+    val stats: CardioWorkoutStats? = null,
+    val generalStats : CardioWorkoutWithGeneralStats? = null
 )
 
 class CardioWorkoutStatsViewModel(
@@ -31,9 +33,11 @@ class CardioWorkoutStatsViewModel(
     init {
         viewModelScope.launch {
             val stats = statRepository.getCardioWorkoutStats(navParams.id)
+            val generalStats = statRepository.getCardioWorkoutGeneralStats(navParams.id)
             _uiState.update {
                 it.copy(
                     stats = stats,
+                    generalStats = generalStats,
                     loading = false
                 )
             }

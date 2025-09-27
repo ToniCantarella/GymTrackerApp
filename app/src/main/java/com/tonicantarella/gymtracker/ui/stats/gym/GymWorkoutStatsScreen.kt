@@ -19,11 +19,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.entity.gym.GymWorkoutStats
+import com.tonicantarella.gymtracker.ui.entity.statsoverview.GymWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.stats.BasicLineChart
+import com.tonicantarella.gymtracker.ui.stats.common.GymGeneralStats
 import com.tonicantarella.gymtracker.utility.UnitUtil
 import com.tonicantarella.gymtracker.utility.toDateString
 import org.koin.androidx.compose.koinViewModel
@@ -66,9 +69,10 @@ fun GymWorkoutStatsScreen(
                 ) {
                     CircularProgressIndicator()
                 }
-            } else if (uiState.stats != null) {
+            } else if (uiState.stats != null && uiState.generalStats != null) {
                 GymWorkoutStatsScreen(
-                    stats = uiState.stats!!
+                    stats = uiState.stats!!,
+                    generalStats = uiState.generalStats!!
                 )
             }
         }
@@ -78,6 +82,7 @@ fun GymWorkoutStatsScreen(
 @Composable
 private fun GymWorkoutStatsScreen(
     stats: GymWorkoutStats,
+    generalStats: GymWorkoutWithGeneralStats,
     modifier: Modifier = Modifier
 ) {
     val weightUnitString = stringResource(id = UnitUtil.weightUnitStringId)
@@ -86,6 +91,14 @@ private fun GymWorkoutStatsScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
+        item{
+            GymGeneralStats(
+                stats = generalStats,
+                modifier = Modifier.padding(
+                    dimensionResource(id = R.dimen.padding_large)
+                )
+            )
+        }
         itemsIndexed(stats.exercises) { index, exercise ->
             HorizontalDivider()
             BasicLineChart(

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.tonicantarella.gymtracker.repository.StatsRepository
 import com.tonicantarella.gymtracker.ui.entity.gym.GymWorkoutStats
+import com.tonicantarella.gymtracker.ui.entity.statsoverview.GymWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.navigation.Navigator
 import com.tonicantarella.gymtracker.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 data class GymWorkoutStatsUiState(
     val loading: Boolean = true,
     val splitName: String = "",
-    val stats: GymWorkoutStats? = null
+    val stats: GymWorkoutStats? = null,
+    val generalStats : GymWorkoutWithGeneralStats? = null
 )
 
 class GymWorkoutStatsViewModel(
@@ -32,10 +34,12 @@ class GymWorkoutStatsViewModel(
     init {
         viewModelScope.launch {
             val stats = statRepository.getGymWorkoutStats(navParams.id)
+            val generalStats = statRepository.getGymWorkoutGeneralStats(navParams.id)
             _uiState.update {
                 it.copy(
                     splitName = stats?.name ?: "",
                     stats = stats,
+                    generalStats = generalStats,
                     loading = false
                 )
             }
