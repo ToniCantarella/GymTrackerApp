@@ -7,7 +7,6 @@ import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.cardio.CardioMetrics
 import com.tonicantarella.gymtracker.ui.entity.cardio.WorkoutWithMetrics
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertDistanceFromDatabase
-import java.time.Duration
 
 class CardioWorkoutRepository(
     private val workoutDao: CardioWorkoutDao,
@@ -56,7 +55,7 @@ class CardioWorkoutRepository(
             metrics = CardioMetrics(
                 steps = session?.steps ?: 0,
                 distance = distance,
-                duration = Duration.ofMillis(session?.durationMillis ?: 0)
+                duration = session?.duration
             )
         )
     }

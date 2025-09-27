@@ -103,7 +103,7 @@ class StatsRepository(
             }.orEmpty(),
             durationHistory = sessions?.map {
                 DurationWithTimestamp(
-                    value = if (it.durationMillis != null) Duration.ofMillis(it.durationMillis) else null,
+                    value = it.duration,
                     timestamp = it.timestamp
                 )
             }.orEmpty()

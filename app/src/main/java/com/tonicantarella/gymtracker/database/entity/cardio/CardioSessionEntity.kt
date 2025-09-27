@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.Duration
 import java.time.Instant
 
 @Entity(
@@ -26,7 +27,7 @@ data class CardioSessionEntity(
     val timestamp: Instant,
     val steps: Int? = null,
     val distance: Double? = null,
-    val durationMillis: Long? = null
+    val duration: Duration? = null
 )
 
 data class AverageCardioStats(

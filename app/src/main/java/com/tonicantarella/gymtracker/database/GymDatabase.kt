@@ -23,6 +23,7 @@ import com.tonicantarella.gymtracker.database.entity.gym.GymSessionEntity
 import com.tonicantarella.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetSessionEntity
+import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
@@ -37,12 +38,17 @@ import java.util.UUID
         CardioMetricsEntity::class,
         CardioSessionEntity::class
     ],
-    version = 2,
+    version = 3,
     autoMigrations = [
         AutoMigration(
             from = 1,
             to = 2,
             spec = DurationToMillisMigration::class
+        ),
+        AutoMigration(
+            from = 2,
+            to = 3,
+            spec = MillisToDurationMigration::class
         )
     ],
     exportSchema = true
@@ -71,6 +77,12 @@ class Converters {
 
     @TypeConverter
     fun toInstant(millis: Long): Instant = Instant.ofEpochMilli(millis)
+
+    @TypeConverter
+    fun fromDuration(duration: Duration): Long  = duration.toMillis()
+
+    @TypeConverter
+    fun toDuration(millis: Long): Duration = Duration.ofMillis(millis)
 }
 
 @RenameColumn(
@@ -84,3 +96,15 @@ class Converters {
     toColumnName = "durationMillis"
 )
 class DurationToMillisMigration : AutoMigrationSpec
+
+@RenameColumn(
+    tableName = "cardio_metrics",
+    fromColumnName = "durationMillis",
+    toColumnName = "duration"
+)
+@RenameColumn(
+    tableName = "cardio_sessions",
+    fromColumnName = "durationMillis",
+    toColumnName = "duration"
+)
+class MillisToDurationMigration : AutoMigrationSpec

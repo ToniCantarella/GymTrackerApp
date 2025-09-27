@@ -27,14 +27,16 @@ interface CardioSessionDao {
     @Query("SELECT * FROM cardio_sessions WHERE timestamp BETWEEN :start AND :end")
     suspend fun getSessionsForTimespan(start: Instant, end: Instant): List<CardioSessionEntity>?
 
-    @Query("""
+    @Query(
+        """
         SELECT 
             AVG(cs.distance) as avgDistance,
             AVG(cs.steps) as avgSteps,
-            AVG(cs.durationMillis) as avgDurationMillis 
+            AVG(cs.duration) as avgDurationMillis 
         FROM cardio_sessions cs
         WHERE cs.workoutId = :cardioWorkoutId
-    """)
+    """
+    )
     suspend fun getAverageStatsForCardioWorkout(cardioWorkoutId: Int): AverageCardioStats?
 
 }

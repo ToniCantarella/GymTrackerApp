@@ -9,7 +9,6 @@ import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutType
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertDistanceFromDatabase
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertDistanceToDatabase
-import java.time.Duration
 import java.time.Instant
 
 class CardioSessionRepository(
@@ -61,7 +60,7 @@ class CardioSessionRepository(
             metrics = CardioMetrics(
                 steps = session.steps,
                 distance = session.distance?.convertDistanceFromDatabase(),
-                duration = if (session.durationMillis != null) Duration.ofMillis(session.durationMillis) else null
+                duration = session.duration
             )
         )
     }
@@ -78,7 +77,7 @@ class CardioSessionRepository(
                 timestamp = timestamp ?: Instant.now(),
                 steps = metrics.steps,
                 distance = metrics.distance?.convertDistanceToDatabase(),
-                durationMillis = metrics.duration?.toMillis()
+                duration = metrics.duration
             )
         )
     }
