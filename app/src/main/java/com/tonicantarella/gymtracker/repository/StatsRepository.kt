@@ -16,7 +16,7 @@ import com.tonicantarella.gymtracker.ui.entity.gym.GymWorkoutStats
 import com.tonicantarella.gymtracker.ui.entity.gym.SetStats
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.CardioWorkoutWithGeneralStats
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.GymWorkoutWithGeneralStats
-import com.tonicantarella.gymtracker.utility.roundToDisplay
+import com.tonicantarella.gymtracker.utility.roundToDecimalPlaces
 import java.time.Duration
 
 class StatsRepository(
@@ -113,8 +113,8 @@ class StatsRepository(
         val exerciseCount = exerciseDao.countExercisesByWorkoutId(workoutId)
 
         val avgSetStats = setSessionDao.getAverageWeightAndRepsForWorkout(workoutId)
-        val avgWeight = avgSetStats?.avgWeight?.roundToDisplay() ?: 0.0
-        val avgReps = avgSetStats?.avgReps?.roundToDisplay() ?: 0.0
+        val avgWeight = avgSetStats?.avgWeight ?: 0.0
+        val avgReps = avgSetStats?.avgReps ?: 0.0
 
         val avgSets = setDao.getAverageSetsPerExerciseForWorkout(workoutId) ?: 0.0
 
@@ -122,7 +122,7 @@ class StatsRepository(
             id = workoutId,
             name = workout.name,
             exerciseCount = exerciseCount,
-            avgWeight = avgWeight,
+            avgWeight = avgWeight.roundToDecimalPlaces(),
             avgSets = avgSets.toInt(),
             avgReps = avgReps.toInt(),
             avgDuration = Duration.ZERO
@@ -133,7 +133,7 @@ class StatsRepository(
         val workout = cardioWorkoutDao.getById(workoutId) ?: return null
         val avgStats = cardioSessionDao.getAverageStatsForCardioWorkout(workoutId)
 
-        val avgDistance = avgStats?.avgDistance?.roundToDisplay() ?: 0.0
+        val avgDistance = avgStats?.avgDistance ?: 0.0
         val avgSteps = avgStats?.avgSteps?.toInt() ?: 0
         val avgDuration = avgStats?.avgDurationMillis?.let { millis ->
             if (millis > 0) Duration.ofMillis(millis) else Duration.ZERO
@@ -144,7 +144,7 @@ class StatsRepository(
             name = workout.name,
             avgSteps = avgSteps,
             avgDuration = avgDuration,
-            avgDistance = avgDistance,
+            avgDistance = avgDistance.roundToDecimalPlaces()
         )
     }
 

@@ -42,13 +42,13 @@ object UnitUtil {
         if (weightUnit == WeightUnit.KILOGRAM)
             this
         else
-            lbToKg(this)
+            lbToKg(this).roundToDecimalPlaces()
 
     fun Double.convertWeightFromDatabase(): Double =
         if (weightUnit == WeightUnit.KILOGRAM)
             this
         else
-            kgToLb(this).roundToDisplay()
+            kgToLb(this).roundToDecimalPlaces()
 
     fun Double.convertDistanceToDatabase(): Double =
         if (distanceUnit == DistanceUnit.KILOMETER)
@@ -60,5 +60,5 @@ object UnitUtil {
         if (distanceUnit == DistanceUnit.KILOMETER)
             this
         else
-            kmToMi(this).roundToDisplay()
+            kmToMi(this).roundToDecimalPlaces()
 }

@@ -1,4 +1,6 @@
 package com.tonicantarella.gymtracker.utility
 
-fun Double.roundToDisplay(decimals: Int = 2): Double =
-    "%.${decimals}f".format(this).toDouble()
+import java.util.Locale
+
+fun Double.roundToDecimalPlaces(decimals: Int = 2): Double =
+    "%.${decimals}f".format(Locale.US, this).toDouble()
