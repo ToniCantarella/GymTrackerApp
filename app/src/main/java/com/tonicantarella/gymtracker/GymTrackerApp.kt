@@ -8,11 +8,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -68,15 +65,11 @@ fun GymTrackerApp(
         }
     }
 
-    Surface(
-        modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
-    ) {
-        GymAppNavHost(
-            viewModel = viewModel,
-            navigator = navigator,
-            modifier = Modifier
-        )
-    }
+    GymAppNavHost(
+        viewModel = viewModel,
+        navigator = navigator,
+        modifier = Modifier
+    )
 }
 
 @Composable
