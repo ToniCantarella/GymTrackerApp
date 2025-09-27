@@ -157,7 +157,7 @@ fun GymAppNavHost(
 
                 item(
                     selected = selected,
-                    onClick = { navigator.navigate(item.route) },
+                    onClick = { if (!selected) navigator.navigate(item.route) },
                     icon = {
                         Icon(
                             painter = painterResource(id = item.iconResInt),
