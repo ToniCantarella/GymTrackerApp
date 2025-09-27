@@ -54,7 +54,7 @@ object UnitUtil {
         if (distanceUnit == DistanceUnit.KILOMETER)
             this
         else
-            miToKm(this)
+            miToKm(this).roundToDecimalPlaces()
 
     fun Double.convertDistanceFromDatabase(): Double =
         if (distanceUnit == DistanceUnit.KILOMETER)
