@@ -7,6 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tonicantarella.gymtracker.database.dao.cardio.CardioMetricsDao
 import com.tonicantarella.gymtracker.database.dao.cardio.CardioSessionDao
 import com.tonicantarella.gymtracker.database.dao.cardio.CardioWorkoutDao
@@ -23,6 +25,7 @@ import com.tonicantarella.gymtracker.database.entity.gym.GymSessionEntity
 import com.tonicantarella.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetSessionEntity
+import com.tonicantarella.gymtracker.database.entity.gym.WorkoutExerciseCrossRef
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -36,9 +39,10 @@ import java.util.UUID
         SetSessionEntity::class,
         GymSessionEntity::class,
         CardioMetricsEntity::class,
-        CardioSessionEntity::class
+        CardioSessionEntity::class,
+        WorkoutExerciseCrossRef::class
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(
             from = 1,
@@ -83,6 +87,23 @@ class Converters {
 
     @TypeConverter
     fun toDuration(millis: Long): Duration = Duration.ofMillis(millis)
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS workout_exercise_cross_ref (
+                workoutId INTEGER NOT NULL,
+                exerciseId INTEGER NOT NULL,
+                PRIMARY KEY(workoutId, exerciseId),
+                FOREIGN KEY(workoutId) REFERENCES GymWorkouts(id) ON DELETE CASCADE,
+                FOREIGN KEY(exerciseId) REFERENCES exercises(id) ON DELETE CASCADE
+            )
+        """)
+
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_workout_exercise_cross_ref_workoutId ON workout_exercise_cross_ref(workoutId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_workout_exercise_cross_ref_exerciseId ON workout_exercise_cross_ref(exerciseId)")
+    }
 }
 
 @RenameColumn(

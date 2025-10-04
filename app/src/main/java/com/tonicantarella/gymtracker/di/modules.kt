@@ -8,6 +8,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.tonicantarella.gymtracker.MainViewModel
 import com.tonicantarella.gymtracker.database.GymDatabase
+import com.tonicantarella.gymtracker.database.MIGRATION_3_4
 import com.tonicantarella.gymtracker.repository.AppRepository
 import com.tonicantarella.gymtracker.repository.StatsRepository
 import com.tonicantarella.gymtracker.repository.cardio.CardioSessionRepository
@@ -51,6 +52,7 @@ val databaseModule = module {
             GymDatabase::class.java,
             "gym-tracker-db"
         )
+            .addMigrations(MIGRATION_3_4)
             .build()
     }
 
