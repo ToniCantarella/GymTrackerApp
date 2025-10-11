@@ -18,7 +18,7 @@ data class GymWorkoutStatsUiState(
     val loading: Boolean = true,
     val splitName: String = "",
     val stats: GymWorkoutStats? = null,
-    val generalStats : GymWorkoutWithGeneralStats? = null
+    val generalStats: GymWorkoutWithGeneralStats? = null
 )
 
 class GymWorkoutStatsViewModel(
