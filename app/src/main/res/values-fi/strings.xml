@@ -96,4 +96,5 @@
     <string name="update_requires_intent_description">Tämä päivitys tarvitsee toiminnon. Odotetaan.</string>
     <string name="move">Siirrä</string>
     <string name="copy">Kopioi</string>
+    <string name="data">Tietosi</string>
 </resources>

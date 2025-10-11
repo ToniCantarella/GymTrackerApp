@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -190,18 +191,43 @@ private fun InfoScreen(
                     onCheckedChange = onUnsavedChangesDialogChecked
                 )
             }
-            Button(
-                onClick = onDeleteAllData,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        }
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
             ) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.delete_all_data)
+                    painter = painterResource(id = R.drawable.save),
+                    contentDescription = null
                 )
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
                 Text(
-                    text = stringResource(id = R.string.delete_all_data)
+                    text = stringResource(id = R.string.data)
                 )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
+                Button(
+                    onClick = onDeleteAllData,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(id = R.string.delete_all_data)
+                    )
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                    Text(
+                        text = stringResource(id = R.string.delete_all_data)
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))

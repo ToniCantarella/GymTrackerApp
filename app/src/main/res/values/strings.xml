@@ -104,4 +104,5 @@
     <string name="update_requires_intent_description">This update requires action. Waiting.</string>
     <string name="move">Move</string>
     <string name="copy">Copy</string>
+    <string name="data">Your data</string>
 </resources>
