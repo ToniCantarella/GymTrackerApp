@@ -105,4 +105,7 @@
     <string name="move">Move</string>
     <string name="copy">Copy</string>
     <string name="data">Your data</string>
+    <string name="min" translatable="false">Min</string>
+    <string name="max" translatable="false">Max</string>
+    <string name="weight">Weight</string>
 </resources>

@@ -97,4 +97,5 @@
     <string name="move">Siirrä</string>
     <string name="copy">Kopioi</string>
     <string name="data">Tietosi</string>
+    <string name="weight">Paino</string>
 </resources>
