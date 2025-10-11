@@ -270,11 +270,13 @@ fun GymWorkoutScreen(
                                 when (exerciseAction) {
                                     ExerciseAction.MOVE -> Icon(
                                         painter = painterResource(id = R.drawable.move_item),
+                                        tint = MaterialTheme.colorScheme.primary,
                                         contentDescription = stringResource(id = R.string.move)
                                     )
 
                                     ExerciseAction.COPY -> Icon(
                                         painter = painterResource(id = R.drawable.copy),
+                                        tint = MaterialTheme.colorScheme.primary,
                                         contentDescription = stringResource(id = R.string.copy)
                                     )
                                 }
