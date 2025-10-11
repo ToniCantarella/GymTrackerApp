@@ -38,7 +38,7 @@ fun GeneralWorkoutStatsList(
     modifier: Modifier = Modifier
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
         modifier = modifier
     ) {
         if (gymWorkouts.isNotEmpty()) {

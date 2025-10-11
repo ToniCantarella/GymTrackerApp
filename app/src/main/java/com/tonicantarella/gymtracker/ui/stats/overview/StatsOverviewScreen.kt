@@ -130,7 +130,7 @@ fun StatsOverviewScreen(
                             contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_large)),
                             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
                             modifier = Modifier
-                                .height(350.dp)
+                                .height(320.dp)
                         ) {
                             item {
                                 WorkoutPieChart(

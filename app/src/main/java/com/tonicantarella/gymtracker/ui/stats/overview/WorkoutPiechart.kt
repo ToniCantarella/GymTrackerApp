@@ -1,10 +1,13 @@
 package com.tonicantarella.gymtracker.ui.stats.overview
 
+import android.graphics.BlurMaskFilter
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -18,7 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,48 +69,94 @@ fun WorkoutPieChart(
         )
     }
 
-    Card(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(id = R.dimen.padding_medium)
-        ),
-        modifier = modifier
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
+    Box(modifier = modifier.fillMaxHeight()) {
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(id = R.dimen.padding_medium)
+            ),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(id = R.dimen.padding_large))
+                .align(Alignment.BottomCenter)
+                .fillMaxHeight(.8f)
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(dimensionResource(id = R.dimen.padding_large))
             ) {
-                Icon(
-                    painter =
-                        if (workoutType == WorkoutType.GYM)
-                            painterResource(id = R.drawable.dumbbell)
-                        else
-                            painterResource(id = R.drawable.run),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center)
+                WorkoutLegendsRow(
+                    legends = legends,
+                    colorIndexMap = colorIndexMap
                 )
-                PieChart(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(200.dp),
-                    data = data,
-                    spaceDegree = 2f,
-                    style = Pie.Style.Stroke(width = 20.dp)
+                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
+                Text(
+                    text = "${stringResource(id = R.string.total)}: ${legends.sumOf { it.sessionCount }}"
                 )
             }
-            WorkoutLegendsRow(
-                legends = legends,
-                colorIndexMap = colorIndexMap
+        }
+        Box(
+            modifier = Modifier
+                .align(alignment = Alignment.TopCenter)
+        ) {
+            BlurredDonutShadow()
+            Icon(
+                painter =
+                    if (workoutType == WorkoutType.GYM)
+                        painterResource(id = R.drawable.dumbbell)
+                    else
+                        painterResource(id = R.drawable.run),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.Center)
             )
-            Text(
-                text = "${stringResource(id = R.string.total)}: ${legends.sumOf { it.sessionCount }}"
+            PieChart(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(200.dp),
+                data = data,
+                spaceDegree = 2f,
+                style = Pie.Style.Stroke(width = 20.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun BlurredDonutShadow() {
+    Canvas(modifier = Modifier.size(220.dp)) {
+        val outerRadius = size.minDimension / 2
+        val innerRadius = outerRadius * 0.7f
+        val blurRadius = 40f
+
+        val paint = Paint().apply {
+            color = Color.Black.copy(alpha = 0.25f)
+        }
+
+        drawIntoCanvas { canvas ->
+            val frameworkPaint = paint.asFrameworkPaint().apply {
+                isAntiAlias = true
+                style = android.graphics.Paint.Style.FILL
+                maskFilter = BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL)
+            }
+
+            val outer = Rect(
+                center.x - outerRadius, center.y - outerRadius,
+                center.x + outerRadius, center.y + outerRadius
+            )
+            val inner = Rect(
+                center.x - innerRadius, center.y - innerRadius,
+                center.x + innerRadius, center.y + innerRadius
+            )
+
+            val path = Path().apply {
+                fillType = PathFillType.EvenOdd
+                addOval(outer)
+                addOval(inner)
+            }
+
+            canvas.drawPath(path, paint)
+            frameworkPaint.maskFilter = null
         }
     }
 }
