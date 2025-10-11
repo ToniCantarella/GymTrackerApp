@@ -60,15 +60,15 @@ fun BasicBarChart(
                         label = "Jan",
                         values = listOf(
                             Bars.Data(
-                                label = minText,
-                                value = data.minRepetitions.toDouble(),
-                                color = SolidColor(minColor)
-                            ),
-                            Bars.Data(
                                 label = maxText,
                                 value = data.maxRepetitions.toDouble(),
                                 color = SolidColor(maxColor)
                             ),
+                            Bars.Data(
+                                label = minText,
+                                value = data.minRepetitions.toDouble(),
+                                color = SolidColor(minColor)
+                            )
                         ),
                     )
                 }
@@ -136,13 +136,15 @@ private fun BarChartPreview() {
                 )
             },
             bottomLabels = listOf("Day 1", "Day last"),
-            dataValues = listOf(SetStats(
-                minWeight = 1.0,
-                maxWeight = 2.0,
-                minRepetitions = 1,
-                maxRepetitions = 2,
-                timestamp = Instant.now()
-            )),
+            dataValues = listOf(
+                SetStats(
+                    minWeight = 1.0,
+                    maxWeight = 2.0,
+                    minRepetitions = 1,
+                    maxRepetitions = 2,
+                    timestamp = Instant.now()
+                )
+            ),
             popupContentBuilder = { _, _, _ -> "" }
         )
     }
