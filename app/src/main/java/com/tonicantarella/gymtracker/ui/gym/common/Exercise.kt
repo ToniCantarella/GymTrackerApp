@@ -218,6 +218,8 @@ fun EditExercise(
     onNameChange: (name: String) -> Unit,
     onDescriptionChange: (description: String) -> Unit,
     deleteEnabled: Boolean,
+    onCopyExercise: () -> Unit,
+    onMoveExercise: () -> Unit,
     onDeletePressed: () -> Unit,
     placeholderName: String,
     addSet: () -> Unit,
@@ -367,6 +369,40 @@ fun EditExercise(
                                     text = {
                                         Text(
                                             text = stringResource(id = R.string.edit)
+                                        )
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onCopyExercise()
+                                        dropdownMenuOpen = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.copy),
+                                            contentDescription = stringResource(id = R.string.copy)
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = R.string.copy)
+                                        )
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onMoveExercise()
+                                        dropdownMenuOpen = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.move_item),
+                                            contentDescription = stringResource(id = R.string.move)
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = R.string.move)
                                         )
                                     }
                                 )
@@ -579,7 +615,9 @@ private fun EditExercisePreview() {
             onCheckSet = { _, _ -> },
             onChangeWeight = { _, _ -> },
             onChangeRepetitions = { _, _ -> },
-            onRemoveSet = {}
+            onRemoveSet = {},
+            onMoveExercise = {},
+            onCopyExercise = {}
         )
     }
 }

@@ -1,24 +1,30 @@
 package com.tonicantarella.gymtracker.ui.gym.gymworkout
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,12 +41,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.Dialog
 import com.tonicantarella.gymtracker.R
 import com.tonicantarella.gymtracker.ui.common.FinishWorkoutDialog
 import com.tonicantarella.gymtracker.ui.common.GymFloatingActionButton
 import com.tonicantarella.gymtracker.ui.common.GymScaffold
 import com.tonicantarella.gymtracker.ui.common.TopBarTextField
 import com.tonicantarella.gymtracker.ui.common.UnsavedChangesDialog
+import com.tonicantarella.gymtracker.ui.common.WorkoutDialogItem
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutSet
 import com.tonicantarella.gymtracker.ui.gym.common.ExerciseListEdit
@@ -54,6 +62,11 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.util.UUID
 
+enum class ExerciseAction {
+    MOVE,
+    COPY
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GymWorkoutScreen(
@@ -62,6 +75,21 @@ fun GymWorkoutScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     var statsBottomSheetOpen by remember { mutableStateOf(false) }
+    var workoutsDialogOpen by remember { mutableStateOf(false) }
+    var exerciseAction by remember { mutableStateOf(ExerciseAction.MOVE) }
+    var selectedExercise by remember { mutableStateOf<Exercise?>(null) }
+
+    fun onExerciseCopyClick(exercise: Exercise) {
+        exerciseAction = ExerciseAction.COPY
+        workoutsDialogOpen = true
+        selectedExercise = exercise
+    }
+
+    fun onExerciseMoveClick(exercise: Exercise) {
+        exerciseAction = ExerciseAction.MOVE
+        workoutsDialogOpen = true
+        selectedExercise = exercise
+    }
 
     BackHandler {
         viewModel.onNavigateBack()
@@ -138,6 +166,8 @@ fun GymWorkoutScreen(
             onChangeRepetitions = viewModel::onChangeRepetitions,
             onRemoveSet = viewModel::onRemoveSet,
             onCheckSet = viewModel::onCheckSet,
+            onExerciseCopyClick = ::onExerciseCopyClick,
+            onExerciseMoveClick = ::onExerciseMoveClick,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -194,6 +224,68 @@ fun GymWorkoutScreen(
             onFinishWorkout = viewModel::onConfirmFinishWorkoutDialog
         )
     }
+
+    if (workoutsDialogOpen) {
+        Dialog(
+            onDismissRequest = { workoutsDialogOpen = false }
+        ) {
+            ElevatedCard {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxHeight(.5f)
+                ) {
+                    stickyHeader {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(dimensionResource(id = R.dimen.padding_large))
+                        ) {
+                            Text(
+                                text = when (exerciseAction) {
+                                    ExerciseAction.MOVE -> stringResource(id = R.string.move)
+                                    ExerciseAction.COPY -> stringResource(id = R.string.copy)
+                                }
+                            )
+                        }
+                    }
+                    items(uiState.allWorkouts) { workout ->
+                        WorkoutDialogItem(
+                            onClick = {
+                                when (exerciseAction) {
+                                    ExerciseAction.MOVE -> viewModel.onMoveExerciseToWorkout(
+                                        selectedExercise!!,
+                                        workout.id
+                                    )
+
+                                    ExerciseAction.COPY -> viewModel.onCopyExerciseToWorkout(
+                                        selectedExercise!!,
+                                        workout.id
+                                    )
+                                }
+                                workoutsDialogOpen = false
+                            },
+                            workoutName = workout.name,
+                            trailingIcon = {
+                                when (exerciseAction) {
+                                    ExerciseAction.MOVE -> Icon(
+                                        painter = painterResource(id = R.drawable.move_item),
+                                        contentDescription = stringResource(id = R.string.move)
+                                    )
+
+                                    ExerciseAction.COPY -> Icon(
+                                        painter = painterResource(id = R.drawable.copy),
+                                        contentDescription = stringResource(id = R.string.copy)
+                                    )
+                                }
+                            }
+                        )
+                        HorizontalDivider()
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -211,6 +303,8 @@ fun GymWorkoutScreen(
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
     onCheckSet: (exerciseId: UUID, setId: UUID, checked: Boolean) -> Unit,
     onRemoveSet: (exerciseId: UUID, setId: UUID) -> Unit,
+    onExerciseCopyClick: (exercise: Exercise) -> Unit,
+    onExerciseMoveClick: (exercise: Exercise) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -241,6 +335,8 @@ fun GymWorkoutScreen(
                 exercises = exercises,
                 onAddExercise = addExercise,
                 onRemoveExercise = onRemoveExercise,
+                onCopyExercise = onExerciseCopyClick,
+                onMoveExercise = onExerciseMoveClick,
                 onExerciseNameChange = onExerciseNameChange,
                 onDescriptionChange = onDescriptionChange,
                 onAddSet = addSet,
@@ -260,6 +356,8 @@ private fun ScreenForPreview(
         loading = false,
         latestTimestamp = Instant.now(),
         addingTimestamp = null,
+        onExerciseCopyClick = {},
+        onExerciseMoveClick = {},
         exercises = listOf(
             Exercise(
                 name = "Bench press",

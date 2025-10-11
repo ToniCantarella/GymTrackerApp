@@ -11,6 +11,7 @@ import com.tonicantarella.gymtracker.preferences.GymPreferences
 import com.tonicantarella.gymtracker.repository.StatsRepository
 import com.tonicantarella.gymtracker.repository.gym.GymSessionRepository
 import com.tonicantarella.gymtracker.repository.gym.GymWorkoutRepository
+import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.gym.Exercise
 import com.tonicantarella.gymtracker.ui.entity.gym.GymWorkoutStats
 import com.tonicantarella.gymtracker.ui.navigation.Navigator
@@ -28,6 +29,7 @@ import java.util.UUID
 
 data class GymWorkoutUiState(
     val loading: Boolean = true,
+    val allWorkouts: List<WorkoutWithTimestamp> = emptyList(),
     val workoutId: Int = 0,
     val workoutName: String = "",
     val initialWorkoutName: String = "",
@@ -65,6 +67,7 @@ class GymWorkoutViewModel(
             getWorkoutInfo()
             getPreferences()
             getStats()
+            getAllWorkouts()
         }
         registerNavigationGuard()
         registerNavigationAttempts()
@@ -111,6 +114,19 @@ class GymWorkoutViewModel(
             it.copy(
                 exercises = it.exercises.filter { exercise -> exercise.uuid != exerciseId }
             )
+        }
+    }
+
+    fun onMoveExerciseToWorkout(exercise: Exercise, workoutId: Int) {
+        viewModelScope.launch {
+            workoutRepository.moveExerciseToWorkout(exercise, workoutId)
+            onRemoveExercise(exercise.uuid)
+        }
+    }
+
+    fun onCopyExerciseToWorkout(exercise: Exercise, workoutId: Int) {
+        viewModelScope.launch {
+            workoutRepository.copyExerciseToWorkout(exercise, workoutId)
         }
     }
 
@@ -325,6 +341,15 @@ class GymWorkoutViewModel(
             workoutName = uiState.value.workoutName,
             exercises = uiState.value.exercises
         )
+    }
+
+    private suspend fun getAllWorkouts() {
+        val workouts = workoutRepository.getAllWorkouts().filter { it.id != navParams.id }
+        _uiState.update {
+            it.copy(
+                allWorkouts = workouts
+            )
+        }
     }
 
     private fun registerNavigationGuard() {

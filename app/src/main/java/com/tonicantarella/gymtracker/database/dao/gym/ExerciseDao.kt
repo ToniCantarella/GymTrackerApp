@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.tonicantarella.gymtracker.database.entity.gym.ExerciseEntity
+import java.util.UUID
 
 @Dao
 interface ExerciseDao {
@@ -17,6 +18,9 @@ interface ExerciseDao {
 
     @Delete
     suspend fun deleteExercises(exercises: List<ExerciseEntity>)
+
+    @Query("DELETE FROM exercises WHERE uuid = :uuid")
+    suspend fun deleteExerciseByUUId(uuid: UUID)
 
     @Query("SELECT * FROM exercises WHERE workoutId = :workoutId")
     suspend fun getExercisesByWorkoutId(workoutId: Int): List<ExerciseEntity>

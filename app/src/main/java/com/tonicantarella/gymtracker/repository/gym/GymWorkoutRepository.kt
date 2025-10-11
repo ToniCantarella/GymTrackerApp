@@ -13,6 +13,7 @@ import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutSet
 import com.tonicantarella.gymtracker.ui.entity.gym.WorkoutWithExercises
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertWeightFromDatabase
 import com.tonicantarella.gymtracker.utility.UnitUtil.convertWeightToDatabase
+import java.util.UUID
 
 class GymWorkoutRepository(
     private val workoutDao: GymWorkoutDao,
@@ -189,5 +190,36 @@ class GymWorkoutRepository(
 
     suspend fun deleteWorkout(splitId: Int) {
         workoutDao.deleteById(splitId)
+    }
+
+    suspend fun copyExerciseToWorkout(exercise: Exercise, workoutId: Int) {
+        addExerciseToWorkout(exercise, workoutId)
+    }
+
+    suspend fun moveExerciseToWorkout(exercise: Exercise, workoutId: Int) {
+        addExerciseToWorkout(exercise, workoutId)
+        exerciseDao.deleteExerciseByUUId(exercise.uuid)
+    }
+
+    private suspend fun addExerciseToWorkout(exercise: Exercise, workoutId: Int) {
+        val exerciseId = exerciseDao.insert(
+            ExerciseEntity(
+                workoutId = workoutId,
+                uuid = UUID.randomUUID(),
+                name = exercise.name,
+                description = exercise.description
+            )
+        ).toInt()
+
+        exercise.sets.forEach { set ->
+            setDao.insert(
+                SetEntity(
+                    exerciseId = exerciseId,
+                    uuid = set.uuid,
+                    weight = set.weight,
+                    repetitions = set.repetitions
+                )
+            )
+        }
     }
 }

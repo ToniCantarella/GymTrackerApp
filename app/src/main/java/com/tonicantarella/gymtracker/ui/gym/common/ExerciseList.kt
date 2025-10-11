@@ -46,6 +46,8 @@ fun ExerciseListEdit(
     onRemoveExercise: (id: UUID) -> Unit,
     onExerciseNameChange: (id: UUID, name: String) -> Unit,
     onDescriptionChange: (id: UUID, description: String) -> Unit,
+    onCopyExercise: (exercise: Exercise) -> Unit,
+    onMoveExercise: (exercise: Exercise) -> Unit,
     onAddSet: (exerciseId: UUID) -> Unit,
     onChangeWeight: (exerciseId: UUID, setId: UUID, weight: Double) -> Unit,
     onChangeRepetitions: (exerciseId: UUID, setId: UUID, repetitions: Int) -> Unit,
@@ -70,6 +72,8 @@ fun ExerciseListEdit(
                     description
                 )
             },
+            onCopyExercise = {onCopyExercise(exercise)},
+            onMoveExercise = {onMoveExercise(exercise)},
             onDeletePressed = {
                 deleteDialogOpen = true
                 itemToDelete = exercise.copy(name = exercise.name.ifBlank { placeholderName })

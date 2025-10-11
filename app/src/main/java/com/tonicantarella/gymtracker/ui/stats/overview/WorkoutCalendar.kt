@@ -41,7 +41,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ripple
@@ -78,6 +77,7 @@ import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.minusMonths
 import com.kizitonwose.calendar.core.plusMonths
 import com.tonicantarella.gymtracker.R
+import com.tonicantarella.gymtracker.ui.common.WorkoutDialogItem
 import com.tonicantarella.gymtracker.ui.entity.WorkoutWithTimestamp
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutLegend
 import com.tonicantarella.gymtracker.ui.entity.statsoverview.WorkoutSession
@@ -399,56 +399,6 @@ fun WorkoutCalendar(
                         )
                         HorizontalDivider()
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WorkoutDialogItem(
-    icon: @Composable () -> Unit,
-    onClick: () -> Unit,
-    workoutName: String,
-    modifier: Modifier = Modifier,
-    timestamp: String? = null,
-    trailingIcon: @Composable (() -> Unit)? = null
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.padding_large))
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                icon()
-                Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
-                Column {
-                    Text(
-                        text = workoutName
-                    )
-                    if (timestamp != null) {
-                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_small)))
-                        Row {
-                            Icon(
-                                painter = painterResource(id = R.drawable.history),
-                                contentDescription = null
-                            )
-                            Text(
-                                text = timestamp
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                if (trailingIcon != null) {
-                    trailingIcon()
                 }
             }
         }

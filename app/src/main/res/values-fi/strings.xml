@@ -94,4 +94,6 @@
     <string name="update_pending_description">Tämä päivitys on käsittelyssä. Toimintoa odotetaan.</string>
     <string name="update_requires_intent">Toiminto vaadittu</string>
     <string name="update_requires_intent_description">Tämä päivitys tarvitsee toiminnon. Odotetaan.</string>
+    <string name="move">Siirrä</string>
+    <string name="copy">Kopioi</string>
 </resources>
