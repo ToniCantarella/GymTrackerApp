@@ -25,7 +25,6 @@ import com.tonicantarella.gymtracker.database.entity.gym.GymSessionEntity
 import com.tonicantarella.gymtracker.database.entity.gym.GymWorkoutEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetEntity
 import com.tonicantarella.gymtracker.database.entity.gym.SetSessionEntity
-import com.tonicantarella.gymtracker.database.entity.gym.WorkoutExerciseCrossRef
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -39,10 +38,9 @@ import java.util.UUID
         SetSessionEntity::class,
         GymSessionEntity::class,
         CardioMetricsEntity::class,
-        CardioSessionEntity::class,
-        WorkoutExerciseCrossRef::class
+        CardioSessionEntity::class
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(
             from = 1,
@@ -103,6 +101,12 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
 
         db.execSQL("CREATE INDEX IF NOT EXISTS index_workout_exercise_cross_ref_workoutId ON workout_exercise_cross_ref(workoutId)")
         db.execSQL("CREATE INDEX IF NOT EXISTS index_workout_exercise_cross_ref_exerciseId ON workout_exercise_cross_ref(exerciseId)")
+    }
+}
+
+val MIGRATION_4_5_DELETE_CROSSREF = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS workout_exercise_cross_ref")
     }
 }
 
