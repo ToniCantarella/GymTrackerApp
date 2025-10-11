@@ -262,7 +262,7 @@ class GymWorkoutViewModel(
         if (navParams.id != null) {
             val latestWorkout = workoutRepository.getLatestWorkoutWithExercises(navParams.id)
             val workoutName = latestWorkout?.name ?: ""
-            val exercises = latestWorkout?.exercises ?: emptyList()
+            val exercises = latestWorkout?.exercises ?: listOf(Exercise.emptyExercise())
             val sessionTimestamp = navParams.timestampString?.let { Instant.parse(it) }
 
             _uiState.update {
@@ -278,11 +278,11 @@ class GymWorkoutViewModel(
                 )
             }
         } else {
+            val exercises = listOf(Exercise.emptyExercise())
             _uiState.update {
                 it.copy(
-                    exercises = listOf(
-                        Exercise.emptyExercise()
-                    ),
+                    exercises = exercises,
+                    initialExercises = exercises,
                     loading = false
                 )
             }
