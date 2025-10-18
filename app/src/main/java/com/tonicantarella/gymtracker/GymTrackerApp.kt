@@ -79,7 +79,12 @@ private fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isOpen)
 }
 
-data class NavigationBarItem(val titleResInt: Int, val route: Route, val iconResInt: Int)
+data class NavigationBarItem(
+    val titleResInt: Int,
+    val route: Route,
+    val startDestination: Route,
+    val iconResInt: Int
+)
 
 @Composable
 fun GymAppNavHost(
@@ -119,21 +124,25 @@ fun GymAppNavHost(
         NavigationBarItem(
             titleResInt = R.string.gym,
             route = Route.GymMain,
+            startDestination = Route.GymWorkouts,
             iconResInt = R.drawable.dumbbell
         ),
         NavigationBarItem(
             titleResInt = R.string.cardio,
             route = Route.CardioMain,
+            startDestination = Route.CardioWorkouts,
             iconResInt = R.drawable.run
         ),
         NavigationBarItem(
             titleResInt = R.string.stats,
             route = Route.StatsMain,
+            startDestination = Route.StatsOverview,
             iconResInt = R.drawable.stats
         ),
         NavigationBarItem(
             titleResInt = R.string.info,
             route = Route.Info,
+            startDestination = Route.Info,
             iconResInt = R.drawable.info
         )
     )
@@ -154,10 +163,13 @@ fun GymAppNavHost(
                 val selected = currentDestination?.hierarchy?.any {
                     it.hasRoute(item.route::class)
                 } ?: false
+                val active = currentDestination?.hierarchy?.any {
+                    it.hasRoute(item.startDestination::class)
+                } ?: false
 
                 item(
                     selected = selected,
-                    onClick = { if (!selected) navigator.navigate(item.route) },
+                    onClick = { if (!active) navigator.navigate(item.route) },
                     icon = {
                         Icon(
                             painter = painterResource(id = item.iconResInt),
